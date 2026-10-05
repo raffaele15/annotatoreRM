@@ -56,6 +56,5 @@
   "giro temporale trasverso (Heschl)",
   "insula"
  ],
- "normalizzazione": "zscore sui pixel >0 (buchi riempiti), sfondo=0",
- "dice_medio_int8": 0.721
+ "normalizzazione": "zscore sui pixel >0 (buchi riempiti), sfondo=0"
 }
