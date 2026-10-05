@@ -206,6 +206,7 @@ const salvate = (() => { try { return JSON.parse(localStorage.getItem('annotator
 let dimFont = salvate.dimFont || 12, visibile = null, versioneFiltro = 0;
 // strutture nascoste, per nome (valgono per tutti i modelli). Le vecchie preferenze per gruppo vengono convertite.
 const nascoste = new Set(salvate.nascoste || GRUPPI.filter(([g]) => (salvate.gruppiNascosti || []).includes(g)).flatMap(([, st]) => st));
+nascoste.add('sostanza bianca cerebrale');   // spenta a ogni avvio; si riaccende dal suo interruttore
 const aperti = new Set();         // gruppi espansi nel pannello
 function salvaOpzioni() {
   try { localStorage.setItem('annotatore-opzioni', JSON.stringify({ dimFont, nascoste: [...nascoste],
