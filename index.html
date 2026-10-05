@@ -134,7 +134,7 @@
         <h2>Modello</h2>
         <div class="scelta" id="sceltaModello" role="group" aria-label="Versione del modello"></div>
         <h2>Visualizzazione</h2>
-        <label class="riga">Maschera <input type="checkbox" class="switch" role="switch" id="mostraMaschere" checked></label>
+        <label class="riga">Maschera <input type="checkbox" class="switch" role="switch" id="mostraMaschere"></label>
         <label class="riga">Etichette <input type="checkbox" class="switch" role="switch" id="mostraEtichette" checked></label>
         <div class="riga">Grandezza testo
           <span class="passo"><button id="fontMeno" aria-label="Riduci il testo">−</button><output id="fontValore">12</output><button id="fontPiu" aria-label="Ingrandisci il testo">+</button></span>
@@ -735,7 +735,7 @@ $('pip').onclick = apriPiP;
 $('pausa').onclick = () => { inPausa = !inPausa; $('pausa').textContent = inPausa ? 'Riprendi' : 'Pausa'; if (!inPausa) ultimaMiniatura = null; };
 for (const id of ['mostraMaschere', 'mostraEtichette', 'opacita', 'soglia']) $(id).addEventListener('input', disegna);
 window.addEventListener('resize', () => { if (!pipWin) disegna(); });
-$('mostraMaschere').checked = salvate.maschere !== false;
+$('mostraMaschere').checked = false;   // spenta a ogni avvio; si riaccende dal suo interruttore
 $('mostraEtichette').checked = salvate.etichette !== false;
 $('ingranaggio').onclick = () => mostraOpzioni($('opzioni').hidden);
 vista.addEventListener('keydown', ev => { if (ev.key === 'Escape') mostraOpzioni(false); });
