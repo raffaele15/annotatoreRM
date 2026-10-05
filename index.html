@@ -31,6 +31,15 @@
   button { font: 600 .95rem var(--corpo); border-radius: 4px; padding: 9px 14px; cursor: pointer;
            border: 1px solid var(--linea); background: var(--pannello); color: var(--testo); }
   button.primario { background: var(--accento); border-color: var(--accento); color: var(--accento-testo); }
+  .passi { align-items: center; }
+  .aiuto { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 19px; height: 19px;
+           border: 1.5px solid var(--tenue); border-radius: 50%; color: var(--tenue); font: 600 .72rem var(--num); padding-top: 2px; cursor: help; user-select: none; }
+  .aiuto:hover, .aiuto:focus-visible { border-color: var(--testo); color: var(--testo); outline: none; }
+  .aiuto .fumetto { display: none; position: absolute; left: 0; top: calc(100% + 8px); z-index: 20; width: max-content; max-width: 340px;
+           background: var(--pannello); border: 1px solid var(--linea); border-radius: 6px; padding: 10px 12px;
+           color: var(--testo); font: 400 .88rem/1.6 var(--corpo); box-shadow: 0 6px 18px rgba(0,0,0,.4); cursor: default; }
+  .aiuto:hover .fumetto, .aiuto:focus .fumetto { display: block; }
+  button.fatto { background: #1E3A2A; border-color: #3F7A55; color: #A9DDBA; }
   button:disabled { opacity: .4; cursor: default; }
   button:focus-visible, input:focus-visible { outline: 2px solid var(--accento); outline-offset: 2px; }
   button .n { font-family: var(--num); opacity: .7; margin-right: 6px; }
@@ -54,8 +63,6 @@
   #stato .ok { color: var(--ok); }
   #cursore { position: absolute; top: 8px; left: 8px; padding: 3px 8px; border-radius: 3px; font-size: .85rem;
              background: rgba(0,0,0,.72); color: #fff; pointer-events: none; display: none; }
-  .aiuto { color: var(--tenue); font-size: .88rem; margin: 0 0 18px; }
-  .aiuto b { color: var(--testo); font-weight: 600; }
 
   /* Ingranaggio e pannello delle opzioni (dentro la vista: si spostano nella finestra fluttuante) */
   #ingranaggio { position: absolute; top: 8px; right: 8px; z-index: 3; width: 34px; height: 34px; padding: 0;
@@ -102,13 +109,14 @@
 <body>
 <main>
   <div class="marchio"><img src="logo-marchio.png" alt=""><h1><span>Atlante</span><span class="rm"><span>RM</span><i class="rombo"></i><span class="minuscolo">Live</span></span></h1></div>
-  <p class="aiuto">
-    <b>1.</b> Clicca <b>Avvia cattura</b> e scegli la scheda del PACS &nbsp; <b>2.</b> Trascina un rettangolo sull'immagine &nbsp; <b>3.</b> Apri la <b>finestra fluttuante</b></p>
 
   <div class="passi">
     <button id="avvia" class="primario" disabled><span class="n">1</span>Avvia cattura</button>
     <button id="seleziona" disabled><span class="n">2</span>Seleziona riquadro</button>
     <button id="pip" disabled><span class="n">3</span>Finestra fluttuante</button>
+    <span class="aiuto" tabindex="0" role="button" aria-label="Istruzioni" aria-describedby="aiuto-testo">?
+      <span class="fumetto" id="aiuto-testo" role="tooltip"><b>1.</b> Clicca <b>Avvia cattura</b> e scegli la scheda del PACS<br><b>2.</b> Trascina un rettangolo sull'immagine<br><b>3.</b> Apri la <b>finestra fluttuante</b></span>
+    </span>
   </div>
   <p id="messaggio" role="status" aria-live="polite">Caricamento del modello…</p>
 
@@ -368,6 +376,11 @@ async function caricaModello() {                        // all'avvio: l'ultima v
 }
 
 // ---------------- Cattura ----------------
+function evidenzia(id) {                   // giallo = passo successivo, verde = passi già riusciti
+  const passi = ['avvia', 'seleziona', 'pip'], k = id ? passi.indexOf(id) : passi.length;
+  passi.forEach((b, i) => { const el = document.getElementById(b);
+    el.classList.toggle('primario', i === k); el.classList.toggle('fatto', i < k); });
+}
 async function avvia() {
   try {
     const opzioni = { video: { displaySurface: 'browser', frameRate: 5 }, audio: false,
@@ -379,6 +392,7 @@ async function avvia() {
     video.srcObject = stream; await video.play();
     stream.getVideoTracks()[0].addEventListener('ended', ferma);
     $('seleziona').disabled = false; $('pausa').disabled = false;
+    evidenzia('seleziona');
     iniziaSelezione();
     ciclo();
   } catch (e) { messaggio('Cattura non avviata: ' + (e.message || e), true); }
@@ -386,6 +400,7 @@ async function avvia() {
 function ferma() {
   stream = null; riquadro = null; risultato = null; selezionando = false;
   $('seleziona').disabled = $('pip').disabled = $('pausa').disabled = true;
+  evidenzia('avvia');
   messaggio('Condivisione terminata. Clicca "Avvia cattura" per ricominciare.'); disegna();
 }
 
@@ -435,7 +450,7 @@ tela.addEventListener('pointerup', () => {
     x: Math.max(0, Math.round(x)), y: Math.max(0, Math.round(y)),
     w: Math.round(Math.min(w, video.videoWidth - x)), h: Math.round(Math.min(h, video.videoHeight - y)) };
   selezionando = false; ultimaMiniatura = null;
-  $('pip').disabled = false;
+  $('pip').disabled = false; evidenzia(pipWin ? null : 'pip');
   messaggio('Riquadro impostato. Apri la finestra fluttuante e torna al PACS.');
 });
 
@@ -702,14 +717,16 @@ async function apriPiP() {
   pipWin.addEventListener('resize', disegna);
   pipWin.addEventListener('pagehide', () => {
     $('contenitore').append(vista); pipWin = null; video.play().catch(() => {});
+    evidenzia(!stream ? 'avvia' : selezionando || !riquadro ? 'seleziona' : 'pip');
     requestAnimationFrame(disegna);
   });
+  evidenzia(null);
   requestAnimationFrame(disegna);
 }
 
 // ---------------- Collegamenti ----------------
 $('avvia').onclick = avvia;
-$('seleziona').onclick = () => { if (pipWin) pipWin.close(); iniziaSelezione(); };
+$('seleziona').onclick = () => { if (pipWin) pipWin.close(); evidenzia('seleziona'); iniziaSelezione(); };
 $('pip').onclick = apriPiP;
 $('pausa').onclick = () => { inPausa = !inPausa; $('pausa').textContent = inPausa ? 'Riprendi' : 'Pausa'; if (!inPausa) ultimaMiniatura = null; };
 for (const id of ['mostraMaschere', 'mostraEtichette', 'opacita', 'soglia']) $(id).addEventListener('input', disegna);
