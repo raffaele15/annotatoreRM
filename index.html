@@ -832,10 +832,38 @@ function aggiornaHover(p) {
 }
 
 // ---------------- Finestra fluttuante ----------------
+// Dimensioni iniziali: l'immagine RM grande quanto il riquadro sul PACS, più i margini per le etichette e la barra.
+function dimensioniPiP() {
+  if (!riquadro) return { width: 560, height: 640 };
+  const dpr = window.devicePixelRatio || 1;
+  let iw = riquadro.w / dpr, ih = riquadro.h / dpr;           // pixel video della scheda -> pixel CSS
+  // margine come in disegna(): etichetta più lunga (se l'analisi non c'è ancora, la più lunga fra tutte le classi)
+  let m = 0;
+  if ($('mostraEtichette').checked) {
+    const c = document.createElement('canvas').getContext('2d');
+    c.font = `600 ${dimFont}px "Segoe UI", system-ui, sans-serif`;
+    const nomi = analisi && analisi.gruppi && analisi.gruppi.length ? analisi.gruppi.map(g => CLASSI[g.c]) : CLASSI.slice(1);
+    const piuLunga = Math.max(0, ...nomi.map(n => c.measureText(trNome(n)).width));
+    m = Math.max(90, piuLunga + 26);
+  }
+  // in disegna() il margine non supera il 30 % della larghezza: W = iw + 2m con m <= 0.3 W
+  const larghezza = iw => Math.max(iw + 2 * m, m ? m / 0.3 : 0);
+  // altezza della barra in basso, misurata alla larghezza prevista (può andare a capo)
+  const barra = vista.querySelector('.barra'), misura = W => {
+    barra.style.width = W + 'px'; const h = barra.offsetHeight; barra.style.width = ''; return h; };
+  let W = larghezza(iw), H = ih + misura(W);
+  // non oltre lo schermo: se serve, rimpicciolisce l'immagine in proporzione
+  const maxW = screen.availWidth * 0.95, maxH = screen.availHeight * 0.9;
+  for (let i = 0; i < 4 && (W > maxW || H > maxH); i++) {
+    const k = Math.min(maxW / W, maxH / H); iw *= k; ih *= k;
+    W = larghezza(iw); H = ih + misura(W);
+  }
+  return { width: Math.round(W), height: Math.round(H) };
+}
 async function apriPiP() {
   if (!('documentPictureInPicture' in window)) { messaggio(() => tr('pipNonSupportata'), true); return; }
   if (pipWin) { pipWin.focus(); return; }
-  pipWin = await documentPictureInPicture.requestWindow({ width: 560, height: 640 });
+  pipWin = await documentPictureInPicture.requestWindow(dimensioniPiP());
   const st = pipWin.document.createElement('style'); st.textContent = $('stili').textContent;
   pipWin.document.head.append(st); pipWin.document.title = 'Atlante RM live';
   pipWin.document.body.className = 'in-pip'; pipWin.document.documentElement.lang = lingua;
