@@ -144,6 +144,16 @@
   #misuraPiP { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 5; padding: 6px 12px;
                border-radius: 4px; background: rgba(0,0,0,.8); color: #fff; font-family: var(--num); pointer-events: none; }
   #misuraPiP[hidden] { display: none; }
+  /* Anteprima della nuova misura durante il trascinamento degli angoli (ancorata in alto a sinistra) */
+  #anteprimaPiP { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: rgba(0,0,0,.35); }
+  #anteprimaPiP[hidden] { display: none; }
+  #anteprimaPiP div { position: absolute; top: 0; left: 0; box-sizing: border-box; }
+  #anteprimaPiP .attuale { border: 1px dashed rgba(255,255,255,.6); }
+  #anteprimaPiP .nuova { border: 3px solid var(--accento); box-shadow: 0 0 0 1px rgba(0,0,0,.6); }
+  /* Pulsanti + / − per la dimensione della finestra (solo nella finestra fluttuante) */
+  .zoomPiP { display: none; gap: 4px; }
+  body.in-pip .zoomPiP { display: inline-flex; }
+  .zoomPiP button { width: 28px; padding: 3px 0; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -169,6 +179,7 @@
       <div class="maniglia m-nw" data-dir="nw"></div><div class="maniglia m-ne" data-dir="ne"></div>
       <div class="maniglia m-sw" data-dir="sw"></div><div class="maniglia m-se" data-dir="se"></div>
       <div id="misuraPiP" hidden></div>
+      <div id="anteprimaPiP" hidden><div class="attuale"></div><div class="nuova"></div></div>
       <button id="ingranaggio" aria-label="Opzioni" title="Opzioni" data-t-aria="opzioni" data-t-title="opzioni" aria-expanded="false" aria-controls="opzioni">&#9881;&#xFE0E;</button>
       <div id="opzioni" hidden>
         <h2 data-t="hModello">Modello</h2>
@@ -186,6 +197,7 @@
         <button id="pausa" disabled>Pausa</button>
         <label><span data-t="opacita">Opacità</span> <input type="range" id="opacita" min="0" max="90" value="40"></label>
         <label title="Nasconde le zone in cui il modello è poco sicuro" data-t-title="confidenzaTitolo"><span data-t="confidenza">Confidenza min.</span> <input type="range" id="soglia" min="0" max="95" value="50"></label>
+        <span class="zoomPiP"><button id="pipMeno" title="Rimpicciolisci la finestra" data-t-title="pipMeno">−</button><button id="pipPiu" title="Ingrandisci la finestra" data-t-title="pipPiu">+</button></span>
         <span id="stato">—</span>
       </div>
     </div>
@@ -253,7 +265,7 @@ const TESTI = {
     aiutoTesto: '<b>1.</b> Clicca <b>Avvia cattura</b> e scegli la scheda del PACS<br><b>2.</b> Trascina un rettangolo sull\'immagine<br><b>3.</b> Apri la <b>finestra fluttuante</b>',
     tela: 'Immagine RM con strutture etichettate', opzioni: 'Opzioni', hModello: 'Modello', hVisual: 'Visualizzazione',
     hNascondi: 'Nascondi elementi', versioneModello: 'Versione del modello', maschera: 'Maschera', etichette: 'Etichette',
-    grandezza: 'Grandezza testo', riduci: 'Riduci il testo', ingrandisci: 'Ingrandisci il testo', pausa: 'Pausa', riprendi: 'Riprendi',
+    grandezza: 'Grandezza testo', riduci: 'Riduci il testo', ingrandisci: 'Ingrandisci il testo', pausa: 'Pausa', riprendi: 'Riprendi', pipMeno: 'Rimpicciolisci la finestra', pipPiu: 'Ingrandisci la finestra',
     opacita: 'Opacità', confidenza: 'Confidenza min.', confidenzaTitolo: 'Nasconde le zone in cui il modello è poco sicuro',
     tutti: 'Seleziona tutti', mostraStrutture: p => `Mostra le strutture di ${p.g}`,
     caricamentoIniziale: 'Caricamento del modello…', caricamento: p => `Caricamento del modello ${p.m}… ${p.p} %`,
@@ -277,7 +289,7 @@ const TESTI = {
     aiutoTesto: '<b>1.</b> Click <b>Start capture</b> and choose the PACS tab<br><b>2.</b> Drag a rectangle over the image<br><b>3.</b> Open the <b>floating window</b>',
     tela: 'MRI image with labelled structures', opzioni: 'Options', hModello: 'Model', hVisual: 'Display',
     hNascondi: 'Hide structures', versioneModello: 'Model version', maschera: 'Mask', etichette: 'Labels',
-    grandezza: 'Text size', riduci: 'Smaller text', ingrandisci: 'Larger text', pausa: 'Pause', riprendi: 'Resume',
+    grandezza: 'Text size', riduci: 'Smaller text', ingrandisci: 'Larger text', pausa: 'Pause', riprendi: 'Resume', pipMeno: 'Smaller window', pipPiu: 'Larger window',
     opacita: 'Opacity', confidenza: 'Min. confidence', confidenzaTitolo: 'Hides the areas where the model is not confident',
     tutti: 'Select all', mostraStrutture: p => `Show the structures of ${p.g}`,
     caricamentoIniziale: 'Loading the model…', caricamento: p => `Loading model ${p.m}… ${p.p} %`,
@@ -927,15 +939,31 @@ for (const mn of vista.querySelectorAll('.maniglia')) {
   mn.addEventListener('pointermove', ev => {
     if (!ini) return; const n = nuova(ev), b = $('misuraPiP');
     b.textContent = `${n.w} × ${n.h}`; b.hidden = false;
+    // contorno giallo della nuova misura; se è più grande della finestra, tutto in scala per farla stare
+    const bw = pipWin.outerWidth - pipWin.innerWidth, bh = pipWin.outerHeight - pipWin.innerHeight;   // bordi e barra del titolo
+    const nw = n.w - bw, nh = n.h - bh, cw = pipWin.innerWidth, ch = pipWin.innerHeight;
+    const k = Math.min(1, cw / nw, ch / nh), ap = $('anteprimaPiP');
+    Object.assign(ap.querySelector('.attuale').style, { width: cw * k + 'px', height: ch * k + 'px', display: k < 1 ? 'block' : 'none' });
+    Object.assign(ap.querySelector('.nuova').style, { width: nw * k + 'px', height: nh * k + 'px' });
+    ap.hidden = false;
   });
   const fine = ev => {
     if (!ini) return; const n = nuova(ev); ini = null;
-    mn.classList.remove('attiva'); $('misuraPiP').hidden = true;
+    mn.classList.remove('attiva'); $('misuraPiP').hidden = true; $('anteprimaPiP').hidden = true;
     try { pipWin && pipWin.resizeTo(n.w, n.h); } catch {}
   };
   mn.addEventListener('pointerup', fine);
-  mn.addEventListener('pointercancel', () => { ini = null; mn.classList.remove('attiva'); $('misuraPiP').hidden = true; });
+  mn.addEventListener('pointercancel', () => { ini = null; mn.classList.remove('attiva'); $('misuraPiP').hidden = true; $('anteprimaPiP').hidden = true; });
 }
+// Pulsanti + / −: ogni clic ridimensiona subito la finestra del 10 %
+function scalaPiP(f) {
+  if (!pipWin) return;
+  const w = Math.round(Math.min(screen.availWidth, Math.max(320, pipWin.outerWidth * f)));
+  const h = Math.round(Math.min(screen.availHeight, Math.max(260, pipWin.outerHeight * f)));
+  try { pipWin.resizeTo(w, h); } catch {}
+}
+$('pipPiu').onclick = () => scalaPiP(1.1);
+$('pipMeno').onclick = () => scalaPiP(1 / 1.1);
 
 // ---------------- Collegamenti ----------------
 $('avvia').onclick = avvia;
