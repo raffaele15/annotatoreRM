@@ -132,6 +132,9 @@
   input.switch:checked { background: var(--accento); }
   input.switch:checked::after { transform: translateX(16px); background: var(--accento-testo); }
   /* Pulsanti + / − per la dimensione della finestra (solo nella finestra fluttuante) */
+  #avvisoPiP { position: absolute; left: 50%; bottom: 52px; transform: translateX(-50%); z-index: 5; padding: 6px 12px; border-radius: 4px;
+               background: rgba(0,0,0,.85); color: #fff; font-size: .85rem; white-space: nowrap; pointer-events: none; }
+  #avvisoPiP[hidden] { display: none; }
   .zoomPiP { display: none; gap: 4px; }
   body.in-pip .zoomPiP { display: inline-flex; }
   .zoomPiP button { width: 28px; padding: 3px 0; font-weight: 600; }
@@ -157,6 +160,7 @@
       <video id="video" muted playsinline></video>
       <canvas id="tela" aria-label="Immagine RM con strutture etichettate" data-t-aria="tela"></canvas>
       <div id="cursore"></div>
+      <div id="avvisoPiP" role="status" hidden></div>
       <button id="ingranaggio" aria-label="Opzioni" title="Opzioni" data-t-aria="opzioni" data-t-title="opzioni" aria-expanded="false" aria-controls="opzioni">&#9881;&#xFE0E;</button>
       <div id="opzioni" hidden>
         <h2 data-t="hModello">Modello</h2>
@@ -242,7 +246,7 @@ const TESTI = {
     aiutoTesto: '<b>1.</b> Clicca <b>Avvia cattura</b> e scegli la scheda del PACS<br><b>2.</b> Trascina un rettangolo sull\'immagine<br><b>3.</b> Apri la <b>finestra fluttuante</b>',
     tela: 'Immagine RM con strutture etichettate', opzioni: 'Opzioni', hModello: 'Modello', hVisual: 'Visualizzazione',
     hNascondi: 'Nascondi elementi', versioneModello: 'Versione del modello', maschera: 'Maschera', etichette: 'Etichette',
-    grandezza: 'Grandezza testo', riduci: 'Riduci il testo', ingrandisci: 'Ingrandisci il testo', pausa: 'Pausa', riprendi: 'Riprendi', pipMeno: 'Rimpicciolisci la finestra', pipPiu: 'Ingrandisci la finestra', pipMassima: 'Dimensione massima (80 % dello schermo)', pipMinima: 'Dimensione minima',
+    grandezza: 'Grandezza testo', riduci: 'Riduci il testo', ingrandisci: 'Ingrandisci il testo', pausa: 'Pausa', riprendi: 'Riprendi', pipMeno: 'Rimpicciolisci la finestra', pipPiu: 'Ingrandisci la finestra', pipMassima: 'Dimensione massima consentita da Chrome', pipMinima: 'Dimensione minima',
     opacita: 'Opacità', confidenza: 'Confidenza min.', confidenzaTitolo: 'Nasconde le zone in cui il modello è poco sicuro',
     tutti: 'Seleziona tutti', mostraStrutture: p => `Mostra le strutture di ${p.g}`,
     caricamentoIniziale: 'Caricamento del modello…', caricamento: p => `Caricamento del modello ${p.m}… ${p.p} %`,
@@ -266,7 +270,7 @@ const TESTI = {
     aiutoTesto: '<b>1.</b> Click <b>Start capture</b> and choose the PACS tab<br><b>2.</b> Drag a rectangle over the image<br><b>3.</b> Open the <b>floating window</b>',
     tela: 'MRI image with labelled structures', opzioni: 'Options', hModello: 'Model', hVisual: 'Display',
     hNascondi: 'Hide structures', versioneModello: 'Model version', maschera: 'Mask', etichette: 'Labels',
-    grandezza: 'Text size', riduci: 'Smaller text', ingrandisci: 'Larger text', pausa: 'Pause', riprendi: 'Resume', pipMeno: 'Smaller window', pipPiu: 'Larger window', pipMassima: 'Maximum size (80% of the screen)', pipMinima: 'Minimum size',
+    grandezza: 'Text size', riduci: 'Smaller text', ingrandisci: 'Larger text', pausa: 'Pause', riprendi: 'Resume', pipMeno: 'Smaller window', pipPiu: 'Larger window', pipMassima: 'Maximum size allowed by Chrome', pipMinima: 'Minimum size',
     opacita: 'Opacity', confidenza: 'Min. confidence', confidenzaTitolo: 'Hides the areas where the model is not confident',
     tutti: 'Select all', mostraStrutture: p => `Show the structures of ${p.g}`,
     caricamentoIniziale: 'Loading the model…', caricamento: p => `Loading model ${p.m}… ${p.p} %`,
@@ -900,19 +904,36 @@ async function apriPiP() {
   requestAnimationFrame(disegna);
 }
 
-// Pulsanti + / −: ogni clic ridimensiona subito la finestra del 10 %
+// Pulsanti + / −: ogni clic ridimensiona subito la finestra del 10 %.
+// Chrome limita resizeTo() a una misura massima che non dichiara (e che può essere più piccola di quella
+// raggiungibile trascinando il bordo): la si scopre al primo tentativo e la si ricorda per questo schermo.
+const chiaveMaxPiP = `annotatore-maxpip-${screen.width}x${screen.height}`;
+let maxPiP = null;
+try { maxPiP = JSON.parse(localStorage.getItem(chiaveMaxPiP)); } catch {}
 function scalaPiP(f) {
   if (!pipWin) return;
-  // proporzioni mantenute: se un lato arriva al limite, anche l'altro si ferma
   const W = pipWin.outerWidth, H = pipWin.outerHeight;
-  const k = Math.min(f, screen.availWidth * MAX_PIP / W, screen.availHeight * MAX_PIP / H);
-  const k2 = Math.max(k, 320 / W, 260 / H);
-  if (Math.abs(k2 - 1) < 0.01) { messaggioPiP(f > 1 ? tr('pipMassima') : tr('pipMinima')); return; }
-  try { pipWin.resizeTo(Math.round(W * k2), Math.round(H * k2)); } catch {}
+  const limW = Math.min(screen.availWidth * MAX_PIP, maxPiP ? maxPiP.w : Infinity);
+  const limH = Math.min(screen.availHeight * MAX_PIP, maxPiP ? maxPiP.h : Infinity);
+  let k = f > 1 ? Math.min(f, limW / W, limH / H) : Math.max(f, 320 / W, 260 / H);
+  // mai rimpicciolire con + né ingrandire con − (succede se la finestra è già oltre il limite)
+  if ((f > 1 && k < 1.01) || (f < 1 && k > 0.99)) { messaggioPiP(tr(f > 1 ? 'pipMassima' : 'pipMinima')); return; }
+  const tw = Math.round(W * k), th = Math.round(H * k);
+  try { pipWin.resizeTo(tw, th); } catch { return; }
+  if (f < 1) return;
+  setTimeout(() => {                         // Chrome ha ridotto la richiesta? allora quello è il suo massimo
+    if (!pipWin) return;
+    const w = pipWin.outerWidth, h = pipWin.outerHeight;
+    if (w < tw - 4 || h < th - 4) {
+      maxPiP = { w: Math.max(w, W), h: Math.max(h, H) };
+      try { localStorage.setItem(chiaveMaxPiP, JSON.stringify(maxPiP)); } catch {}
+      messaggioPiP(tr('pipMassima'));
+    }
+  }, 350);
 }
-function messaggioPiP(t) {
-  const b = $('stato'), prima = b.innerHTML; b.textContent = t;
-  clearTimeout(messaggioPiP.t); messaggioPiP.t = setTimeout(() => { if (ultimoStato) stato(ultimoStato); else b.innerHTML = prima; }, 1800);
+function messaggioPiP(t) {                  // avviso temporaneo sopra la barra (la barra di stato si aggiorna di continuo)
+  const el = $('avvisoPiP'); el.textContent = t; el.hidden = false;
+  clearTimeout(messaggioPiP.t); messaggioPiP.t = setTimeout(() => { el.hidden = true; }, 2000);
 }
 $('pipPiu').onclick = () => scalaPiP(1.1);
 $('pipMeno').onclick = () => scalaPiP(1 / 1.1);
