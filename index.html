@@ -131,6 +131,19 @@
                         background: var(--tenue); transition: transform .15s; }
   input.switch:checked { background: var(--accento); }
   input.switch:checked::after { transform: translateX(16px); background: var(--accento-testo); }
+  /* Maniglie grandi agli angoli della finestra fluttuante per ridimensionarla */
+  .maniglia { display: none; position: absolute; z-index: 4; width: 28px; height: 28px; touch-action: none; }
+  body.in-pip .maniglia { display: block; }
+  .maniglia::after { content: ''; position: absolute; inset: 4px; border: 3px solid var(--accento); opacity: .35; transition: opacity .15s; }
+  .maniglia:hover::after, .maniglia.attiva::after { opacity: 1; }
+  .m-nw { top: 0; left: 0; cursor: nwse-resize; }   .m-nw::after { border-right: 0; border-bottom: 0; }
+  .m-ne { top: 0; right: 0; cursor: nesw-resize; }  .m-ne::after { border-left: 0; border-bottom: 0; }
+  .m-sw { bottom: 0; left: 0; cursor: nesw-resize; } .m-sw::after { border-right: 0; border-top: 0; }
+  .m-se { bottom: 0; right: 0; cursor: nwse-resize; } .m-se::after { border-left: 0; border-top: 0; }
+  body.in-pip #ingranaggio { right: 30px; }
+  #misuraPiP { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 5; padding: 6px 12px;
+               border-radius: 4px; background: rgba(0,0,0,.8); color: #fff; font-family: var(--num); pointer-events: none; }
+  #misuraPiP[hidden] { display: none; }
 </style>
 </head>
 <body>
@@ -153,6 +166,9 @@
       <video id="video" muted playsinline></video>
       <canvas id="tela" aria-label="Immagine RM con strutture etichettate" data-t-aria="tela"></canvas>
       <div id="cursore"></div>
+      <div class="maniglia m-nw" data-dir="nw"></div><div class="maniglia m-ne" data-dir="ne"></div>
+      <div class="maniglia m-sw" data-dir="sw"></div><div class="maniglia m-se" data-dir="se"></div>
+      <div id="misuraPiP" hidden></div>
       <button id="ingranaggio" aria-label="Opzioni" title="Opzioni" data-t-aria="opzioni" data-t-title="opzioni" aria-expanded="false" aria-controls="opzioni">&#9881;&#xFE0E;</button>
       <div id="opzioni" hidden>
         <h2 data-t="hModello">Modello</h2>
@@ -832,11 +848,20 @@ function aggiornaHover(p) {
 }
 
 // ---------------- Finestra fluttuante ----------------
+// Quanti pixel CSS vale un pixel del video catturato.
+// Se il PACS è una scheda della stessa finestra, la sua area visibile è grande quanto la nostra: confronto diretto.
+function pixelCssPerPixelVideo() {
+  const vw = video.videoWidth, vh = video.videoHeight;
+  if (vw && vh && Math.abs(vw / vh - innerWidth / innerHeight) < 0.03) return innerWidth / vw;
+  const t = stream && stream.getVideoTracks()[0], st = t && t.getSettings ? t.getSettings() : {};
+  if (st.screenPixelRatio) return 1 / st.screenPixelRatio;
+  return 1 / (window.devicePixelRatio || 1);
+}
 // Dimensioni iniziali: l'immagine RM grande quanto il riquadro sul PACS, più i margini per le etichette e la barra.
 function dimensioniPiP() {
   if (!riquadro) return { width: 560, height: 640 };
-  const dpr = window.devicePixelRatio || 1;
-  let iw = riquadro.w / dpr, ih = riquadro.h / dpr;           // pixel video della scheda -> pixel CSS
+  const k0 = pixelCssPerPixelVideo();
+  let iw = riquadro.w * k0, ih = riquadro.h * k0;             // pixel video della scheda -> pixel CSS sullo schermo
   // margine come in disegna(): etichetta più lunga (se l'analisi non c'è ancora, la più lunga fra tutte le classi)
   let m = 0;
   if ($('mostraEtichette').checked) {
@@ -858,12 +883,18 @@ function dimensioniPiP() {
     const k = Math.min(maxW / W, maxH / H); iw *= k; ih *= k;
     W = larghezza(iw); H = ih + misura(W);
   }
-  return { width: Math.round(W), height: Math.round(H) };
+  // preferInitialWindowPlacement: Chrome non riusa la dimensione/posizione dell'ultima finestra
+  return { width: Math.round(W), height: Math.round(H), preferInitialWindowPlacement: true };
 }
 async function apriPiP() {
   if (!('documentPictureInPicture' in window)) { messaggio(() => tr('pipNonSupportata'), true); return; }
   if (pipWin) { pipWin.focus(); return; }
-  pipWin = await documentPictureInPicture.requestWindow(dimensioniPiP());
+  const dim = dimensioniPiP();
+  pipWin = await documentPictureInPicture.requestWindow(dim);
+  try {                                     // al centro dello schermo (ignorato se il browser non lo consente)
+    pipWin.moveTo((screen.availLeft || 0) + (screen.availWidth - pipWin.outerWidth) / 2,
+                  (screen.availTop || 0) + (screen.availHeight - pipWin.outerHeight) / 2);
+  } catch {}
   const st = pipWin.document.createElement('style'); st.textContent = $('stili').textContent;
   pipWin.document.head.append(st); pipWin.document.title = 'Atlante RM live';
   pipWin.document.body.className = 'in-pip'; pipWin.document.documentElement.lang = lingua;
@@ -877,6 +908,33 @@ async function apriPiP() {
   });
   evidenzia(null);
   requestAnimationFrame(disegna);
+}
+
+// Ridimensionamento dagli angoli: si trascina, al rilascio la finestra prende la nuova misura
+// (il browser consente un solo ridimensionamento per clic, quindi non segue il mouse in tempo reale)
+for (const mn of vista.querySelectorAll('.maniglia')) {
+  let ini = null;
+  const nuova = ev => {
+    const sx = ini.dir.includes('w') ? -1 : 1, sy = ini.dir.includes('n') ? -1 : 1;
+    return { w: Math.round(Math.min(screen.availWidth, Math.max(320, ini.w + sx * (ev.screenX - ini.x)))),
+             h: Math.round(Math.min(screen.availHeight, Math.max(260, ini.h + sy * (ev.screenY - ini.y)))) };
+  };
+  mn.addEventListener('pointerdown', ev => {
+    if (!pipWin) return;
+    ev.preventDefault(); mn.setPointerCapture(ev.pointerId); mn.classList.add('attiva');
+    ini = { dir: mn.dataset.dir, x: ev.screenX, y: ev.screenY, w: pipWin.outerWidth, h: pipWin.outerHeight };
+  });
+  mn.addEventListener('pointermove', ev => {
+    if (!ini) return; const n = nuova(ev), b = $('misuraPiP');
+    b.textContent = `${n.w} × ${n.h}`; b.hidden = false;
+  });
+  const fine = ev => {
+    if (!ini) return; const n = nuova(ev); ini = null;
+    mn.classList.remove('attiva'); $('misuraPiP').hidden = true;
+    try { pipWin && pipWin.resizeTo(n.w, n.h); } catch {}
+  };
+  mn.addEventListener('pointerup', fine);
+  mn.addEventListener('pointercancel', () => { ini = null; mn.classList.remove('attiva'); $('misuraPiP').hidden = true; });
 }
 
 // ---------------- Collegamenti ----------------
