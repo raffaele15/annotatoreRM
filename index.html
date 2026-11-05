@@ -253,6 +253,8 @@
   #didRisultato .did-tit { margin: 10px 0 3px; color: var(--tenue); font-size: .78rem; font-weight: 600; }
   #didRisultato ul { margin: 0; padding-left: 18px; line-height: 1.5; }
   #didRisultato li + li { margin-top: 3px; }
+  .modifica-testo { position: absolute; z-index: 6; width: 200px; padding: 2px 5px; font: 600 12px "Segoe UI", system-ui, sans-serif;
+                    color: #fff; background: rgba(0,0,0,.85); border: 1px solid var(--accento); border-radius: 3px; outline: none; }
   .les-nulla { margin: 3px 0 0; color: var(--tenue); }
   #pannelloStrum h2 { font: 600 .85rem var(--corpo); margin: 0 0 6px; }
   #pannelloStrum input[type=number], #pannelloStrum input[type=text] { width: 84px; padding: 4px 6px; border: var(--bordo) solid var(--linea);
@@ -801,7 +803,7 @@ const TESTI = {
     ps_volume: 'Su ogni fetta traccia l\'area (mano libera, ellisse o clic su una struttura) e premi Aggiungi fetta, poi passa alla fetta successiva nel PACS.',
     ps_abc: 'Traccia A, l\'asse maggiore della lesione nella fetta in cui è più grande, poi B, perpendicolare ad A. C = fette × spessore.',
     ps_evans: 'Traccia la larghezza massima dei corni frontali, poi il diametro interno del cranio sulla stessa fetta, oppure premi Automatico.',
-    ps_testo: 'Scrivi il testo, poi clicca sull\'immagine dove metterlo.',
+    ps_testo: 'Scrivi il testo, poi clicca sull\'immagine dove metterlo. Per modificare un testo già inserito fai doppio clic su di esso.',
     ps_struttura: 'Clicca su una struttura etichettata per misurarne l\'area in questa fetta.',
     lunghezzaNota: 'Lunghezza nota (mm)', applica: 'Applica', spessore: 'Spessore fetta (mm)', gap: 'Gap tra fette (mm)',
     aggiungiFetta: 'Aggiungi fetta', azzera: 'Azzera', nFette: 'Fette con la lesione', spessGap: 'Spessore + gap (mm)',
@@ -877,7 +879,7 @@ const TESTI = {
     ps_volume: 'On each slice draw the area (freehand, ellipse or click a structure) and press Add slice, then move to the next slice in the PACS.',
     ps_abc: 'Draw A, the longest axis of the lesion on the slice where it is largest, then B, perpendicular to A. C = slices × thickness.',
     ps_evans: 'Draw the maximum width of the frontal horns, then the inner skull diameter on the same slice, or press Automatic.',
-    ps_testo: 'Type the text, then click on the image where to place it.',
+    ps_testo: 'Type the text, then click on the image where to place it. Double-click an existing text to edit it.',
     ps_struttura: 'Click a labelled structure to measure its area on this slice.',
     lunghezzaNota: 'Known length (mm)', applica: 'Apply', spessore: 'Slice thickness (mm)', gap: 'Gap between slices (mm)',
     aggiungiFetta: 'Add slice', azzera: 'Reset', nFette: 'Slices with the lesion', spessGap: 'Thickness + gap (mm)',
@@ -1646,7 +1648,7 @@ let strumento = null, misure = [], bozza = null, calib = null, panning = null, f
 let zoom = { z: 1, px: 0, py: 0 }, eraBloccata = false;
 const DUE_PUNTI = { righello: 1, calibra: 1, abc: 1, evans: 1, freccia: 1, ellisse: 1 };
 const AREE = { area: 1, ellisse: 1, struttura: 1, volume: 1, lesione: 1 };
-let archivioMisure = [], miniCorrente = null, selezionata = null, xBtn = null;
+let archivioMisure = [], miniCorrente = null, selezionata = null, xBtn = null, spostando = null;
 function misureAttive() { return misure.length > 0 || !!bozza; }
 function applicaZoom(a0) {
   return { x: a0.x + a0.w / 2 * (1 - zoom.z) + zoom.px, y: a0.y + a0.h / 2 * (1 - zoom.z) + zoom.py, w: a0.w * zoom.z, h: a0.h * zoom.z };
@@ -1693,7 +1695,15 @@ tela.addEventListener('pointerdown', ev => {
   if (selezionata && xBtn && Math.hypot(p.x - xBtn.x, p.y - xBtn.y) <= 11) { ev.stopImmediatePropagation(); eliminaMisura(selezionata); return; }
   if (!strumento || strumento === 'sposta') {          // clic su una misura: la seleziona e mostra la ×
     const k = trovaVicina(p);
-    if (k >= 0) { ev.stopImmediatePropagation(); selezionata = misure[k]; disegna(); return; }
+    if (k >= 0) {
+      ev.stopImmediatePropagation(); const m = misure[k]; selezionata = m;
+      const P = m.p.map(inSch); let vertice = -1;
+      if (m.tipo !== 'area' && m.tipo !== 'volume' && m.tipo !== 'lesione' && m.tipo !== 'penna' && m.tipo !== 'testo' && m.tipo !== 'struttura')
+        P.forEach((q, i) => { if (Math.hypot(q.x - p.x, q.y - p.y) <= 9) vertice = i; });
+      spostando = { m, q0: inImg(p), orig: m.p.map(q => ({ ...q })), vertice, mosso: false };
+      try { tela.setPointerCapture(ev.pointerId); } catch {}
+      disegna(); return;
+    }
     if (selezionata) { selezionata = null; disegna(); }
     if (!strumento) return;
   }
@@ -1716,9 +1726,15 @@ tela.addEventListener('pointerdown', ev => {
 tela.addEventListener('pointermove', ev => {
   if (selezionando || !aImg()) return;
   const p = posizione(ev);
+  if (spostando) {
+    const q = inImg(p), dx = q.x - spostando.q0.x, dy = q.y - spostando.q0.y, s = spostando;
+    s.m.p = s.orig.map((o, i) => s.vertice < 0 || s.vertice === i ? { x: o.x + dx, y: o.y + dy } : { ...o });
+    s.mosso = true; tela.style.cursor = 'grabbing'; ev.stopImmediatePropagation(); disegna(); return;
+  }
   if (!panning && !bozza && (!strumento || strumento === 'sposta' || strumento === 'gomma')) {
     const sopraX = selezionata && xBtn && Math.hypot(p.x - xBtn.x, p.y - xBtn.y) <= 11;
-    tela.style.cursor = sopraX || trovaVicina(p) >= 0 ? 'pointer' : strumento === 'sposta' ? 'grab' : strumento ? 'crosshair' : '';
+    const kk = trovaVicina(p);
+    tela.style.cursor = sopraX ? 'pointer' : kk >= 0 ? (misure[kk] === selezionata ? 'move' : 'pointer') : strumento === 'sposta' ? 'grab' : strumento ? 'crosshair' : '';
   }
   if (!strumento) return;
   if (panning) { zoom.px = panning.px + p.x - panning.x; zoom.py = panning.py + p.y - panning.y; disegna(); ev.stopImmediatePropagation(); return; }
@@ -1729,6 +1745,15 @@ tela.addEventListener('pointermove', ev => {
   disegna(); ev.stopImmediatePropagation();
 }, true);
 tela.addEventListener('pointerup', ev => {
+  if (spostando) {
+    const { m, mosso } = spostando; spostando = null; ev.stopImmediatePropagation(); tela.style.cursor = 'pointer';
+    if (mosso) {
+      if (m.tipo === 'struttura') { misuraStruttura(m.p[0]); selezionata = misure[misure.length - 1]; }
+      if (m.tipo === 'lesione') { const r = analizzaLesione(m.p); ultimaLesione = r && { ...r, poligono: m.p }; }
+      aggiornaPannelloStrum(); disegna();
+    }
+    return;
+  }
   if (!strumento || selezionando) return;
   if (panning) { panning = null; tela.style.cursor = 'grab'; ev.stopImmediatePropagation(); return; }
   if (!bozza || bozza.tipo === 'angolo') return;
@@ -1748,7 +1773,20 @@ tela.addEventListener('pointerup', ev => {
   if (m.tipo === 'struttura') misure = misure.filter(x => x === m || x.tipo !== 'struttura');
   aggiornaPannelloStrum(); disegna();
 }, true);
-tela.addEventListener('dblclick', ev => { if (strumento === 'sposta' || zoom.z > 1) { zoom = { z: 1, px: 0, py: 0 }; disegna(); } });
+tela.addEventListener('dblclick', ev => {
+  if (aImg()) { const k = trovaVicina(posizione(ev)); if (k >= 0 && misure[k].tipo === 'testo') { modificaTesto(misure[k]); return; } }
+  if (strumento === 'sposta' || zoom.z > 1) { zoom = { z: 1, px: 0, py: 0 }; disegna(); }
+});
+function modificaTesto(m) {                  // casella sopra l'immagine: Invio conferma, Esc annulla
+  const doc = tela.ownerDocument, P = inSch(m.p[0]), rt = tela.getBoundingClientRect(), rv = vista.getBoundingClientRect();
+  const inp = doc.createElement('input'); inp.type = 'text'; inp.value = m.testo; inp.maxLength = 60; inp.className = 'modifica-testo';
+  inp.style.left = (rt.left - rv.left + P.x) + 'px'; inp.style.top = (rt.top - rv.top + P.y - 12) + 'px';
+  vista.append(inp); inp.focus(); inp.select();
+  let fatto = false;
+  const chiudi = ok => { if (fatto) return; fatto = true; if (ok && inp.value.trim()) m.testo = inp.value.trim(); inp.remove(); selezionata = m; disegna(); };
+  inp.addEventListener('keydown', e => { e.stopPropagation(); if (e.key === 'Enter') chiudi(true); if (e.key === 'Escape') chiudi(false); });
+  inp.addEventListener('blur', () => chiudi(true));
+}
 tela.addEventListener('wheel', ev => {
   if (!ev.ctrlKey || selezionando || !aImg()) return;
   ev.preventDefault();
@@ -1951,8 +1989,8 @@ const DEFICIT = {
                                en: { t: ['Supplementary motor area: reduced motor initiation, {C} akinesia', 'Alien hand syndrome', 'Executive dysfunction'], s: ['Transcortical motor aphasia'] } },
   'giro frontale medio caudale': { it: { t: ['Campo oculare frontale: deviazione dello sguardo verso il lato della lesione', 'Paresi dello sguardo {C}'] },
                                    en: { t: ['Frontal eye field: gaze deviation towards the lesion', 'Impaired saccades towards the {C} side'] } },
-  'giro frontale medio rostrale': { it: { t: ['Corteccia prefrontale dorsolaterale: disfunzione esecutiva, deficit di memoria di lavoro e pianificazione'] },
-                                    en: { t: ['Dorsolateral prefrontal cortex: executive dysfunction, impaired working memory and planning'] } },
+  'giro frontale medio rostrale': { it: { t: ['Corteccia prefrontale dorsolaterale: disfunzione esecutiva, deficit di memoria di lavoro e pianificazione', 'Apatia, abulia'] },
+                                    en: { t: ['Dorsolateral prefrontal cortex: executive dysfunction, impaired working memory and planning', 'Apathy, abulia'] } },
   'pars opercularis': { it: { s: ['Afasia di Broca (non fluente)', 'Aprassia del linguaggio'], d: ['Aprosodia motoria'] },
                         en: { s: ['Broca aphasia (non-fluent)', 'Apraxia of speech'], d: ['Motor aprosodia'] } },
   'pars triangularis': { it: { s: ['Afasia di Broca (non fluente)'], d: ['Aprosodia motoria'] },
@@ -1985,15 +2023,15 @@ const DEFICIT = {
   'corteccia entorinale': { it: { t: ['Deficit di memoria anterograda'] }, en: { t: ['Anterograde memory deficit'] } },
   'giro paraippocampale': { it: { t: ['Deficit di memoria', 'Disorientamento topografico (riconoscimento dei luoghi)'] },
                             en: { t: ['Memory deficit', 'Topographical disorientation (place recognition)'] } },
-  'ippocampo': { it: { t: ['Amnesia anterograda'], s: ['Soprattutto memoria verbale'], d: ['Soprattutto memoria visuospaziale'] },
-                 en: { t: ['Anterograde amnesia'], s: ['Mainly verbal memory'], d: ['Mainly visuospatial memory'] } },
-  'amigdala': { it: { t: ['Alterata elaborazione della paura e delle emozioni', 'Crisi epilettiche'] }, en: { t: ['Impaired fear and emotion processing', 'Seizures'] } },
+  'ippocampo': { it: { t: ['Amnesia anterograda grave se bilaterale; se unilaterale deficit di memoria più lievi'], s: ['Soprattutto memoria verbale'], d: ['Soprattutto memoria visuospaziale'] },
+                 en: { t: ['Severe anterograde amnesia if bilateral; milder memory deficits if unilateral'], s: ['Mainly verbal memory'], d: ['Mainly visuospatial memory'] } },
+  'amigdala': { it: { t: ['Alterata elaborazione della paura e delle emozioni, soprattutto se bilaterale (placidità; sindrome di Klüver-Bucy, rara)', 'Crisi epilettiche con paura o panico'] }, en: { t: ['Impaired fear and emotion processing, mainly if bilateral (placidity; Klüver-Bucy syndrome, rare)', 'Seizures with fear or panic'] } },
   'corteccia pericalcarina': { it: { t: ['Emianopsia omonima {C}, spesso con risparmio maculare'] }, en: { t: ['{C} homonymous hemianopia, often with macular sparing'] } },
   'cuneo': { it: { t: ['Quadrantanopsia inferiore omonima {C}'] }, en: { t: ['{C} inferior homonymous quadrantanopia'] } },
   'giro linguale': { it: { t: ['Quadrantanopsia superiore omonima {C}', 'Emiacromatopsia {C}'] }, en: { t: ['{C} superior homonymous quadrantanopia', '{C} hemiachromatopsia'] } },
   'corteccia occipitale laterale': { it: { t: ['Agnosia visiva (soprattutto se bilaterale)', 'Deficit di percezione del movimento (area MT/V5); acinetopsia se bilaterale'] }, en: { t: ['Visual agnosia (mainly if bilateral)', 'Impaired motion perception (MT/V5); akinetopsia if bilateral'] } },
-  'lobulo parietale superiore': { it: { t: ['Atassia ottica (errori di raggiungimento visivo)', 'Deficit sensitivi corticali {C}'] },
-                                  en: { t: ['Optic ataxia (visually guided reaching errors)', '{C} cortical sensory deficits'] } },
+  'lobulo parietale superiore': { it: { t: ['Atassia ottica (errori di raggiungimento visivo); se parieto-occipitale bilaterale: sindrome di Balint', 'Deficit sensitivi corticali {C}'] },
+                                  en: { t: ['Optic ataxia (visually guided reaching errors); if bilateral parieto-occipital: Balint syndrome', '{C} cortical sensory deficits'] } },
   'lobulo parietale inferiore': { it: { s: ['Sindrome di Gerstmann: agrafia, acalculia, agnosia digitale, disorientamento destra-sinistra', 'Alessia con agrafia'], d: ['Neglect spaziale sinistro', 'Anosognosia'] },
                                   en: { s: ['Gerstmann syndrome: agraphia, acalculia, finger agnosia, left-right disorientation', 'Alexia with agraphia'], d: ['Left spatial neglect', 'Anosognosia'] } },
   'giro sopramarginale': { it: { s: ['Afasia di conduzione (ripetizione compromessa)', 'Aprassia ideomotoria'], d: ['Neglect spaziale sinistro'] },
