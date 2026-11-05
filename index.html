@@ -7,12 +7,29 @@
 <link rel="icon" type="image/png" href="icona.png">
 <script src="coi-serviceworker.min.js"></script>
 <script src="ort/ort.wasm.min.js"></script>
+<script>try{const t=localStorage.getItem("annotatore-tema");if(t)document.documentElement.dataset.tema=t;}catch{}</script>
 <style id="stili">
-  :root {
-    --fondo: #0F1518; --pannello: #172024; --linea: #2A373D; --testo: #D9E2E6; --tenue: #8FA0A8;
-    --accento: #E0A526; --accento-testo: #1A1405; --ok: #6CC08B; --errore: #F07A6E;
+  :root, :root[data-tema="ambra"] {
+    --fondo: #12171B; --pannello: #1A2026; --rilievo: #212930; --linea: #2C353D; --testo: #DDE4E9; --tenue: #8D99A4;
+    --accento: #E0A526; --accento-testo: #1A1405; --ok: #6CC08B; --ok-fondo: #1C3226; --ok-bordo: #3F7A55; --errore: #F07A6E;
+    --ombra: 0 10px 30px rgba(0,0,0,.45); --bordo: 1px; --logo-filtro: none;
     --num: "Bahnschrift", "DIN Alternate", "Segoe UI", system-ui, sans-serif;
     --corpo: "Segoe UI", system-ui, -apple-system, sans-serif;
+    color-scheme: dark;
+  }
+  :root[data-tema="ardesia"] {
+    --fondo: #0E1420; --pannello: #151D2B; --rilievo: #1C2637; --linea: #283447; --testo: #DCE5F2; --tenue: #8796AD;
+    --accento: #5B9DF5; --accento-testo: #06101F; --ok: #5CC3A0; --ok-fondo: #12302A; --ok-bordo: #2F7562; --errore: #F27C7C;
+  }
+  :root[data-tema="chiaro"] {
+    --fondo: #EDF0F3; --pannello: #FFFFFF; --rilievo: #F4F6F8; --linea: #D3DAE1; --testo: #18222D; --tenue: #5B6976;
+    --accento: #1E5FAF; --accento-testo: #FFFFFF; --ok: #1F7A4D; --ok-fondo: #E3F2E9; --ok-bordo: #9DCDB0; --errore: #B3261E;
+    --ombra: 0 10px 30px rgba(24,34,45,.14); --logo-filtro: brightness(.42) contrast(1.25); color-scheme: light;
+  }
+  :root[data-tema="contrasto"] {
+    --fondo: #000000; --pannello: #000000; --rilievo: #141414; --linea: #9A9A9A; --testo: #FFFFFF; --tenue: #D6D6D6;
+    --accento: #FFD60A; --accento-testo: #000000; --ok: #4BE08A; --ok-fondo: #002B14; --ok-bordo: #4BE08A; --errore: #FF7070;
+    --ombra: none; --bordo: 2px;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--fondo); color: var(--testo); font: 15px/1.45 var(--corpo); }
@@ -131,28 +148,197 @@
                         background: var(--tenue); transition: transform .15s; }
   input.switch:checked { background: var(--accento); }
   input.switch:checked::after { transform: translateX(16px); background: var(--accento-testo); }
+
+  /* ================= Restyling: testata, passi, stato vuoto, temi, guida ================= */
+  html, body { transition: background-color .2s; }
+  main { max-width: 1160px; padding: 20px 24px 40px; }
+  .testata { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0 0 20px;
+             padding-bottom: 16px; border-bottom: var(--bordo) solid var(--linea); }
+  .testata .marchio { margin: 0; }
+  .marchio img { height: 52px; filter: var(--logo-filtro); }
+  .marchio h1 { font-size: 23px; line-height: 25px; }
+  .strumenti { display: flex; align-items: center; gap: 8px; }
+  .lingua { position: static; border-width: var(--bordo); }
+  .lingua button { padding: 6px 11px; }
+  button.discreto { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; font-size: .85rem; font-weight: 600;
+                    background: transparent; border: var(--bordo) solid var(--linea); border-radius: 999px; color: var(--testo); }
+  button.discreto:hover { background: var(--rilievo); }
+  button.discreto svg { width: 16px; height: 16px; flex: none; }
+  button { border-width: var(--bordo); }
+
+  /* Passi: una sequenza vera, collegata */
+  .passi { gap: 0; margin-bottom: 12px; flex-wrap: nowrap; }
+  .passi button { display: inline-flex; align-items: center; gap: 9px; padding: 8px 16px 8px 9px; border-radius: 999px; }
+  .passi .ponte { flex: 0 0 28px; height: var(--bordo); background: var(--linea); }
+  .passi button .n { display: inline-grid; place-items: center; width: 24px; height: 24px; margin: 0; border-radius: 50%; opacity: 1;
+                     font-size: .8rem; background: var(--rilievo); border: var(--bordo) solid var(--linea); color: var(--tenue); }
+  .passi button.primario { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accento) 22%, transparent); }
+  .passi button.primario .n { background: var(--accento-testo); color: var(--accento); border-color: transparent; }
+  button.fatto { background: var(--ok-fondo); border-color: var(--ok-bordo); color: var(--ok); }
+  .passi button.fatto .n { background: var(--ok); border-color: var(--ok); color: var(--ok-fondo); font-size: 0; }
+  .passi button.fatto .n::before { content: "✓"; font-size: .8rem; font-weight: 700; }
+  #messaggio { font-size: .9rem; }
+
+  /* Vista */
+  #vista { border: var(--bordo) solid var(--linea); border-radius: 10px; box-shadow: var(--ombra); }
+  .barra { padding: 8px 12px; gap: 8px 20px; border-top-width: var(--bordo); }
+  .barra input[type=range] { width: 110px; }
+  #ingranaggio { background: color-mix(in srgb, var(--pannello) 90%, transparent); color: var(--testo); }
+  #opzioni { border-radius: 10px; box-shadow: var(--ombra); border-width: var(--bordo); }
+  .vuoto { position: absolute; inset: 0 0 46px 0; display: none; flex-direction: column; align-items: center; justify-content: center;
+           gap: 14px; text-align: center; color: #AEB8C1; pointer-events: none; padding: 20px; }
+  #vista.vuota .vuoto { display: flex; }
+  .vuoto svg { width: 168px; height: auto; }
+  .vuoto p { margin: 0; max-width: 46ch; font-size: .95rem; line-height: 1.5; }
+  .vuoto p b { color: #fff; font-weight: 600; }
+  .vuoto button { pointer-events: auto; color: #E6ECF0; border-color: #3A444C; background: #0d1012; }
+  .vuoto button:hover { background: #1b2024; }
+  body.in-pip .vuoto button { display: none; }
+
+  /* Sostieni: più sobrio */
+  #sostieniBtn { box-shadow: var(--ombra); border-width: var(--bordo); }
+  #sostieniPannello { border-radius: 10px; border-width: var(--bordo); box-shadow: var(--ombra); }
+
+  /* Scelta dello stile */
+  .menu-stile { position: relative; }
+  #temi { position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; width: 250px; padding: 6px;
+          background: var(--pannello); border: var(--bordo) solid var(--linea); border-radius: 10px; box-shadow: var(--ombra); }
+  #temi[hidden] { display: none; }
+  #temi button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 6px;
+                 background: transparent; text-align: left; font-weight: 500; }
+  #temi button:hover { background: var(--rilievo); }
+  #temi button[aria-checked=true] { background: var(--rilievo); font-weight: 600; }
+  #temi button[aria-checked=true]::after { content: "✓"; margin-left: auto; color: var(--accento); }
+  #temi small { display: block; color: var(--tenue); font-weight: 400; font-size: .76rem; }
+  .campione { flex: none; display: grid; grid-template-columns: 1fr 1fr; width: 30px; height: 30px; border-radius: 6px; overflow: hidden;
+              border: 1px solid var(--linea); }
+  .campione i:nth-child(3) { grid-column: span 2; }
+
+  /* Guida animata */
+  #guida { width: min(780px, calc(100vw - 32px)); padding: 0; border: var(--bordo) solid var(--linea); border-radius: 14px;
+           background: var(--pannello); color: var(--testo); box-shadow: 0 24px 70px rgba(0,0,0,.55); }
+  #guida::backdrop { background: rgba(5,8,12,.62); }
+  .guida-testa { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px 0; }
+  .guida-testa h2 { margin: 0; font: 600 1.05rem var(--corpo); }
+  .guida-testa button { width: 32px; height: 32px; padding: 0; border-radius: 50%; background: transparent; font-size: 1.1rem; }
+  .schermo { margin: 12px 18px 0; border-radius: 10px; overflow: hidden; background: var(--rilievo); border: var(--bordo) solid var(--linea); }
+  .schermo svg { display: block; width: 100%; height: auto; }
+  .didascalia { display: flex; gap: 14px; align-items: flex-start; padding: 14px 18px 4px; min-height: 86px; }
+  .didascalia .num { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+                     background: var(--accento); color: var(--accento-testo); font: 700 .95rem var(--num); }
+  .didascalia p { margin: 0; line-height: 1.5; }
+  .didascalia .nota { margin-top: 6px; color: var(--tenue); font-size: .85rem; }
+  .guida-comandi { display: flex; align-items: center; gap: 8px; padding: 10px 18px 16px; }
+  .guida-comandi .punti { display: flex; gap: 6px; margin: 0 auto; }
+  .guida-comandi .punti button { width: 26px; height: 6px; padding: 0; border: 0; border-radius: 3px; background: var(--linea); }
+  .guida-comandi .punti button[aria-current=true] { background: var(--accento); }
+  .guida-comandi > button { padding: 6px 12px; font-size: .85rem; }
+
+  /* Elementi del disegno (colori legati al tema) */
+  .g-fondo { fill: var(--fondo); } .g-pann { fill: var(--pannello); } .g-ril { fill: var(--rilievo); }
+  .g-linea { stroke: var(--linea); } .g-filo { fill: none; stroke: var(--linea); stroke-width: 1.5; }
+  .g-testo { fill: var(--testo); font: 600 9px var(--corpo); } .g-tenue { fill: var(--tenue); font: 500 8px var(--corpo); }
+  .g-acc { fill: var(--accento); } .g-acc-t { fill: var(--accento-testo); font: 600 8.5px var(--corpo); }
+  .g-ok { fill: var(--ok-fondo); stroke: var(--ok-bordo); } .g-ok-t { fill: var(--ok); font: 600 8.5px var(--corpo); }
+  .g-chrome { fill: #FFFFFF; } .g-chrome-t { fill: #202124; font: 500 8.5px "Segoe UI", system-ui, sans-serif; }
+  .g-chrome-tit { fill: #202124; font: 600 11px "Segoe UI", system-ui, sans-serif; }
+  .g-chrome-sel { fill: #E8F0FE; stroke: #1A73E8; stroke-width: 1.2; }
+  .g-blu { fill: #1A73E8; } .g-blu-t { fill: #fff; font: 600 8.5px "Segoe UI", system-ui, sans-serif; }
+
+  .scena { display: none; }
+  .scena.attiva { display: inline; }
+  .scena.attiva * { animation-duration: 6s; animation-timing-function: ease-in-out; animation-fill-mode: both; }
+  .cursore { animation-name: none; }
+  .clic { fill: none; stroke: var(--accento); stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
+
+  /* scena 1: clic su Avvia cattura */
+  .scena.attiva .s1-cur { animation-name: s1-cur; }
+  @keyframes s1-cur { 0%,10% { transform: translate(560px, 300px); } 52% { transform: translate(92px, 132px); }
+                      58% { transform: translate(92px, 132px) scale(.85); } 64%,100% { transform: translate(92px, 132px); } }
+  .scena.attiva .s1-clic { animation-name: anello; animation-delay: 3.4s; animation-duration: .8s; }
+  .scena.attiva .s1-pill { animation-name: premi; animation-delay: 3.4s; animation-duration: .4s; transform-box: fill-box; transform-origin: center; }
+  @keyframes anello { 0% { opacity: .9; transform: scale(.3); } 100% { opacity: 0; transform: scale(1.6); } }
+  @keyframes premi { 50% { transform: scale(.94); } }
+  @keyframes compari { from { opacity: 0; } to { opacity: 1; } }
+
+  /* scena 2: scelta della scheda del PACS */
+  .scena.attiva .s2-cur { animation-name: s2-cur; }
+  @keyframes s2-cur { 0%,8% { transform: translate(470px, 330px); } 32% { transform: translate(250px, 150px); }
+                      36% { transform: translate(250px, 150px) scale(.85); } 40%,48% { transform: translate(250px, 150px); }
+                      74% { transform: translate(442px, 297px); } 78% { transform: translate(442px, 297px) scale(.85); }
+                      82%,100% { transform: translate(442px, 297px); } }
+  .scena.attiva .s2-sel { animation-name: compari; animation-delay: 2.1s; animation-duration: .25s; }
+  .scena.attiva .s2-condividi { animation-name: accendi; animation-delay: 2.1s; animation-duration: .3s; }
+  @keyframes accendi { from { opacity: .45; } to { opacity: 1; } }
+  .scena.attiva .s2-clic1 { animation-name: anello; animation-delay: 2.1s; animation-duration: .8s; }
+  .scena.attiva .s2-clic2 { animation-name: anello; animation-delay: 4.6s; animation-duration: .8s; }
+
+  /* scena 3: trascinare il riquadro */
+  .scena.attiva .s3-cur { animation-name: s3-cur; }
+  @keyframes s3-cur { 0%,6% { transform: translate(520px, 110px); } 28% { transform: translate(120px, 170px); }
+                      34% { transform: translate(120px, 170px) scale(.85); } 76% { transform: translate(242px, 322px) scale(.85); }
+                      82%,100% { transform: translate(242px, 322px); } }
+  .scena.attiva .s3-rett { animation-name: s3-rett; }
+  @keyframes s3-rett { 0%,34% { width: 0; height: 0; opacity: 1; } 76%,100% { width: 122px; height: 152px; opacity: 1; } }
+  .scena.attiva .s3-buio { animation-name: s3-buio; }
+  @keyframes s3-buio { 0%,30% { opacity: 0; } 40%,100% { opacity: .5; } }
+
+  /* scena 4: finestra fluttuante sopra il PACS */
+  .scena.attiva .s4-cur { animation-name: s4-cur; }
+  @keyframes s4-cur { 0%,5% { transform: translate(470px, 250px); } 26% { transform: translate(336px, 132px); }
+                      30% { transform: translate(336px, 132px) scale(.85); } 34%,100% { transform: translate(336px, 132px); } }
+  .scena.attiva .s4-clic { animation-name: anello; animation-delay: 1.8s; animation-duration: .8s; }
+  .scena.attiva .s4-app { animation-name: sparisci; animation-delay: 2.2s; animation-duration: .4s; }
+  @keyframes sparisci { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+  .scena.attiva .s4-pacs, .scena.attiva .s4-tab2 { animation-name: compari; animation-delay: 2.2s; animation-duration: .4s; }
+  .scena.attiva .s4-tab1 { animation-name: sparisci; animation-delay: 2.2s; animation-duration: .4s; }
+  .scena.attiva .s4-pip { animation-name: s4-pip; animation-delay: 2.6s; animation-duration: .5s; transform-box: fill-box; transform-origin: center; }
+  @keyframes s4-pip { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
+  .scena.attiva .s4-et { animation-name: compari; animation-duration: .4s; }
+  .scena.attiva .s4-et:nth-of-type(1) { animation-delay: 3.3s; } .scena.attiva .s4-et:nth-of-type(2) { animation-delay: 3.6s; }
+  .scena.attiva .s4-et:nth-of-type(3) { animation-delay: 3.9s; } .scena.attiva .s4-et:nth-of-type(4) { animation-delay: 4.2s; }
+  .scena.attiva .s4-et:nth-of-type(5) { animation-delay: 4.5s; }
+  .scena.attiva .s4-cur2 { animation-name: sparisci; animation-delay: 2.4s; animation-duration: .3s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scena.attiva * { animation-duration: 1ms !important; animation-delay: 0s !important; }
+    .passi button.primario { box-shadow: none; }
+  }
 </style>
 </head>
 <body>
 <main>
-  <div class="lingua" role="group" aria-label="Lingua / Language"><button type="button" data-lingua="it" aria-pressed="true">IT</button><button type="button" data-lingua="en" aria-pressed="false">EN</button></div>
+  <header class="testata">
   <div class="marchio"><img src="logo-marchio.png" alt=""><h1><span>Atlante</span><span class="rm"><span>RM</span><i class="rombo"></i><span class="minuscolo">Live</span></span></h1></div>
+    <div class="strumenti">
+      <button type="button" id="guidaBtn" class="discreto"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 5.2v5.6L11 8z" fill="currentColor"/></svg><span data-t="guida">Guida</span></button>
+      <div class="menu-stile">
+        <button type="button" id="stileBtn" class="discreto" aria-haspopup="menu" aria-expanded="false" aria-controls="temi"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1a7 7 0 0 1 0 14z" fill="currentColor"/></svg><span data-t="stile">Stile</span></button>
+        <div id="temi" role="menu" aria-labelledby="stileBtn" hidden></div>
+      </div>
+      <div class="lingua" role="group" aria-label="Lingua / Language"><button type="button" data-lingua="it" aria-pressed="true">IT</button><button type="button" data-lingua="en" aria-pressed="false">EN</button></div>
+    </div>
+  </header>
 
   <div class="passi">
-    <button id="avvia" class="primario attesa" disabled><span class="n">1</span><span data-t="avvia">Avvia cattura</span></button>
-    <button id="seleziona" disabled><span class="n">2</span><span data-t="seleziona">Seleziona riquadro</span></button>
+    <button id="avvia" class="primario attesa" disabled><span class="n">1</span><span data-t="avvia">Avvia cattura</span></button><span class="ponte" aria-hidden="true"></span>
+    <button id="seleziona" disabled><span class="n">2</span><span data-t="seleziona">Seleziona riquadro</span></button><span class="ponte" aria-hidden="true"></span>
     <button id="pip" disabled><span class="n">3</span><span data-t="pip">Finestra fluttuante</span></button>
-    <span class="aiuto" tabindex="0" role="button" aria-label="Istruzioni" data-t-aria="istruzioni" aria-describedby="aiuto-testo">?
-      <span class="fumetto" id="aiuto-testo" role="tooltip" data-t-html="aiutoTesto"><b>1.</b> Clicca <b>Avvia cattura</b> e scegli la scheda del PACS<br><b>2.</b> Trascina un rettangolo sull'immagine<br><b>3.</b> Apri la <b>finestra fluttuante</b></span>
-    </span>
   </div>
   <p id="messaggio" class="caricando" role="status" aria-live="polite">Caricamento del modello…</p>
 
   <div id="contenitore">
-    <div id="vista">
+    <div id="vista" class="vuota">
       <video id="video" muted playsinline></video>
       <canvas id="tela" aria-label="Immagine RM con strutture etichettate" data-t-aria="tela"></canvas>
       <div id="cursore"></div>
+      <div class="vuoto">
+        <svg viewBox="0 0 168 104" aria-hidden="true"><rect x="1" y="1" width="166" height="102" rx="8" fill="none" stroke="#3A444C" stroke-width="1.5" stroke-dasharray="5 4"/>
+          <ellipse cx="84" cy="52" rx="30" ry="38" fill="#2A2F33"/><ellipse cx="84" cy="52" rx="22" ry="30" fill="#4A5157"/>
+          <path d="M82 36q-8 6-6 18l4 1q-1-10 2-19zM86 36q8 6 6 18l-4 1q1-10-2-19z" fill="#1B1F22"/><path d="M84 15v16M84 74v15" stroke="#1B1F22" stroke-width="1.6"/></svg>
+        <p data-t-html="vuotoTesto">Clicca <b>Avvia cattura</b> e scegli la scheda del PACS.</p>
+        <button type="button" id="vuotoGuida" class="discreto" data-t="vuotoGuida">Guarda come si fa</button>
+      </div>
       <button id="ingranaggio" aria-label="Opzioni" title="Opzioni" data-t-aria="opzioni" data-t-title="opzioni" aria-expanded="false" aria-controls="opzioni">&#9881;&#xFE0E;</button>
       <div id="opzioni" hidden>
         <h2 data-t="hModello">Modello</h2>
@@ -176,6 +362,146 @@
   </div>
 
 </main>
+
+<dialog id="guida" aria-labelledby="guidaTitolo">
+  <div class="guida-testa">
+    <h2 id="guidaTitolo" data-t="guidaTitolo">Come si usa</h2>
+    <button type="button" id="guidaChiudi" aria-label="Chiudi" data-t-aria="chiudi">✕</button>
+  </div>
+  <div class="schermo">
+    <svg viewBox="0 0 640 360" role="img" aria-labelledby="guidaTesto">
+      <defs>
+        <symbol id="cervello" viewBox="0 0 100 120">
+          <ellipse cx="50" cy="60" rx="45" ry="57" fill="#3a3a3a"/>
+          <ellipse cx="50" cy="60" rx="42" ry="54" fill="#8c8c8c"/>
+          <ellipse cx="50" cy="60" rx="33" ry="45" fill="#cfcfcf"/>
+          <path d="M50 6 V40 M50 82 V114" stroke="#3a3a3a" stroke-width="2.4"/>
+          <path d="M9 40 q10 2 14 8 M8 66 q11 -2 16 3 M14 92 q9 -5 15 -1 M91 40 q-10 2 -14 8 M92 66 q-11 -2 -16 3 M86 92 q-9 -5 -15 -1 M30 12 q4 9 10 11 M70 12 q-4 9 -10 11"
+                fill="none" stroke="#5a5a5a" stroke-width="2" stroke-linecap="round"/>
+          <path d="M47 40 q-12 8 -9 26 q3 6 7 3 q-3 -14 3 -27z M53 40 q12 8 9 26 q-3 6 -7 3 q3 -14 -3 -27z" fill="#2e2e2e"/>
+          <ellipse cx="42" cy="76" rx="6" ry="8" fill="#a9a9a9"/><ellipse cx="58" cy="76" rx="6" ry="8" fill="#a9a9a9"/>
+        </symbol>
+        <g id="freccia"><path d="M0 0 L0 16 L4.3 12.2 L7.4 19 L10 17.9 L7 11.3 L12.6 11.3 Z" fill="#fff" stroke="#111" stroke-width="1.3" stroke-linejoin="round"/></g>
+        <g id="browser">
+          <rect x="20" y="16" width="600" height="328" rx="10" class="g-pann g-linea" stroke-width="1.5"/>
+          <path d="M20 26 a10 10 0 0 1 10 -10 h580 a10 10 0 0 1 10 10 V50 H20z" class="g-fondo"/>
+          <circle cx="36" cy="33" r="3.5" fill="#E5677A"/><circle cx="48" cy="33" r="3.5" fill="#E0A526"/><circle cx="60" cy="33" r="3.5" fill="#6CC08B"/>
+          <rect x="30" y="56" width="580" height="18" rx="9" class="g-ril"/>
+          <text x="44" y="68.5" class="g-tenue">rmpapa.github.io</text>
+        </g>
+        <g id="schedaApp"><path d="M78 50 v-12 a5 5 0 0 1 5 -5 h120 a5 5 0 0 1 5 5 v12z" class="g-pann"/>
+          <circle cx="92" cy="42" r="4" class="g-acc"/><text x="102" y="45" class="g-testo">Atlante RM Live</text></g>
+        <g id="schedaApp0"><circle cx="92" cy="42" r="4" class="g-acc" opacity=".6"/><text x="102" y="45" class="g-tenue">Atlante RM Live</text></g>
+        <g id="schedaPacs"><path d="M212 50 v-12 a5 5 0 0 1 5 -5 h96 a5 5 0 0 1 5 5 v12z" class="g-pann"/>
+          <rect x="222" y="38" width="8" height="8" rx="2" fill="#4a90a4"/><text x="236" y="45" class="g-testo">PACS</text></g>
+        <g id="schedaPacs0"><rect x="222" y="38" width="8" height="8" rx="2" fill="#4a90a4" opacity=".6"/><text x="236" y="45" class="g-tenue">PACS</text></g>
+        <g id="appTesta">
+          <circle cx="54" cy="98" r="8" class="g-ril"/><text x="68" y="101.5" class="g-testo" letter-spacing="1">ATLANTE RM</text>
+          <rect x="44" y="150" width="552" height="182" rx="6" fill="#000"/>
+        </g>
+        <g id="pacs">
+          <rect x="44" y="150" width="552" height="182" rx="6" fill="#0b0d10"/>
+          <rect x="44" y="150" width="552" height="14" rx="4" fill="#2a3036"/>
+          <rect x="52" y="155" width="26" height="4" rx="2" fill="#5d666e"/><rect x="84" y="155" width="26" height="4" rx="2" fill="#5d666e"/><rect x="116" y="155" width="26" height="4" rx="2" fill="#5d666e"/>
+          <rect x="52" y="168" width="256" height="160" fill="#000"/><rect x="314" y="168" width="274" height="160" fill="#000"/>
+          <use href="#cervello" x="128" y="174" width="110" height="146"/>
+          <use href="#cervello" x="400" y="174" width="110" height="146"/>
+          <text x="56" y="178" fill="#8aa" font-size="6.5" font-family="Segoe UI">AX T1  SE 3  IM 14</text>
+          <text x="318" y="178" fill="#8aa" font-size="6.5" font-family="Segoe UI">AX FLAIR  SE 5  IM 14</text>
+        </g>
+      </defs>
+
+      <g class="scena" data-s="0">
+        <use href="#browser"/><use href="#schedaApp"/><use href="#schedaPacs0"/>
+        <use href="#appTesta"/>
+        <g class="s1-pill"><rect x="44" y="118" width="104" height="22" rx="11" class="g-acc"/><text x="56" y="132" class="g-acc-t" data-t="avvia">Avvia cattura</text></g>
+        <rect x="154" y="118" width="116" height="22" rx="11" class="g-ril g-linea"/><text x="166" y="132" class="g-tenue" data-t="seleziona">Seleziona riquadro</text>
+        <rect x="276" y="118" width="122" height="22" rx="11" class="g-ril g-linea"/><text x="288" y="132" class="g-tenue" data-t="pip">Finestra fluttuante</text>
+        <circle cx="96" cy="129" r="14" class="clic s1-clic"/>
+        <g class="cursore s1-cur"><use href="#freccia"/></g>
+      </g>
+
+      <g class="scena" data-s="1">
+        <use href="#browser"/><use href="#schedaApp"/><use href="#schedaPacs0"/><use href="#appTesta"/>
+        <rect x="20" y="16" width="600" height="328" rx="10" fill="#000" opacity=".35"/>
+        <rect x="150" y="66" width="340" height="256" rx="10" class="g-chrome"/>
+        <text x="170" y="92" class="g-chrome-tit" data-t="gScegli">Scegli cosa condividere</text>
+        <text x="170" y="114" class="g-chrome-t" style="fill:#1A73E8" data-t="gSchedaChrome">Scheda di Chrome</text>
+        <rect x="170" y="119" width="74" height="2" class="g-blu"/>
+        <text x="262" y="114" class="g-chrome-t" data-t="gFinestra">Finestra</text>
+        <text x="318" y="114" class="g-chrome-t" data-t="gSchermo">Schermo intero</text>
+        <rect x="150" y="121" width="340" height="1" fill="#dadce0"/>
+        <rect x="166" y="132" width="308" height="34" rx="6" class="g-chrome-sel s2-sel" opacity="0"/>
+        <rect x="176" y="138" width="30" height="22" rx="3" fill="#000"/><use href="#cervello" x="185" y="139" width="12" height="20"/>
+        <text x="216" y="152" class="g-chrome-t">PACS – Visualizzatore</text>
+        <rect x="176" y="176" width="30" height="22" rx="3" fill="#e8eaed"/><text x="216" y="190" class="g-chrome-t" data-t="gPosta">Posta in arrivo</text>
+        <rect x="176" y="214" width="30" height="22" rx="3" fill="#e8eaed"/><text x="216" y="228" class="g-chrome-t" data-t="gReferti">Referti</text>
+        <rect x="358" y="286" width="56" height="22" rx="11" fill="#fff" stroke="#dadce0"/><text x="371" y="300" class="g-chrome-t" data-t="gAnnulla">Annulla</text>
+        <g class="s2-condividi" opacity=".45"><rect x="420" y="286" width="58" height="22" rx="11" class="g-blu"/><text x="430" y="300" class="g-blu-t" data-t="gCondividi">Condividi</text></g>
+        <circle cx="254" cy="153" r="14" class="clic s2-clic1"/><circle cx="446" cy="300" r="14" class="clic s2-clic2"/>
+        <g class="cursore s2-cur"><use href="#freccia"/></g>
+      </g>
+
+      <g class="scena" data-s="2">
+        <use href="#browser"/><use href="#schedaApp"/><use href="#schedaPacs0"/><use href="#appTesta"/>
+        <rect x="44" y="118" width="104" height="22" rx="11" class="g-ok"/><text x="56" y="132" class="g-ok-t" data-t="avvia">Avvia cattura</text>
+        <rect x="154" y="118" width="116" height="22" rx="11" class="g-acc"/><text x="166" y="132" class="g-acc-t" data-t="seleziona">Seleziona riquadro</text>
+        <rect x="276" y="118" width="122" height="22" rx="11" class="g-ril g-linea"/><text x="288" y="132" class="g-tenue" data-t="pip">Finestra fluttuante</text>
+        <use href="#pacs"/>
+        <rect x="44" y="150" width="552" height="182" rx="6" fill="#000" class="s3-buio" opacity="0"/>
+        <rect x="122" y="170" width="0" height="0" class="s3-rett" fill="rgba(255,255,255,.04)" style="stroke:var(--accento)" stroke-width="2" stroke-dasharray="6 4"/>
+        <g class="cursore s3-cur"><use href="#freccia"/></g>
+      </g>
+
+      <g class="scena" data-s="3">
+        <use href="#browser"/>
+        <g class="s4-tab1"><use href="#schedaApp"/><use href="#schedaPacs0"/></g>
+        <g class="s4-tab2" opacity="0"><use href="#schedaApp0"/><use href="#schedaPacs"/></g>
+        <g class="s4-app"><use href="#appTesta"/>
+          <rect x="44" y="118" width="104" height="22" rx="11" class="g-ok"/><text x="56" y="132" class="g-ok-t" data-t="avvia">Avvia cattura</text>
+          <rect x="154" y="118" width="116" height="22" rx="11" class="g-ok"/><text x="166" y="132" class="g-ok-t" data-t="seleziona">Seleziona riquadro</text>
+          <rect x="276" y="118" width="122" height="22" rx="11" class="g-acc"/><text x="288" y="132" class="g-acc-t" data-t="pip">Finestra fluttuante</text>
+          <circle cx="340" cy="129" r="14" class="clic s4-clic"/></g>
+        <g class="s4-pacs" opacity="0">
+          <rect x="30" y="82" width="580" height="254" fill="#0b0d10"/>
+          <rect x="30" y="82" width="580" height="16" fill="#2a3036"/>
+          <rect x="38" y="88" width="30" height="4" rx="2" fill="#5d666e"/><rect x="74" y="88" width="30" height="4" rx="2" fill="#5d666e"/>
+          <rect x="38" y="104" width="300" height="226" fill="#000"/>
+          <use href="#cervello" x="108" y="118" width="160" height="200"/>
+          <text x="44" y="116" fill="#8aa" font-size="7" font-family="Segoe UI">AX T1  SE 3  IM 14</text>
+        </g>
+        <g class="s4-pip" opacity="0">
+          <rect x="362" y="100" width="236" height="222" rx="8" class="g-pann g-linea" stroke-width="1.5"/>
+          <rect x="362" y="100" width="236" height="16" rx="8" class="g-fondo"/><text x="372" y="111" class="g-tenue">Atlante RM live</text>
+          <rect x="363" y="117" width="234" height="204" fill="#000"/>
+          <use href="#cervello" x="425" y="150" width="110" height="132"/>
+          <ellipse cx="480" cy="172" rx="30" ry="15" fill="#E58A3A" opacity=".45"/>
+          <ellipse cx="480" cy="263" rx="26" ry="12" fill="#9B6BE0" opacity=".45"/>
+          <ellipse cx="471" cy="234" rx="6.6" ry="8.8" fill="#4FB37A" opacity=".7"/><ellipse cx="489" cy="234" rx="6.6" ry="8.8" fill="#4FB37A" opacity=".7"/>
+          <path transform="translate(425 150) scale(1.1)" d="M47 40 q-12 8 -9 26 q3 6 7 3 q-3 -14 3 -27z M53 40 q12 8 9 26 q-3 6 -7 3 q3 -14 -3 -27z" fill="#3D8FE0" opacity=".9"/>
+          <g>
+            <g class="s4-et"><path d="M462 170 L420 140" stroke="#E58A3A"/><circle cx="462" cy="170" r="2" fill="#E58A3A"/><text x="372" y="143" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gFrontale">frontale sup.</text></g>
+            <g class="s4-et"><path d="M472 205 L420 196" stroke="#3D8FE0"/><circle cx="472" cy="205" r="2" fill="#3D8FE0"/><text x="372" y="199" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gVentricolo">ventricolo</text></g>
+            <g class="s4-et"><path d="M493 234 L542 214" stroke="#4FB37A"/><circle cx="493" cy="234" r="2" fill="#4FB37A"/><text x="546" y="217" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gTalamo">talamo</text></g>
+            <g class="s4-et"><path d="M500 263 L542 292" stroke="#9B6BE0"/><circle cx="500" cy="263" r="2" fill="#9B6BE0"/><text x="546" y="295" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gCuneo">cuneo</text></g>
+            <g class="s4-et"><path d="M452 216 L420 252" stroke="#C9C9C9"/><circle cx="452" cy="216" r="2" fill="#C9C9C9"/><text x="372" y="255" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gSostanzaBianca">sost. bianca</text></g>
+          </g>
+        </g>
+        <g class="cursore s4-cur"><use href="#freccia"/></g>
+      </g>
+    </svg>
+  </div>
+  <div class="didascalia">
+    <span class="num" id="guidaNum">1</span>
+    <div><p id="guidaTesto"></p><p class="nota" id="guidaNota" hidden></p></div>
+  </div>
+  <div class="guida-comandi">
+    <button type="button" id="guidaIndietro" data-t="indietro">Indietro</button>
+    <div class="punti" id="guidaPunti"></div>
+    <button type="button" id="guidaPlay">Pausa</button>
+    <button type="button" id="guidaAvanti" class="primario" autofocus>Avanti</button>
+  </div>
+</dialog>
 
 <div class="sostieni">
   <div id="sostieniPannello" role="dialog" aria-labelledby="sostieniTitolo" hidden>
@@ -255,6 +581,24 @@ const TESTI = {
     sostieniBtn: 'Sostieni il progetto', sostieniTitolo: 'Sostieni il progetto',
     sostieniTesto: 'Atlante RM Live è gratuito e lo sviluppo nel tempo libero. Se ti è utile per studiare o lavorare, una donazione aiuta a coprire l\'addestramento dei modelli e lo sviluppo di nuove versioni. Grazie!',
     dona: 'Dona con PayPal ↗', qr: 'oppure inquadra con il telefono',
+    guida: 'Guida', stile: 'Stile', chiudi: 'Chiudi', guidaTitolo: 'Come si usa Atlante RM Live',
+    indietro: 'Indietro', avanti: 'Avanti', fine: 'Ho capito', pausaGuida: 'Pausa', riproduci: 'Riproduci',
+    vuotoTesto: 'Clicca <b>Avvia cattura</b> e scegli la scheda del PACS: l\'immagine comparirà qui con le strutture etichettate.',
+    vuotoGuida: 'Guarda come si fa',
+    tema_ambra: 'Sala refertazione', temaDescr_ambra: 'Scuro, accento ambra',
+    tema_ardesia: 'Ardesia', temaDescr_ardesia: 'Scuro blu, accento azzurro',
+    tema_chiaro: 'Clinico chiaro', temaDescr_chiaro: 'Chiaro, per stanze illuminate',
+    tema_contrasto: 'Alto contrasto', temaDescr_contrasto: 'Massima leggibilità',
+    guida1: 'Clicca <b>Avvia cattura</b>.',
+    guida2: 'Chrome chiede cosa condividere: nella scheda <b>Scheda di Chrome</b> scegli il <b>PACS</b> e clicca <b>Condividi</b>.',
+    guidaNota2: 'Il PACS non è nell\'elenco? Se è aperto in incognito, apri Atlante nella stessa finestra in incognito, oppure scegli <b>Finestra</b>.',
+    guida3: 'Trascina un rettangolo <b>solo sull\'immagine RM</b>, senza menu né scritte.',
+    guidaNota3: 'Per cambiare zona in seguito clicca di nuovo <b>Seleziona riquadro</b>.',
+    guida4: 'Clicca <b>Finestra fluttuante</b> e torna al PACS: le etichette seguono l\'immagine mentre scorri le sezioni.',
+    guidaNota4: 'Con l\'ingranaggio scegli il modello, mostri le maschere e nascondi le strutture che non ti servono.',
+    gScegli: 'Scegli cosa condividere', gSchedaChrome: 'Scheda di Chrome', gFinestra: 'Finestra', gSchermo: 'Schermo intero',
+    gPosta: 'Posta in arrivo', gReferti: 'Referti', gAnnulla: 'Annulla', gCondividi: 'Condividi',
+    gVentricolo: 'ventricolo', gTalamo: 'talamo', gSostanzaBianca: 'sost. bianca', gFrontale: 'frontale sup.', gCuneo: 'cuneo',
   },
   en: {
     avvia: 'Start capture', seleziona: 'Select area', pip: 'Floating window', istruzioni: 'Instructions',
@@ -279,6 +623,24 @@ const TESTI = {
     sostieniBtn: 'Support the project', sostieniTitolo: 'Support the project',
     sostieniTesto: 'Atlante RM Live is free and developed in my spare time. If it helps you study or work, a donation helps cover training the models and developing new versions. Thank you!',
     dona: 'Donate with PayPal ↗', qr: 'or scan with your phone',
+    guida: 'Guide', stile: 'Style', chiudi: 'Close', guidaTitolo: 'How to use Atlante RM Live',
+    indietro: 'Back', avanti: 'Next', fine: 'Got it', pausaGuida: 'Pause', riproduci: 'Play',
+    vuotoTesto: 'Click <b>Start capture</b> and choose the PACS tab: the image will appear here with labelled structures.',
+    vuotoGuida: 'See how it works',
+    tema_ambra: 'Reading room', temaDescr_ambra: 'Dark, amber accent',
+    tema_ardesia: 'Slate', temaDescr_ardesia: 'Dark blue, light blue accent',
+    tema_chiaro: 'Clinical light', temaDescr_chiaro: 'Light, for bright rooms',
+    tema_contrasto: 'High contrast', temaDescr_contrasto: 'Maximum legibility',
+    guida1: 'Click <b>Start capture</b>.',
+    guida2: 'Chrome asks what to share: in the <b>Chrome tab</b> section pick the <b>PACS</b> and click <b>Share</b>.',
+    guidaNota2: 'PACS not in the list? If it is open in incognito, open Atlante in the same incognito window, or choose <b>Window</b>.',
+    guida3: 'Drag a rectangle <b>over the MRI image only</b>, without menus or text.',
+    guidaNota3: 'To change the area later, click <b>Select area</b> again.',
+    guida4: 'Click <b>Floating window</b> and go back to the PACS: the labels follow the image as you scroll through the slices.',
+    guidaNota4: 'Use the gear to pick the model, show the masks and hide the structures you do not need.',
+    gScegli: 'Choose what to share', gSchedaChrome: 'Chrome tab', gFinestra: 'Window', gSchermo: 'Entire screen',
+    gPosta: 'Inbox', gReferti: 'Reports', gAnnulla: 'Cancel', gCondividi: 'Share',
+    gVentricolo: 'ventricle', gTalamo: 'thalamus', gSostanzaBianca: 'white matter', gFrontale: 'sup. frontal', gCuneo: 'cuneus',
   },
 };
 const NOMI_EN = {          // strutture (nomi di config_app.json) e gruppi del pannello
@@ -507,6 +869,7 @@ function evidenzia(id) {                   // giallo = passo successivo, verde =
   const passi = ['avvia', 'seleziona', 'pip'], k = id ? passi.indexOf(id) : passi.length;
   passi.forEach((b, i) => { const el = document.getElementById(b);
     el.classList.toggle('primario', i === k); el.classList.toggle('fatto', i < k); });
+  vista.classList.toggle('vuota', k === 0);
 }
 async function avvia() {
   try {
@@ -551,7 +914,7 @@ function disegnaSelezione() {
     const w = Math.abs(trascina.x1 - trascina.x0), h = Math.abs(trascina.y1 - trascina.y0);
     ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(0, 0, tela.clientWidth, tela.clientHeight);
     ctx.drawImage(video, (x - a.x) / a.s, (y - a.y) / a.s, w / a.s, h / a.s, x, y, w, h);
-    ctx.strokeStyle = '#E0A526'; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accento').trim() || '#E0A526'; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
   }
 }
 function posizione(ev) { const r = tela.getBoundingClientRect(); return { x: ev.clientX - r.left, y: ev.clientY - r.top }; }
@@ -838,7 +1201,7 @@ async function apriPiP() {
   pipWin = await documentPictureInPicture.requestWindow({ width: 560, height: 640 });
   const st = pipWin.document.createElement('style'); st.textContent = $('stili').textContent;
   pipWin.document.head.append(st); pipWin.document.title = 'Atlante RM live';
-  pipWin.document.body.className = 'in-pip'; pipWin.document.documentElement.lang = lingua;
+  pipWin.document.body.className = 'in-pip'; pipWin.document.documentElement.dataset.tema = tema; pipWin.document.documentElement.lang = lingua;
   pipWin.document.body.append(vista);
   video.play().catch(() => {});
   pipWin.addEventListener('resize', disegna);
@@ -908,7 +1271,7 @@ function applicaLingua() {
   $('pausa').textContent = tr(inPausa ? 'riprendi' : 'pausa');
   if (ultimoMessaggio) messaggio(...ultimoMessaggio);
   if (ultimoStato) stato(ultimoStato);
-  costruisciOpzioni(); aggiornaScelta(); disegna();
+  costruisciOpzioni(); aggiornaScelta(); costruisciTemi(); testiGuida(); disegna();
 }
 document.querySelector('.lingua').addEventListener('click', ev => {
   const b = ev.target.closest('button[data-lingua]'); if (!b || b.dataset.lingua === lingua) return;
@@ -916,6 +1279,79 @@ document.querySelector('.lingua').addEventListener('click', ev => {
   try { localStorage.setItem('annotatore-lingua', lingua); } catch {}
   applicaLingua();
 });
+// ---------------- Stile (tema) ----------------
+const TEMI = ['ambra', 'ardesia', 'chiaro', 'contrasto'];
+const CAMPIONI = { ambra: ['#12171B', '#E0A526', '#2C353D'], ardesia: ['#0E1420', '#5B9DF5', '#283447'],
+                   chiaro: ['#FFFFFF', '#1E5FAF', '#D3DAE1'], contrasto: ['#000000', '#FFD60A', '#FFFFFF'] };
+let tema = (() => { try { const t = localStorage.getItem('annotatore-tema'); if (TEMI.includes(t)) return t; } catch {} return 'ambra'; })();
+function applicaTema() {
+  for (const doc of [document, pipWin && pipWin.document]) if (doc) doc.documentElement.dataset.tema = tema;
+  document.querySelectorAll('#temi button').forEach(b => b.setAttribute('aria-checked', b.dataset.tema === tema));
+}
+function costruisciTemi() {
+  const box = $('temi'); box.textContent = '';
+  for (const t of TEMI) {
+    const b = document.createElement('button'); b.type = 'button'; b.dataset.tema = t; b.setAttribute('role', 'menuitemradio');
+    const c = document.createElement('span'); c.className = 'campione';
+    for (const col of CAMPIONI[t]) { const i = document.createElement('i'); i.style.background = col; c.append(i); }
+    const txt = document.createElement('span'); txt.append(tr('tema_' + t));
+    const d = document.createElement('small'); d.textContent = tr('temaDescr_' + t); txt.append(d);
+    b.append(c, txt); box.append(b);
+  }
+  applicaTema();
+}
+const menuTemi = apri => { $('temi').hidden = !apri; $('stileBtn').setAttribute('aria-expanded', apri);
+  if (apri) (document.querySelector('#temi button[aria-checked=true]') || document.querySelector('#temi button')).focus(); };
+$('stileBtn').onclick = ev => { ev.stopPropagation(); menuTemi($('temi').hidden); };
+$('temi').addEventListener('click', ev => {
+  const b = ev.target.closest('button[data-tema]'); if (!b) return;
+  tema = b.dataset.tema; try { localStorage.setItem('annotatore-tema', tema); } catch {}
+  applicaTema(); menuTemi(false); $('stileBtn').focus(); disegna();
+});
+$('temi').addEventListener('keydown', ev => {
+  const bs = [...document.querySelectorAll('#temi button')], i = bs.indexOf(document.activeElement);
+  if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); bs[(i + (ev.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length].focus(); }
+  if (ev.key === 'Escape') { menuTemi(false); $('stileBtn').focus(); }
+});
+document.addEventListener('click', ev => { if (!ev.target.closest('.menu-stile')) menuTemi(false); });
+
+// ---------------- Guida animata ----------------
+const SCENE = 4, DURATA = 6800;
+let scenaG = 0, timerG = null, guidaInPlay = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+function mostraScena(i) {
+  scenaG = (i + SCENE) % SCENE;
+  document.querySelectorAll('#guida .scena').forEach(g => g.classList.remove('attiva'));
+  const g = document.querySelector(`#guida .scena[data-s="${scenaG}"]`);
+  void g.getBoundingClientRect(); g.classList.add('attiva');
+  $('guidaNum').textContent = scenaG + 1;
+  $('guidaTesto').innerHTML = tr('guida' + (scenaG + 1));
+  const nota = tr('guidaNota' + (scenaG + 1)); $('guidaNota').hidden = nota === 'guidaNota' + (scenaG + 1); $('guidaNota').innerHTML = $('guidaNota').hidden ? '' : nota;
+  document.querySelectorAll('#guidaPunti button').forEach((b, k) => b.setAttribute('aria-current', k === scenaG));
+  testiGuida();
+  clearTimeout(timerG);
+  if (guidaInPlay) timerG = setTimeout(() => mostraScena(scenaG + 1), DURATA);
+}
+function testiGuida() {
+  $('guidaAvanti').textContent = tr(scenaG === SCENE - 1 ? 'fine' : 'avanti');
+  $('guidaPlay').textContent = tr(guidaInPlay ? 'pausaGuida' : 'riproduci');
+  if ($('guida').open) { $('guidaTesto').innerHTML = tr('guida' + (scenaG + 1));
+    const k = 'guidaNota' + (scenaG + 1), n = tr(k); $('guidaNota').hidden = n === k; $('guidaNota').innerHTML = n === k ? '' : n; }
+}
+function apriGuida() { if (!$('guida').open) $('guida').showModal(); mostraScena(0); }
+(() => { const p = $('guidaPunti');
+  for (let k = 0; k < SCENE; k++) { const b = document.createElement('button'); b.type = 'button'; b.dataset.k = k;
+    b.setAttribute('aria-label', `${k + 1} / ${SCENE}`); p.append(b); } })();
+$('guidaPunti').addEventListener('click', ev => { const b = ev.target.closest('button'); if (b) mostraScena(+b.dataset.k); });
+$('guidaIndietro').onclick = () => mostraScena(scenaG - 1);
+$('guidaAvanti').onclick = () => { if (scenaG === SCENE - 1) $('guida').close(); else mostraScena(scenaG + 1); };
+$('guidaPlay').onclick = () => { guidaInPlay = !guidaInPlay; $('guidaPlay').textContent = tr(guidaInPlay ? 'pausaGuida' : 'riproduci'); mostraScena(scenaG); };
+$('guidaChiudi').onclick = () => $('guida').close();
+$('guida').addEventListener('close', () => clearTimeout(timerG));
+$('guida').addEventListener('click', ev => { if (ev.target === $('guida')) $('guida').close(); });   // clic fuori
+$('guida').addEventListener('keydown', ev => { if (ev.key === 'ArrowRight') mostraScena(scenaG + 1); if (ev.key === 'ArrowLeft') mostraScena(scenaG - 1); });
+$('guidaBtn').onclick = apriGuida;
+$('vuotoGuida').onclick = apriGuida;
+costruisciTemi();
 messaggio(() => tr('caricamentoIniziale'), false, true);
 applicaLingua();
 if (typeof ort === 'undefined') messaggio(() => tr('ortMancante'), true);
