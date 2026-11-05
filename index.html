@@ -112,7 +112,7 @@
   .riga { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 0; cursor: pointer; }
   .riga small { color: var(--tenue); font-family: var(--num); }
   .passo { display: inline-flex; align-items: center; gap: 6px; }
-  .passo button { width: 30px; height: 26px; padding: 0; font-size: .85rem; }
+  .passo button { display: grid; place-items: center; width: 30px; height: 26px; padding: 0; font-size: 1rem; line-height: 1; }
   .passo output { font-family: var(--num); min-width: 2.5ch; text-align: center; }
   .gruppo-riga { display: flex; align-items: center; gap: 2px; }
   .gruppo-riga .riga { flex: 1; }
@@ -220,6 +220,54 @@
   body.in-pip #vista:not(:hover):not(:focus-within) .barra,
   body.in-pip #vista:not(:hover):not(:focus-within) #ingranaggio[aria-expanded=false] { opacity: 0; pointer-events: none; }
   @media (prefers-reduced-motion: reduce) { body.in-pip .barra, body.in-pip #ingranaggio { transition: none; } }
+
+  /* Lingua alta come gli altri pulsanti della testata */
+  .strumenti button.discreto, .strumenti .lingua { height: 34px; }
+  .lingua { align-items: stretch; }
+  .lingua button { display: inline-flex; align-items: center; padding: 0 13px; font-size: .85rem; }
+
+  /* Strumenti di misura */
+  #tela { margin-left: 42px; width: calc(100% - 42px); }
+  #strumenti { position: absolute; left: 0; top: 0; bottom: 42px; width: 42px; z-index: 3; display: flex; flex-direction: column;
+               align-items: center; gap: 2px; padding: 6px 0; overflow-y: auto; scrollbar-width: none;
+               background: var(--pannello); border-right: var(--bordo) solid var(--linea); }
+  .strum { flex: none; display: grid; place-items: center; width: 32px; height: 30px; padding: 0; border: 0; border-radius: 6px;
+           background: transparent; color: var(--tenue); }
+  .strum:hover { background: var(--rilievo); color: var(--testo); }
+  .strum[aria-pressed=true] { background: var(--accento); color: var(--accento-testo); }
+  .strum .ico { width: 17px; height: 17px; }
+  #strumenti .sep { flex: none; width: 22px; height: 1px; margin: 4px 0; background: var(--linea); }
+  #pannelloStrum { position: absolute; left: 50px; top: 8px; z-index: 4; width: min(260px, calc(100% - 60px)); max-height: calc(100% - 64px);
+                   overflow-y: auto; padding: 10px 12px; font-size: .85rem; background: var(--pannello); color: var(--testo);
+                   border: var(--bordo) solid var(--linea); border-radius: 10px; box-shadow: var(--ombra); }
+  #pannelloStrum[hidden], #pannelloStrum [data-ps][hidden] { display: none; }
+  #pannelloStrum.largo { width: min(340px, calc(100% - 60px)); left: auto; right: 8px; top: 48px; }
+  #lesRisultato .les-testa { margin: 8px 0; }
+  .les-str { padding: 7px 0; border-top: 1px solid var(--linea); }
+  .les-nome { display: flex; justify-content: space-between; gap: 8px; font-weight: 600; }
+  .les-nome span { font-family: var(--num); font-variant-numeric: tabular-nums; color: var(--accento); }
+  .les-str ul { margin: 4px 0 0; padding-left: 18px; line-height: 1.45; }
+  .les-str li + li { margin-top: 2px; }
+  #didRisultato p { margin: 0 0 6px; line-height: 1.5; }
+  #didRisultato .did-nome { font: 600 1rem var(--corpo); margin-bottom: 8px; }
+  #didRisultato .did-tit { margin: 10px 0 3px; color: var(--tenue); font-size: .78rem; font-weight: 600; }
+  #didRisultato ul { margin: 0; padding-left: 18px; line-height: 1.5; }
+  #didRisultato li + li { margin-top: 3px; }
+  .les-nulla { margin: 3px 0 0; color: var(--tenue); }
+  #pannelloStrum h2 { font: 600 .85rem var(--corpo); margin: 0 0 6px; }
+  #pannelloStrum input[type=number], #pannelloStrum input[type=text] { width: 84px; padding: 4px 6px; border: var(--bordo) solid var(--linea);
+    border-radius: 5px; background: var(--rilievo); color: var(--testo); font: inherit; }
+  #pannelloStrum input[type=text] { width: 130px; }
+  #pannelloStrum button { padding: 5px 10px; font-size: .82rem; margin-top: 6px; }
+  .aiuto-ps { color: var(--tenue); margin: 0 0 6px; line-height: 1.45; }
+  .ps-risultato { margin: 8px 0 4px; font: 600 1rem var(--num); font-variant-numeric: tabular-nums; }
+  .ps-risultato:empty { display: none; }
+  .ps-azioni { display: flex; gap: 6px; }
+  #volFette { margin: 6px 0; padding-left: 20px; font-family: var(--num); font-variant-numeric: tabular-nums; color: var(--testo); }
+  #volFette:empty { display: none; }
+  #volFette button { margin: 0 0 0 6px; padding: 0 5px; font-size: .75rem; }
+  body.in-pip #vista:not(:hover):not(:focus-within) #strumenti { opacity: 0; pointer-events: none; }
+  body.in-pip #strumenti { transition: opacity .2s; bottom: 0; }
   .privacy { display: flex; align-items: center; gap: 8px; margin: 12px 0 0; color: var(--tenue); font-size: .85rem; }
   .privacy svg { width: 14px; height: 14px; flex: none; color: var(--ok); }
   /* Sostieni: più sobrio */
@@ -266,7 +314,7 @@
 
   /* scena 1: clic su Avvia cattura */
   .scena.attiva .s1-cur { animation-name: s1-cur; }
-  @keyframes s1-cur { 0%,10% { transform: translate(560px, 300px); } 52% { transform: translate(92px, 132px); }
+  @keyframes s1-cur { 0%,10% { transform: translate(150px, 230px); } 52% { transform: translate(92px, 132px); }
                       58% { transform: translate(92px, 132px) scale(.85); } 64%,100% { transform: translate(92px, 132px); } }
   .scena.attiva .s1-clic { animation-name: anello; animation-delay: 3.4s; animation-duration: .8s; }
   .scena.attiva .s1-pill { animation-name: premi; animation-delay: 3.4s; animation-duration: .4s; transform-box: fill-box; transform-origin: center; }
@@ -277,7 +325,7 @@
 
   /* scena 2: scelta della scheda del PACS */
   .scena.attiva .s2-cur { animation-name: s2-cur; }
-  @keyframes s2-cur { 0%,8% { transform: translate(470px, 330px); } 32% { transform: translate(250px, 150px); }
+  @keyframes s2-cur { 0%,8% { transform: translate(92px, 132px); } 32% { transform: translate(250px, 150px); }
                       36% { transform: translate(250px, 150px) scale(.85); } 40%,48% { transform: translate(250px, 150px); }
                       74% { transform: translate(442px, 297px); } 78% { transform: translate(442px, 297px) scale(.85); }
                       82%,100% { transform: translate(442px, 297px); } }
@@ -289,7 +337,7 @@
 
   /* scena 3: trascinare il riquadro */
   .scena.attiva .s3-cur { animation-name: s3-cur; }
-  @keyframes s3-cur { 0%,6% { transform: translate(520px, 110px); } 28% { transform: translate(120px, 170px); }
+  @keyframes s3-cur { 0%,6% { transform: translate(442px, 297px); } 28% { transform: translate(120px, 170px); }
                       34% { transform: translate(120px, 170px) scale(.85); } 76% { transform: translate(242px, 322px) scale(.85); }
                       82%,100% { transform: translate(242px, 322px); } }
   .scena.attiva .s3-rett { animation-name: s3-rett; }
@@ -299,7 +347,7 @@
 
   /* scena 4: la finestra fluttuante compare sopra la stessa scheda */
   .scena.attiva .s4-cur { animation-name: s4-cur; }
-  @keyframes s4-cur { 0%,5% { transform: translate(470px, 250px); } 26% { transform: translate(336px, 132px); }
+  @keyframes s4-cur { 0%,5% { transform: translate(242px, 322px); } 26% { transform: translate(336px, 132px); }
                       30% { transform: translate(336px, 132px) scale(.85); } 34%,100% { transform: translate(336px, 132px); } }
   .scena.attiva .s4-clic { animation-name: anello; animation-delay: 1.8s; animation-duration: .8s; }
   .scena.attiva .s4-pip { animation-name: s4-pip; animation-delay: 2.3s; animation-duration: .5s; transform-box: fill-box; transform-origin: center; }
@@ -381,13 +429,54 @@
         </div>
       </div>
       <button id="ingranaggio" aria-label="Opzioni" title="Opzioni" data-t-aria="opzioni" data-t-title="opzioni" aria-expanded="false" aria-controls="opzioni"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 5.3a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.9 1.5h2.2l.4 1.8 1.3.6 1.6-1 1.5 1.5-1 1.6.6 1.3 1.8.4v2.2l-1.8.4-.6 1.3 1 1.6-1.5 1.5-1.6-1-1.3.6-.4 1.8H6.9l-.4-1.8-1.3-.6-1.6 1-1.5-1.5 1-1.6-.6-1.3-1.8-.4V6.9l1.8-.4.6-1.3-1-1.6 1.5-1.5 1.6 1 1.3-.6z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button>
+      <div id="strumenti" role="toolbar" aria-label="Strumenti" data-t-aria="strumenti">
+        <button type="button" class="strum" data-strum="didattica" aria-pressed="false" data-t-title="s_didattica" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3L1 6.5 8 10l7-3.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8v3.2c1.2 1.2 2.6 1.8 4 1.8s2.8-.6 4-1.8V8M15 6.5v4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span><button type="button" class="strum" data-strum="sposta" aria-pressed="false" data-t-title="s_sposta" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v13M1.5 8h13M8 1.5l-2 2M8 1.5l2 2M8 14.5l-2-2M8 14.5l2-2M1.5 8l2-2M1.5 8l2 2M14.5 8l-2-2M14.5 8l-2 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="righello" aria-pressed="false" data-t-title="s_righello" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 12.5L12.5 2l1.5 1.5L3.5 14z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5l1.2 1.2M7 7.5l1.2 1.2M9 5.5l1.2 1.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="angolo" aria-pressed="false" data-t-title="s_angolo" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5h11M2.5 13.5L11 3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 13.5a4 4 0 0 0-1.3-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="area" aria-pressed="false" data-t-title="s_area" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5.5L7.5 2.5l5.5 2-1 6.5-5 3L2.5 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="ellisse" aria-pressed="false" data-t-title="s_ellisse" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6" ry="4.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="penna" aria-pressed="false" data-t-title="s_penna" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5l1-3.5L11 2.5l2.5 2.5L6 12.5z M9.5 4l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="freccia" aria-pressed="false" data-t-title="s_freccia" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13L13 3M13 3H7.5M13 3v5.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="testo" aria-pressed="false" data-t-title="s_testo" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h10M8 3.5v10M6 13.5h4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span>
+        <button type="button" class="strum" data-strum="struttura" aria-pressed="false" data-t-title="s_struttura" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5l8 4-3.5 1.2L6 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11.5" cy="11.5" r="2.5" fill="currentColor"/></svg></button><button type="button" class="strum" data-strum="lesione" aria-pressed="false" data-t-title="s_lesione" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2c3.3 0 6 2.4 6 5.6 0 3.4-2.7 6.4-6 6.4S2 11 2 7.6C2 4.4 4.7 2 8 2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 6.2c1.2.2 1.8 1 1.6 2-.2 1.2-1.4 1.6-2.4 1.2-.9-.4-1.1-1.5-.5-2.4.3-.5.8-.8 1.3-.8z" fill="currentColor"/></svg></button><button type="button" class="strum" data-strum="evans" aria-pressed="false" data-t-title="s_evans" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6.2" ry="6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 6.5h5M2.5 9.5h11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="calibra" aria-pressed="false" data-t-title="s_calibra" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 6h13v4h-13z M4 6v2M6.5 6v2.5M9 6v2M11.5 6v2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="volume" aria-pressed="false" data-t-title="s_volume" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2l6 3-6 3-6-3z M2 8l6 3 6-3 M2 11l6 3 6-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="abc" aria-pressed="false" data-t-title="s_abc" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><text x="8" y="11.2" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" font-family="Segoe UI, sans-serif">ABC</text></svg></button><span class="sep"></span>
+        <button type="button" class="strum" id="annullaMisura" data-t-title="s_annulla" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3.5L2.5 6.5l3 3M2.5 6.5H10a3.5 3.5 0 0 1 0 7H7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" id="cancellaMisure" data-t-title="s_cancella" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5h11M6 4.5V2.5h4v2M4 4.5l.8 9h6.4l.8-9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div id="pannelloStrum" hidden>
+        <h2 id="psTitolo"></h2>
+        <div data-ps="calibra">
+          <p class="aiuto-ps" data-t="ps_calibra"></p>
+          <label class="riga"><span data-t="lunghezzaNota">Lunghezza nota (mm)</span><input type="number" id="calMm" min="0.1" step="0.1" value="10"></label>
+          <button type="button" id="calApplica" class="primario" data-t="applica">Applica</button>
+        </div>
+        <div data-ps="volume">
+          <p class="aiuto-ps" data-t="ps_volume"></p>
+          <label class="riga"><span data-t="spessore">Spessore fetta (mm)</span><input type="number" id="volSpess" min="0.1" step="0.1" value="5"></label>
+          <label class="riga"><span data-t="gap">Gap tra fette (mm)</span><input type="number" id="volGap" min="0" step="0.1" value="1"></label>
+          <ol id="volFette"></ol>
+          <div class="ps-azioni"><button type="button" id="volAggiungi" class="primario" data-t="aggiungiFetta">Aggiungi fetta</button><button type="button" id="volAzzera" data-t="azzera">Azzera</button></div>
+        </div>
+        <div data-ps="abc">
+          <p class="aiuto-ps" data-t="ps_abc"></p>
+          <label class="riga"><span data-t="nFette">Fette con la lesione</span><input type="number" id="abcN" min="1" step="1" value="1"></label>
+          <label class="riga"><span data-t="spessGap">Spessore + gap (mm)</span><input type="number" id="abcSp" min="0.1" step="0.1" value="6"></label>
+        </div>
+        <div data-ps="evans">
+          <p class="aiuto-ps" data-t="ps_evans"></p>
+          <button type="button" id="evansAuto" data-t="automatico">Automatico</button>
+        </div>
+        <div data-ps="testo">
+          <label class="riga"><span data-t="testoNota">Testo</span><input type="text" id="testoNota" value="" maxlength="60"></label>
+          <p class="aiuto-ps" data-t="ps_testo"></p>
+        </div>
+        <div data-ps="struttura"><p class="aiuto-ps" data-t="ps_struttura"></p>
+          <button type="button" id="strutturaVolume" data-t="aggiungiVolume" disabled>Aggiungi al volume</button></div>
+        <div data-ps="didattica"><div id="didRisultato"></div></div>
+        <div data-ps="lesione"><p class="aiuto-ps" data-t="ps_lesione"></p>
+          <label class="riga riga-check"><span data-t="lesNeuro">Immagine in convenzione neurologica</span><input type="checkbox" class="switch" role="switch" id="lesNeuro"></label>
+          <div id="lesRisultato"></div></div>
+        <p id="psRisultato" class="ps-risultato"></p>
+        <p id="psCal" class="aiuto-ps"></p>
+      </div>
       <div id="opzioni" hidden>
         <h2 data-t="hModello">Modello</h2>
         <div class="scelta" id="sceltaModello" role="group" aria-label="Versione del modello" data-t-aria="versioneModello"></div>
         <h2 data-t="hVisual">Visualizzazione</h2>
         <label class="riga"><span><span data-t="maschera">Maschera</span> <kbd>M</kbd></span> <input type="checkbox" class="switch" role="switch" id="mostraMaschere"></label>
         <label class="riga"><span><span data-t="etichette">Etichette</span> <kbd>E</kbd></span> <input type="checkbox" class="switch" role="switch" id="mostraEtichette" checked></label>
-        <div class="riga"><span><span data-t="grandezza">Grandezza testo</span> <kbd>+</kbd><kbd>−</kbd></span>
+        <div class="riga"><span data-t="grandezza">Grandezza testo</span>
           <span class="passo"><button id="fontMeno" aria-label="Riduci il testo" data-t-aria="riduci">−</button><output id="fontValore">12</output><button id="fontPiu" aria-label="Ingrandisci il testo" data-t-aria="ingrandisci">+</button></span>
         </div>
         <h2 data-t="hNascondi">Nascondi elementi</h2>
@@ -696,10 +785,37 @@ const TESTI = {
     vuotoTesto: 'Clicca <b>Avvia cattura</b> e scegli la scheda del PACS: l\'immagine comparirà qui con le strutture etichettate.',
     vuotoGuida: 'Guida',
     tema: 'Tema', temaChiaro: 'Passa al tema chiaro', temaScuro: 'Passa al tema scuro',
+    s_didattica: 'Guida alle strutture: clicca una struttura per vederne funzione e deficit', didVuoto: 'Clicca una struttura sull\'immagine o la sua etichetta.',
+    funzione: 'Funzione', deficitLesione: 'In caso di lesione', controlat: 'controlaterale', omolat: 'omolaterale',
+    s_lesione: 'Analisi lesione (traccia il contorno della lesione)',
+    ps_lesione: 'Traccia il contorno della lesione: vengono indicate le strutture coinvolte e i deficit che potrebbero manifestarsi. Di solito il PACS mostra le immagini in convenzione radiologica (la sinistra dell\'immagine è la destra del paziente).',
+    lesNeuro: 'Convenzione neurologica (sinistra = sinistra)', latoSx: 'a sinistra', latoDx: 'a destra', latoEntrambi: 'su entrambi i lati',
+    lesEmisfero: 'Emisfero', emisferoSx: 'sinistro', emisferoDx: 'destro', emisferoBi: 'entrambi / linea mediana',
+    seSx: 'Se a sinistra: ', seDx: 'Se a destra: ', lesNessuno: 'Nessun deficit focale atteso.',
+    strumenti: 'Strumenti', s_sposta: 'Sposta e zoom (Ctrl + rotella per lo zoom, doppio clic per tornare alla vista intera)',
+    s_righello: 'Righello', s_angolo: 'Angolo (3 clic)', s_area: 'Area a mano libera', s_ellisse: 'Area ellisse', s_penna: 'Penna',
+    s_freccia: 'Freccia', s_testo: 'Testo', s_struttura: 'Area di una struttura (clic sulla struttura)', s_evans: 'Indice di Evans',
+    s_calibra: 'Calibrazione', s_volume: 'Volume per fette', s_abc: 'Volume ABC/2', s_annulla: 'Annulla l\'ultima misura (Ctrl+Z)',
+    s_cancella: 'Cancella tutte le misure',
+    ps_calibra: 'Traccia una linea su una lunghezza nota (per esempio il righello del PACS), scrivi i mm e premi Applica. Se cambi lo zoom nel PACS ripeti la calibrazione.',
+    ps_volume: 'Su ogni fetta traccia l\'area (mano libera, ellisse o clic su una struttura) e premi Aggiungi fetta, poi passa alla fetta successiva nel PACS.',
+    ps_abc: 'Traccia A, l\'asse maggiore della lesione nella fetta in cui è più grande, poi B, perpendicolare ad A. C = fette × spessore.',
+    ps_evans: 'Traccia la larghezza massima dei corni frontali, poi il diametro interno del cranio sulla stessa fetta, oppure premi Automatico.',
+    ps_testo: 'Scrivi il testo, poi clicca sull\'immagine dove metterlo.',
+    ps_struttura: 'Clicca su una struttura etichettata per misurarne l\'area in questa fetta.',
+    lunghezzaNota: 'Lunghezza nota (mm)', applica: 'Applica', spessore: 'Spessore fetta (mm)', gap: 'Gap tra fette (mm)',
+    aggiungiFetta: 'Aggiungi fetta', azzera: 'Azzera', nFette: 'Fette con la lesione', spessGap: 'Spessore + gap (mm)',
+    automatico: 'Automatico', testoNota: 'Testo', aggiungiVolume: 'Aggiungi al volume',
+    calibrato: p => `Calibrazione: ${p.v} mm per pixel`, nonCalibrato: 'Non calibrato: le misure sono in pixel.',
+    calLinea: 'Prima traccia la linea di calibrazione.', fetta: 'fetta', volTot: p => `Volume: ${p.v} mL (${p.n} fette)`,
+    nessunaArea: 'Traccia prima un\'area su questa fetta.', abcRis: p => `A ${p.a} × B ${p.b} × C ${p.c} / 2 = ${p.v} mL`,
+    abcManca: 'Traccia la linea A, poi la B.', evansRis: p => `Indice di Evans: ${p.v}${p.alto ? ' (≥ 0,3: ventricolomegalia)' : ''}`,
+    evansManca: 'Traccia i corni frontali, poi il diametro interno del cranio.', evansNo: 'Ventricoli laterali non trovati in questa fetta.',
+    bloccata: 'immagine bloccata per le misure: cancellale per riprendere', serveCal: 'calibra per avere i mm',
     salva: 'Salva immagine', salvaTitolo: 'Salva l\'immagine come la vedi (PNG)', salvata: p => `Immagine salvata: ${p.f}`,
     cerca: 'Cerca struttura…', nessunRisultato: 'Nessuna struttura trovata.',
     tipSeleziona: 'Prima avvia la cattura', tipPip: 'Prima seleziona il riquadro sull\'immagine',
-    demoBtn: 'Prova con un esempio', demoAttiva: 'Esempio: atlante MNI152 (ICBM 2009c, McConnell Brain Imaging Centre). Usa la rotella sull\'immagine per cambiare sezione.',
+    demoBtn: 'Prova con un esempio', demoAttiva: 'Usa la rotella sull\'immagine per cambiare sezione.',
     privacy: 'Le immagini restano nel tuo browser: l\'analisi avviene sul tuo computer e nessun dato viene inviato o salvato altrove.',
     guida1: 'Clicca <b>Avvia cattura</b>.',
     guidaNota1: 'In alternativa alla scheda del PACS puoi condividere anche una <b>finestra</b> o lo <b>schermo intero</b> del PC.',
@@ -744,10 +860,37 @@ const TESTI = {
     vuotoTesto: 'Click <b>Start capture</b> and choose the PACS tab: the image will appear here with labelled structures.',
     vuotoGuida: 'Guide',
     tema: 'Theme', temaChiaro: 'Switch to light theme', temaScuro: 'Switch to dark theme',
+    s_didattica: 'Structure guide: click a structure to see its function and deficits', didVuoto: 'Click a structure on the image or its label.',
+    funzione: 'Function', deficitLesione: 'If damaged', controlat: 'contralateral', omolat: 'ipsilateral',
+    s_lesione: 'Lesion analysis (draw the outline of the lesion)',
+    ps_lesione: 'Draw the outline of the lesion: the structures involved and the deficits that may appear are listed. PACS usually shows images in radiological convention (the left of the image is the patient\'s right).',
+    lesNeuro: 'Neurological convention (left = left)', latoSx: 'left', latoDx: 'right', latoEntrambi: 'bilateral',
+    lesEmisfero: 'Hemisphere', emisferoSx: 'left', emisferoDx: 'right', emisferoBi: 'both / midline',
+    seSx: 'If left: ', seDx: 'If right: ', lesNessuno: 'No focal deficit expected.',
+    strumenti: 'Tools', s_sposta: 'Pan and zoom (Ctrl + wheel to zoom, double-click to fit)',
+    s_righello: 'Ruler', s_angolo: 'Angle (3 clicks)', s_area: 'Freehand area', s_ellisse: 'Ellipse area', s_penna: 'Pen',
+    s_freccia: 'Arrow', s_testo: 'Text', s_struttura: 'Area of a structure (click the structure)', s_evans: 'Evans index',
+    s_calibra: 'Calibration', s_volume: 'Volume from slices', s_abc: 'ABC/2 volume', s_annulla: 'Undo last measurement (Ctrl+Z)',
+    s_cancella: 'Clear all measurements',
+    ps_calibra: 'Draw a line over a known length (for example the PACS ruler), type the mm and press Apply. If you change the zoom in the PACS, calibrate again.',
+    ps_volume: 'On each slice draw the area (freehand, ellipse or click a structure) and press Add slice, then move to the next slice in the PACS.',
+    ps_abc: 'Draw A, the longest axis of the lesion on the slice where it is largest, then B, perpendicular to A. C = slices × thickness.',
+    ps_evans: 'Draw the maximum width of the frontal horns, then the inner skull diameter on the same slice, or press Automatic.',
+    ps_testo: 'Type the text, then click on the image where to place it.',
+    ps_struttura: 'Click a labelled structure to measure its area on this slice.',
+    lunghezzaNota: 'Known length (mm)', applica: 'Apply', spessore: 'Slice thickness (mm)', gap: 'Gap between slices (mm)',
+    aggiungiFetta: 'Add slice', azzera: 'Reset', nFette: 'Slices with the lesion', spessGap: 'Thickness + gap (mm)',
+    automatico: 'Automatic', testoNota: 'Text', aggiungiVolume: 'Add to volume',
+    calibrato: p => `Calibration: ${p.v} mm per pixel`, nonCalibrato: 'Not calibrated: measurements are in pixels.',
+    calLinea: 'Draw the calibration line first.', fetta: 'slice', volTot: p => `Volume: ${p.v} mL (${p.n} slices)`,
+    nessunaArea: 'Draw an area on this slice first.', abcRis: p => `A ${p.a} × B ${p.b} × C ${p.c} / 2 = ${p.v} mL`,
+    abcManca: 'Draw line A, then B.', evansRis: p => `Evans index: ${p.v}${p.alto ? ' (≥ 0.3: ventriculomegaly)' : ''}`,
+    evansManca: 'Draw the frontal horns, then the inner skull diameter.', evansNo: 'Lateral ventricles not found on this slice.',
+    bloccata: 'image frozen for measurements: clear them to resume', serveCal: 'calibrate to get mm',
     salva: 'Save image', salvaTitolo: 'Save the image as you see it (PNG)', salvata: p => `Image saved: ${p.f}`,
     cerca: 'Search structure…', nessunRisultato: 'No structure found.',
     tipSeleziona: 'Start the capture first', tipPip: 'Select the area on the image first',
-    demoBtn: 'Try an example', demoAttiva: 'Example: MNI152 atlas (ICBM 2009c, McConnell Brain Imaging Centre). Use the mouse wheel on the image to change slice.',
+    demoBtn: 'Try an example', demoAttiva: 'Use the mouse wheel on the image to change slice.',
     privacy: 'Images stay in your browser: the analysis runs on your computer and no data is sent or stored elsewhere.',
     guida1: 'Click <b>Start capture</b>.',
     guidaNota1: 'Instead of the PACS tab you can also share a <b>window</b> or your <b>entire screen</b>.',
@@ -867,7 +1010,7 @@ function costruisciOpzioni() {
         r.append(t, interruttore('struttura', x)); figli.append(r);
       }
     } else { const sp = document.createElement('span'); sp.className = 'spazio-freccia'; riga.append(sp); }
-    const lab = document.createElement('label'); lab.className = 'riga'; lab.title = st.map(trNome).join(', ');
+    const lab = document.createElement('label'); lab.className = 'riga';
     const etich = document.createElement('span'); etich.append(trNome(nome) + ' ');
     const n = document.createElement('small'); n.textContent = st.length; etich.append(n);
     lab.append(etich, interruttore('gruppo', nome)); riga.append(lab); blocco.append(riga);
@@ -1024,7 +1167,7 @@ function areaVideo() {                     // dove appare il video intero dentro
   return { x: (W - video.videoWidth * s) / 2, y: (H - video.videoHeight * s) / 2, s };
 }
 function iniziaSelezione() {
-  selezionando = true; trascina = null;
+  selezionando = true; trascina = null; nuovaVista(true);
   messaggio(() => tr('trascina'));
   const anima = () => { if (!selezionando) return; disegnaSelezione(); requestAnimationFrame(anima); };
   anima();
@@ -1063,7 +1206,7 @@ tela.addEventListener('pointerup', () => {
   riquadro = {
     x: Math.max(0, Math.round(x)), y: Math.max(0, Math.round(y)),
     w: Math.round(Math.min(w, video.videoWidth - x)), h: Math.round(Math.min(h, video.videoHeight - y)) };
-  selezionando = false; ultimaMiniatura = null;
+  selezionando = false; ultimaMiniatura = null; nuovaVista(true);
   $('pip').disabled = false; $('salvaImg').disabled = false; evidenzia(pipWin ? null : 'pip');
   messaggio(() => tr('impostato'));
 });
@@ -1073,7 +1216,7 @@ let cicloAttivo = false;
 async function ciclo() {
   if (cicloAttivo) return; cicloAttivo = true;
   try { while (stream) {
-    if (!inPausa && riquadro && sessione && !inCorso && video.videoWidth) {
+    if (!inPausa && !bozza && riquadro && sessione && !inCorso && video.videoWidth) {
       const m = miniatura();
       if (!ultimaMiniatura || differenza(m, ultimaMiniatura) > SOGLIA_CAMBIO) {
         ultimaMiniatura = m;
@@ -1113,6 +1256,14 @@ async function analizza() {
   const out = await sessione.run({ input: new ort.Tensor('float32', prep.input, [1, 1, LATO, LATO]) });
   const ms = performance.now() - t;
   risultato = { classe: out.classe.data, conf: out.confidenza.data, geo, centro: prep.centro };
+  { // le misure appartengono alla sezione: si mettono da parte e ritornano quando si torna su quella sezione
+    const mini = miniatura();
+    if (misure.length && miniCorrente) archivioMisure.push({ mini: miniCorrente, misure });
+    misure = [];
+    const k = archivioMisure.findIndex(x => differenza(x.mini, mini) <= SOGLIA_CAMBIO);
+    if (k >= 0) { misure = archivioMisure[k].misure; archivioMisure.splice(k, 1); }
+    if (archivioMisure.length > 300) archivioMisure.shift();
+    miniCorrente = mini; aggiornaPannelloStrum(); }
   inCorso = false;
   stato(`<span class="ok">●</span> ${modelloAttivo ? modelloAttivo.nome + ' ' : ''}${Math.round(ms)} ms`);
   disegna();
@@ -1216,7 +1367,8 @@ function areaImmagine(margine = 0) {       // dove appare il riquadro dentro la 
 }
 const rgba = (c, a) => `rgba(${colori[c][0]},${colori[c][1]},${colori[c][2]},${a})`;
 
-function disegna() {
+function disegna() { disegnaBase(); disegnaMisure(); }
+function disegnaBase() {
   if (selezionando) return;
   const ctx = preparaTela(); impaginato = null; if (!ctx) return;
   if (!risultato || !fotogramma.width) return;
@@ -1230,10 +1382,11 @@ function disegna() {
   const spazioTesto = margine - 26;
   const tronca = t => { if (ctx.measureText(t).width <= spazioTesto) return t;
     while (t.length > 3 && ctx.measureText(t + '…').width > spazioTesto) t = t.slice(0, -1); return t + '…'; };
-  const a = areaImmagine(margine);
+  const a0 = areaImmagine(margine), a = applicaZoom(a0);
   const inSchermo = (u, v) => ({ x: a.x + (u + .5 - g.dx) / g.dw * a.w, y: a.y + (v + .5 - g.dy) / g.dh * a.h });
 
-  // immagine
+  // immagine (ritagliata alla zona centrale quando è ingrandita)
+  ctx.save(); ctx.beginPath(); ctx.rect(margine, 0, W - 2 * margine, H); ctx.clip();
   ctx.imageSmoothingEnabled = true;
   ctx.drawImage(fotogramma, a.x, a.y, a.w, a.h);
 
@@ -1256,6 +1409,7 @@ function disegna() {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(sovrapposizione, g.dx, g.dy, g.dw, g.dh, a.x, a.y, a.w, a.h);
   }
+  ctx.restore();
 
   impaginato = { a, etichette: [] };
   if (!conEtichette) return;
@@ -1266,7 +1420,8 @@ function disegna() {
   for (const lato of ['sx', 'dx']) {
     let col = A.gruppi.filter(gr => gr.lato === lato);
     if (col.length > capienza) col = col.sort((p, q) => q.area - p.area).slice(0, capienza);
-    col = col.map(gr => ({ gr, p: inSchermo(gr.ax, gr.ay) })).sort((p, q) => p.p.y - q.p.y);
+    col = col.map(gr => ({ gr, p: inSchermo(gr.ax, gr.ay) })).filter(e => e.p.x >= margine && e.p.x <= W - margine && e.p.y >= 0 && e.p.y <= H)
+             .sort((p, q) => p.p.y - q.p.y);
     // posizioni verticali: vicine all'altezza della struttura, distanziate di una riga
     let y = 4 + riga / 2;
     for (const e of col) { e.y = Math.max(e.p.y, y); y = e.y + riga; }
@@ -1331,7 +1486,7 @@ async function apriPiP() {
   pipWin.document.body.append(vista);
   video.play().catch(() => {});
   pipWin.addEventListener('resize', disegna);
-  pipWin.document.addEventListener('keydown', scorciatoie);
+  pipWin.document.addEventListener('keydown', scorciatoie); pipWin.document.addEventListener('keydown', tastiStrumenti);
   pipWin.addEventListener('pagehide', () => {
     $('contenitore').append(vista); pipWin = null; video.play().catch(() => {});
     evidenzia(!stream ? 'avvia' : selezionando || !riquadro ? 'seleziona' : 'pip');
@@ -1403,6 +1558,9 @@ $('salvaImg').onclick = () => {
 };
 
 // ---------------- Suggerimenti sui passi disattivati ----------------
+function aggiornaSuggerimentiStrum() {
+  document.querySelectorAll('[data-t-title]').forEach(el => { if (el.dataset.tTitle.startsWith('s_')) el.title = tr(el.dataset.tTitle); });
+}
 function aggiornaSuggerimenti() {
   $('tip-seleziona').title = $('seleziona').disabled ? tr('tipSeleziona') : '';
   $('tip-pip').title = $('pip').disabled ? tr('tipPip') : '';
@@ -1445,9 +1603,7 @@ function scorciatoie(ev) {
 }
 document.addEventListener('keydown', scorciatoie);
 
-// ---------------- Esempio (atlante MNI152, ICBM 2009c) ----------------
-// Immagini: ICBM 2009c Nonlinear Symmetric, (c) 1993-2009 Louis Collins, McConnell Brain Imaging Centre,
-// Montreal Neurological Institute, McGill University. Uso libero con questa nota di copyright.
+// ---------------- Esempio ----------------
 const DEMO_SPRITE = 'data:image/webp;base64,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';
 const DEMO_N = 11, DEMO_W = 197, DEMO_H = 233, DEMO_LATO = 640;
 let demo = null;
@@ -1468,6 +1624,7 @@ async function avviaDemo() {
   video.srcObject = stream; await video.play();
   riquadro = { x: 0, y: 0, w: DEMO_LATO, h: DEMO_LATO }; selezionando = false; ultimaMiniatura = null;
   $('seleziona').disabled = false; $('pip').disabled = false; $('salvaImg').disabled = false;
+  nuovaVista(true); calib = DEMO_H / (DEMO_LATO - 40); $('volSpess').value = 8; $('volGap').value = 0; $('abcSp').value = 8;
   evidenzia('pip'); messaggio(() => tr('demoAttiva'));
   ciclo();
 }
@@ -1477,11 +1634,489 @@ function fermaDemo() {
   demo = null;
 }
 tela.addEventListener('wheel', ev => {
-  if (!demo || selezionando) return;
+  if (!demo || selezionando || ev.ctrlKey) return;
   ev.preventDefault();
   demo.i = Math.max(0, Math.min(DEMO_N - 1, demo.i + (ev.deltaY > 0 ? -1 : 1))); demo.disegna();
 }, { passive: false });
 $('demoBtn').onclick = () => avviaDemo().catch(e => messaggio(() => tr('erroreAnalisi') + (e.message || e), true));
+
+// ---------------- Strumenti di misura ----------------
+let strumento = null, misure = [], bozza = null, calib = null, panning = null, fette = [];
+let zoom = { z: 1, px: 0, py: 0 }, eraBloccata = false;
+const DUE_PUNTI = { righello: 1, calibra: 1, abc: 1, evans: 1, freccia: 1, ellisse: 1 };
+const AREE = { area: 1, ellisse: 1, struttura: 1, volume: 1, lesione: 1 };
+let archivioMisure = [], miniCorrente = null;
+function misureAttive() { return misure.length > 0 || !!bozza; }
+function applicaZoom(a0) {
+  return { x: a0.x + a0.w / 2 * (1 - zoom.z) + zoom.px, y: a0.y + a0.h / 2 * (1 - zoom.z) + zoom.py, w: a0.w * zoom.z, h: a0.h * zoom.z };
+}
+function nuovaVista(azzeraCal) {
+  misure = []; bozza = null; panning = null; zoom = { z: 1, px: 0, py: 0 };
+  if (azzeraCal) { calib = null; fette = []; archivioMisure = []; miniCorrente = null; }
+  if (typeof aggiornaPannelloStrum === 'function' && $('pannelloStrum')) aggiornaPannelloStrum();
+}
+const aImg = () => impaginato && impaginato.a && fotogramma.width ? impaginato.a : null;
+const inImg = p => { const a = aImg(); return { x: (p.x - a.x) / a.w * fotogramma.width, y: (p.y - a.y) / a.h * fotogramma.height }; };
+const inSch = q => { const a = aImg(); return { x: a.x + q.x / fotogramma.width * a.w, y: a.y + q.y / fotogramma.height * a.h }; };
+const dist = (p, q) => Math.hypot(q.x - p.x, q.y - p.y);
+const num = (v, d = 1) => v.toLocaleString(lingua === 'it' ? 'it-IT' : 'en-GB', { minimumFractionDigits: d, maximumFractionDigits: d });
+const fmtL = px => calib ? num(px * calib) + ' mm' : Math.round(px) + ' px';
+const fmtA = px2 => calib ? num(px2 * calib * calib, 0) + ' mm²' : Math.round(px2) + ' px²';
+function areaPoligono(p) { let s = 0; for (let i = 0; i < p.length; i++) { const a = p[i], b = p[(i + 1) % p.length]; s += a.x * b.y - b.x * a.y; } return Math.abs(s) / 2; }
+function areaMisura(m) {
+  if (m.tipo === 'area' || m.tipo === 'volume' || m.tipo === 'lesione') return areaPoligono(m.p);
+  if (m.tipo === 'ellisse') return Math.PI * Math.abs(m.p[1].x - m.p[0].x) / 2 * Math.abs(m.p[1].y - m.p[0].y) / 2;
+  if (m.tipo === 'struttura') return m.areaPx;
+  return null;
+}
+function angolo(p) {
+  const a1 = Math.atan2(p[0].y - p[1].y, p[0].x - p[1].x), a2 = Math.atan2(p[2].y - p[1].y, p[2].x - p[1].x);
+  let d = Math.abs(a1 - a2) * 180 / Math.PI; if (d > 180) d = 360 - d; return d;
+}
+
+function scegliStrumento(k) {
+  strumento = strumento === k ? null : k; bozza = null;
+  document.querySelectorAll('.strum[data-strum]').forEach(b => b.setAttribute('aria-pressed', b.dataset.strum === strumento));
+  tela.style.cursor = strumento === 'sposta' ? 'grab' : strumento ? 'crosshair' : '';
+  mostraOpzioni(false); aggiornaPannelloStrum(); disegna();
+}
+$('strumenti').addEventListener('click', ev => {
+  const b = ev.target.closest('.strum[data-strum]'); if (b) scegliStrumento(b.dataset.strum);
+});
+$('annullaMisura').onclick = () => { if (bozza) bozza = null; else misure.pop(); aggiornaPannelloStrum(); disegna(); };
+$('cancellaMisure').onclick = () => { misure = []; bozza = null; archivioMisure = []; aggiornaPannelloStrum(); disegna(); };
+
+tela.addEventListener('pointerdown', ev => {
+  if (!strumento || selezionando || !aImg() || ev.button !== 0) return;
+  ev.stopImmediatePropagation(); mostraOpzioni(false);
+  try { tela.setPointerCapture(ev.pointerId); } catch {}
+  const p = posizione(ev), q = inImg(p);
+  if (strumento === 'sposta') { panning = { x: p.x, y: p.y, px: zoom.px, py: zoom.py }; tela.style.cursor = 'grabbing'; return; }
+  if (DUE_PUNTI[strumento]) bozza = { tipo: strumento, p: [q, { ...q }] };
+  else if (strumento === 'area' || strumento === 'penna' || strumento === 'volume' || strumento === 'lesione') bozza = { tipo: strumento, p: [q] };
+  else if (strumento === 'angolo') {
+    if (!bozza) bozza = { tipo: 'angolo', p: [q, { ...q }] };
+    else { bozza.p[bozza.p.length - 1] = q;
+      if (bozza.p.length === 3) { misure.push(bozza); bozza = null; } else bozza.p.push({ ...q }); }
+  } else if (strumento === 'testo') misure.push({ tipo: 'testo', p: [q], testo: $('testoNota').value.trim() || '•' });
+  else if (strumento === 'struttura') misuraStruttura(q);
+  else if (strumento === 'didattica') scegliStrutturaDidattica(p);
+  aggiornaPannelloStrum(); disegna();
+}, true);
+tela.addEventListener('pointermove', ev => {
+  if (!strumento || selezionando || !aImg()) return;
+  const p = posizione(ev);
+  if (panning) { zoom.px = panning.px + p.x - panning.x; zoom.py = panning.py + p.y - panning.y; disegna(); ev.stopImmediatePropagation(); return; }
+  if (!bozza) return;
+  const q = inImg(p), ult = bozza.p[bozza.p.length - 1];
+  if (bozza.tipo === 'area' || bozza.tipo === 'penna' || bozza.tipo === 'volume' || bozza.tipo === 'lesione') { if (dist(inSch(ult), p) > 2) bozza.p.push(q); }
+  else bozza.p[bozza.p.length - 1] = q;
+  disegna(); ev.stopImmediatePropagation();
+}, true);
+tela.addEventListener('pointerup', ev => {
+  if (!strumento || selezionando) return;
+  if (panning) { panning = null; tela.style.cursor = 'grab'; ev.stopImmediatePropagation(); return; }
+  if (!bozza || bozza.tipo === 'angolo') return;
+  ev.stopImmediatePropagation();
+  const m = bozza; bozza = null;
+  const corta = m.p.length === 2 && dist(inSch(m.p[0]), inSch(m.p[1])) < 4;
+  if (corta || ((m.tipo === 'area' || m.tipo === 'volume' || m.tipo === 'lesione') && m.p.length < 3)) { disegna(); return; }
+  if (m.tipo === 'lesione') { misure = misure.filter(x => x.tipo !== 'lesione'); const r = analizzaLesione(m.p); ultimaLesione = r && { ...r, poligono: m.p }; }
+  if (m.tipo === 'calibra') misure = misure.filter(x => x.tipo !== 'calibra');
+  if (m.tipo === 'abc' || m.tipo === 'evans') {
+    const stessi = misure.filter(x => x.tipo === m.tipo);
+    if (stessi.length >= 2) misure = misure.filter(x => x.tipo !== m.tipo);
+    m.ruolo = misure.filter(x => x.tipo === m.tipo).length;
+  }
+  misure.push(m);
+  if (m.tipo === 'calibra') { $('calMm').focus(); $('calMm').select(); }
+  aggiornaPannelloStrum(); disegna();
+}, true);
+tela.addEventListener('dblclick', ev => { if (strumento === 'sposta' || zoom.z > 1) { zoom = { z: 1, px: 0, py: 0 }; disegna(); } });
+tela.addEventListener('wheel', ev => {
+  if (!ev.ctrlKey || selezionando || !aImg()) return;
+  ev.preventDefault();
+  const a = aImg(), p = posizione(ev), z2 = Math.min(8, Math.max(1, zoom.z * (ev.deltaY < 0 ? 1.15 : 1 / 1.15)));
+  const rx = (p.x - a.x) / a.w, ry = (p.y - a.y) / a.h, a0w = a.w / zoom.z, a0h = a.h / zoom.z;
+  const a0x = a.x - a0w / 2 * (1 - zoom.z) - zoom.px, a0y = a.y - a0h / 2 * (1 - zoom.z) - zoom.py;
+  zoom.px = p.x - rx * a0w * z2 - (a0x + a0w / 2 * (1 - z2)); zoom.py = p.y - ry * a0h * z2 - (a0y + a0h / 2 * (1 - z2));
+  zoom.z = z2; if (z2 === 1) zoom.px = zoom.py = 0;
+  disegna();
+}, { passive: false });
+
+function misuraStruttura(q) {
+  if (!risultato) return;
+  const g = risultato.geo, u = Math.floor(g.dx + q.x / fotogramma.width * g.dw), v = Math.floor(g.dy + q.y / fotogramma.height * g.dh);
+  if (u < 0 || v < 0 || u >= LATO || v >= LATO) return;
+  const A = calcolaAnalisi(), i = v * LATO + u, c = A.L[i]; if (!c) return;
+  const comp = A.comp[i]; let n = 0; for (let j = 0; j < N; j++) if (A.comp[j] === comp) n++;
+  const k = fotogramma.width / g.dw;
+  misure.push({ tipo: 'struttura', p: [q], nome: trNome(CLASSI[c]), areaPx: n * k * k });
+}
+function evansAutomatico() {
+  if (!risultato) return false;
+  const soglia = +$('soglia').value / 100, g = risultato.geo, cl = risultato.classe, cf = risultato.conf;
+  const vent = new Set(CLASSI.map((n, c) => n === 'ventricolo laterale' ? c : -1).filter(c => c >= 0));
+  let sv = 0, nv = 0;
+  for (let i = 0; i < N; i++) if (vent.has(cl[i]) && cf[i] >= soglia) { sv += (i / LATO) | 0; nv++; }
+  if (!nv) return false;
+  const vc = sv / nv; let corni = null, cranio = null;
+  for (let v = 0; v < LATO; v++) {
+    let v0 = LATO, v1 = -1, b0 = LATO, b1 = -1;
+    for (let u = 0; u < LATO; u++) { const i = v * LATO + u; if (cf[i] < soglia || !cl[i]) continue;
+      if (u < b0) b0 = u; if (u > b1) b1 = u;
+      if (vent.has(cl[i]) && v < vc) { if (u < v0) v0 = u; if (u > v1) v1 = u; } }
+    if (v1 >= 0 && (!corni || v1 - v0 > corni.w)) corni = { v, u0: v0, u1: v1 + 1, w: v1 + 1 - v0 };
+    if (b1 >= 0 && (!cranio || b1 - b0 > cranio.w)) cranio = { v, u0: b0, u1: b1 + 1, w: b1 + 1 - b0 };
+  }
+  if (!corni || !cranio) return false;
+  const P = (u, v) => ({ x: (u - g.dx) / g.dw * fotogramma.width, y: (v + .5 - g.dy) / g.dh * fotogramma.height });
+  misure = misure.filter(x => x.tipo !== 'evans');
+  misure.push({ tipo: 'evans', ruolo: 0, p: [P(corni.u0, corni.v), P(corni.u1, corni.v)] });
+  misure.push({ tipo: 'evans', ruolo: 1, p: [P(cranio.u0, cranio.v), P(cranio.u1, cranio.v)] });
+  return true;
+}
+$('evansAuto').onclick = () => { if (!evansAutomatico()) $('psRisultato').textContent = tr('evansNo'); else { aggiornaPannelloStrum(); disegna(); } };
+$('calApplica').onclick = () => {
+  const l = misure.find(m => m.tipo === 'calibra'), mm = parseFloat(String($('calMm').value).replace(',', '.'));
+  if (!l) { $('psRisultato').textContent = tr('calLinea'); return; }
+  if (!(mm > 0)) return;
+  calib = mm / dist(l.p[0], l.p[1]); misure = misure.filter(m => m.tipo !== 'calibra');
+  aggiornaPannelloStrum(); disegna();
+};
+function ultimaArea() { for (let i = misure.length - 1; i >= 0; i--) { const a = areaMisura(misure[i]); if (a != null) return a; } return null; }
+function aggiungiFetta() {
+  const a = ultimaArea(); if (a == null) { $('psRisultato').textContent = tr('nessunaArea'); return; }
+  fette.push(a); misure = []; bozza = null; ultimaMiniatura = null;     // l'immagine si sblocca: passa alla fetta successiva
+  aggiornaPannelloStrum(); disegna();
+}
+$('volAggiungi').onclick = aggiungiFetta;
+$('strutturaVolume').onclick = () => { if (strumento !== 'volume') scegliStrumento('volume'); aggiungiFetta(); };
+$('volAzzera').onclick = () => { fette = []; aggiornaPannelloStrum(); };
+$('volFette').addEventListener('click', ev => { const b = ev.target.closest('button[data-k]'); if (b) { fette.splice(+b.dataset.k, 1); aggiornaPannelloStrum(); } });
+for (const id of ['volSpess', 'volGap', 'abcN', 'abcSp']) $(id).addEventListener('input', () => aggiornaPannelloStrum());
+
+const PANNELLO = { didattica: 'didattica', lesione: 'lesione', calibra: 'calibra', volume: 'volume', abc: 'abc', evans: 'evans', testo: 'testo', struttura: 'struttura' };
+function aggiornaPannelloStrum() {
+  const ps = $('pannelloStrum'), k = PANNELLO[strumento];
+  ps.hidden = !k;
+  if (k) {
+    $('psTitolo').textContent = tr('s_' + k).replace(/\s*[(:].*$/, '');
+    ps.querySelectorAll('[data-ps]').forEach(d => { d.hidden = d.dataset.ps !== k; });
+    let r = '';
+    if (k === 'calibra') r = '';
+    if (k === 'volume') {
+      const passo = (parseFloat($('volSpess').value) || 0) + (parseFloat($('volGap').value) || 0);
+      $('volFette').innerHTML = fette.map((a, i) => `<li>${fmtA(a)}<button type="button" data-k="${i}" aria-label="×">×</button></li>`).join('');
+      if (fette.length) r = calib ? tr('volTot', { v: num(fette.reduce((s, a) => s + a, 0) * calib * calib * passo / 1000, 1), n: fette.length }) : tr('serveCal');
+    }
+    if (k === 'abc') {
+      const l = misure.filter(m => m.tipo === 'abc');
+      if (l.length < 2) r = tr('abcManca');
+      else if (!calib) r = tr('serveCal');
+      else { const A = dist(l[0].p[0], l[0].p[1]) * calib / 10, B = dist(l[1].p[0], l[1].p[1]) * calib / 10,
+                   C = (parseFloat($('abcN').value) || 0) * (parseFloat($('abcSp').value) || 0) / 10;
+        r = tr('abcRis', { a: num(A) + ' cm', b: num(B) + ' cm', c: num(C) + ' cm', v: num(A * B * C / 2) }); }
+    }
+    if (k === 'evans') {
+      const l = misure.filter(m => m.tipo === 'evans');
+      if (l.length < 2) r = tr('evansManca');
+      else { const v = dist(l[0].p[0], l[0].p[1]) / dist(l[1].p[0], l[1].p[1]); r = tr('evansRis', { v: num(v, 2), alto: v >= 0.3 }); }
+    }
+    if (k === 'struttura') {
+      const m = [...misure].reverse().find(x => x.tipo === 'struttura');
+      r = m ? `${m.nome}: ${fmtA(m.areaPx)}` : ''; $('strutturaVolume').disabled = !m;
+    }
+    if (k === 'lesione') $('lesRisultato').innerHTML = testoLesione(ultimaLesione);
+    if (k === 'didattica') $('didRisultato').innerHTML = strutturaDidattica ? testoGuidaStruttura(strutturaDidattica) : `<p class="aiuto-ps">${tr('didVuoto')}</p>`;
+    ps.classList.toggle('largo', k === 'lesione' || k === 'didattica');
+    $('psRisultato').textContent = r;
+    $('psCal').textContent = (k === 'evans' || k === 'testo' || k === 'didattica') ? '' : calib ? tr('calibrato', { v: num(calib, 3) }) : tr('nonCalibrato');
+  }
+}
+
+function disegnaMisure() {
+  const a = aImg(); if (!a || !risultato || (!misure.length && !bozza)) return;
+  const ctx = tela.getContext('2d');
+  const col = getComputedStyle(document.documentElement).getPropertyValue('--accento').trim() || '#F2B33D';
+  const scritta = (x, y, t) => {
+    ctx.font = '600 12px "Segoe UI", system-ui, sans-serif'; ctx.textBaseline = 'middle';
+    const w = ctx.measureText(t).width + 10;
+    ctx.fillStyle = 'rgba(0,0,0,.78)'; ctx.fillRect(x, y - 10, w, 20);
+    ctx.fillStyle = '#fff'; ctx.fillText(t, x + 5, y + .5);
+  };
+  ctx.save(); ctx.lineWidth = 2; ctx.strokeStyle = col; ctx.fillStyle = col; ctx.lineJoin = ctx.lineCap = 'round';
+  for (const m of bozza ? [...misure, bozza] : misure) {
+    const P = m.p.map(inSch);
+    if (m.tipo === 'testo') { scritta(P[0].x, P[0].y, m.testo); continue; }
+    if (m.tipo === 'struttura') { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(P[0].x, P[0].y, 4, 0, 2 * Math.PI); ctx.fill();
+      scritta(P[0].x + 8, P[0].y, `${m.nome}: ${fmtA(m.areaPx)}`); continue; }
+    ctx.setLineDash(m.tipo === 'calibra' ? [6, 4] : []);
+    ctx.beginPath();
+    if (m.tipo === 'ellisse') {
+      ctx.ellipse((P[0].x + P[1].x) / 2, (P[0].y + P[1].y) / 2, Math.abs(P[1].x - P[0].x) / 2, Math.abs(P[1].y - P[0].y) / 2, 0, 0, 2 * Math.PI);
+    } else { ctx.moveTo(P[0].x, P[0].y); for (const q of P.slice(1)) ctx.lineTo(q.x, q.y); }
+    const chiusa = m.tipo === 'area' || m.tipo === 'volume' || m.tipo === 'ellisse' || m.tipo === 'lesione';
+    if (m.tipo === 'lesione') { ctx.strokeStyle = ctx.fillStyle = '#E5484D'; }
+    if (chiusa) { ctx.closePath(); ctx.globalAlpha = .18; ctx.fill(); ctx.globalAlpha = 1; }
+    ctx.stroke(); ctx.setLineDash([]); ctx.strokeStyle = ctx.fillStyle = col;
+    if (m.tipo === 'freccia') {
+      const an = Math.atan2(P[1].y - P[0].y, P[1].x - P[0].x), L = 12;
+      ctx.beginPath(); ctx.moveTo(P[1].x, P[1].y);
+      ctx.lineTo(P[1].x - L * Math.cos(an - .45), P[1].y - L * Math.sin(an - .45));
+      ctx.lineTo(P[1].x - L * Math.cos(an + .45), P[1].y - L * Math.sin(an + .45)); ctx.closePath(); ctx.fill();
+    }
+    if (DUE_PUNTI[m.tipo] && m.tipo !== 'freccia' && m.tipo !== 'ellisse') {
+      for (const q of P) { ctx.beginPath(); ctx.arc(q.x, q.y, 3, 0, 2 * Math.PI); ctx.fill(); }
+      const d = dist(m.p[0], m.p[1]);
+      const pre = m.tipo === 'abc' ? (m.ruolo ? 'B ' : 'A ') : m.tipo === 'evans' ? (m.ruolo ? '② ' : '① ') : '';
+      scritta((P[0].x + P[1].x) / 2 + 8, (P[0].y + P[1].y) / 2 - 14, pre + (m.tipo === 'evans' && !calib ? Math.round(d) + ' px' : fmtL(d)));
+    }
+    if (m.tipo === 'angolo' && P.length === 3) scritta(P[1].x + 10, P[1].y - 14, num(angolo(m.p)) + '°');
+    if (chiusa && (m !== bozza || m.tipo === 'ellisse')) {
+      const c = P.reduce((s, q) => ({ x: s.x + q.x / P.length, y: s.y + q.y / P.length }), { x: 0, y: 0 });
+      scritta(c.x + 6, c.y, fmtA(areaMisura(m)));
+    }
+  }
+  ctx.restore();
+}
+// ---------------- Analisi lesione: strutture coinvolte e possibili deficit ----------------
+// t = qualunque lato, s = emisfero sinistro del paziente, d = emisfero destro; {C} = lato controlaterale, {O} = omolaterale
+const DEFICIT = {
+  'giro precentrale': { it: { t: ['Emiparesi {C}, soprattutto volto e arto superiore (corteccia motoria primaria)'] },
+                        en: { t: ['{C} hemiparesis, mainly face and arm (primary motor cortex)'] } },
+  'lobulo paracentrale': { it: { t: ['Paresi e ipoestesia dell\'arto inferiore {C}', 'Se bilaterale: incontinenza urinaria'] },
+                           en: { t: ['{C} leg weakness and sensory loss', 'If bilateral: urinary incontinence'] } },
+  'giro postcentrale': { it: { t: ['Ipoestesia {C}', 'Astereognosia e agrafestesia {C}'] },
+                         en: { t: ['{C} sensory loss', '{C} astereognosis and agraphesthesia'] } },
+  'giro frontale superiore': { it: { t: ['Area motoria supplementare: riduzione dell\'iniziativa motoria, acinesia {C}', 'Sindrome della mano aliena', 'Deficit delle funzioni esecutive'], s: ['Afasia motoria transcorticale'] },
+                               en: { t: ['Supplementary motor area: reduced motor initiation, {C} akinesia', 'Alien hand syndrome', 'Executive dysfunction'], s: ['Transcortical motor aphasia'] } },
+  'giro frontale medio caudale': { it: { t: ['Campo oculare frontale: deviazione dello sguardo verso il lato della lesione', 'Paresi dello sguardo {C}'] },
+                                   en: { t: ['Frontal eye field: gaze deviation towards the lesion', 'Impaired saccades towards the {C} side'] } },
+  'giro frontale medio rostrale': { it: { t: ['Corteccia prefrontale dorsolaterale: disfunzione esecutiva, deficit di memoria di lavoro e pianificazione'] },
+                                    en: { t: ['Dorsolateral prefrontal cortex: executive dysfunction, impaired working memory and planning'] } },
+  'pars opercularis': { it: { s: ['Afasia di Broca (non fluente)', 'Aprassia del linguaggio'], d: ['Aprosodia motoria'] },
+                        en: { s: ['Broca aphasia (non-fluent)', 'Apraxia of speech'], d: ['Motor aprosodia'] } },
+  'pars triangularis': { it: { s: ['Afasia di Broca (non fluente)'], d: ['Aprosodia motoria'] },
+                         en: { s: ['Broca aphasia (non-fluent)'], d: ['Motor aprosodia'] } },
+  'pars orbitalis': { it: { t: ['Disinibizione, impulsività'], s: ['Difficoltà semantiche nella produzione del linguaggio'] },
+                      en: { t: ['Disinhibition, impulsivity'], s: ['Semantic difficulties in language production'] } },
+  'corteccia orbitofrontale laterale': { it: { t: ['Disinibizione, impulsività, comportamento socialmente inappropriato'] },
+                                         en: { t: ['Disinhibition, impulsivity, socially inappropriate behaviour'] } },
+  'corteccia orbitofrontale mediale': { it: { t: ['Alterazioni della personalità e del giudizio, difficoltà nelle decisioni', 'Anosmia (vicinanza delle vie olfattive)'] },
+                                        en: { t: ['Personality and judgement changes, impaired decision making', 'Anosmia (close to the olfactory tracts)'] } },
+  'polo frontale': { it: { t: ['Deficit di pianificazione e multitasking, apatia'] }, en: { t: ['Impaired planning and multitasking, apathy'] } },
+  'cingolo anteriore rostrale': { it: { t: ['Apatia, alterazioni della regolazione emotiva'] }, en: { t: ['Apathy, impaired emotional regulation'] } },
+  'cingolo anteriore caudale': { it: { t: ['Abulia, riduzione dell\'iniziativa', 'Se bilaterale: mutismo acinetico'] },
+                                 en: { t: ['Abulia, reduced initiative', 'If bilateral: akinetic mutism'] } },
+  'cingolo posteriore': { it: { t: ['Deficit di memoria e di orientamento spaziale'] }, en: { t: ['Memory and spatial orientation deficits'] } },
+  'istmo del cingolo': { it: { t: ['Amnesia retrospleniale', 'Disorientamento topografico'] }, en: { t: ['Retrosplenial amnesia', 'Topographical disorientation'] } },
+  'giro temporale superiore': { it: { t: ['Fibre di Meyer sottostanti: quadrantanopsia superiore {C}'], s: ['Afasia di Wernicke (fluente, comprensione compromessa), se posteriore'], d: ['Aprosodia recettiva, amusia'] },
+                                en: { t: ['Underlying Meyer loop: {C} superior quadrantanopia'], s: ['Wernicke aphasia (fluent, impaired comprehension), if posterior'], d: ['Receptive aprosodia, amusia'] } },
+  'banca del solco temporale superiore': { it: { s: ['Deficit di comprensione del linguaggio'], d: ['Deficit di percezione sociale (sguardo, espressioni)'] },
+                                           en: { s: ['Impaired language comprehension'], d: ['Impaired social perception (gaze, expressions)'] } },
+  'giro temporale trasverso (Heschl)': { it: { t: ['Corteccia uditiva primaria: unilaterale di solito lieve', 'Se bilaterale: sordità corticale'] },
+                                         en: { t: ['Primary auditory cortex: usually mild if unilateral', 'If bilateral: cortical deafness'] } },
+  'giro temporale medio': { it: { s: ['Anomia, deficit semantici'], d: ['Deficit nel riconoscimento di volti e oggetti (se posteriore)'] },
+                            en: { s: ['Anomia, semantic deficits'], d: ['Impaired recognition of faces and objects (if posterior)'] } },
+  'giro temporale inferiore': { it: { t: ['Agnosia visiva per gli oggetti'], s: ['Anomia, alessia'] },
+                                en: { t: ['Visual object agnosia'], s: ['Anomia, alexia'] } },
+  'giro fusiforme': { it: { t: ['Acromatopsia (perdita della visione dei colori)'], s: ['Alessia pura (area della forma visiva delle parole)'], d: ['Prosopagnosia (riconoscimento dei volti)'] },
+                      en: { t: ['Achromatopsia (loss of colour vision)'], s: ['Pure alexia (visual word form area)'], d: ['Prosopagnosia (face recognition)'] } },
+  'polo temporale': { it: { s: ['Deficit semantici (demenza semantica)'], d: ['Difficoltà a riconoscere le persone note'] },
+                      en: { s: ['Semantic deficits (semantic dementia)'], d: ['Difficulty recognising familiar people'] } },
+  'corteccia entorinale': { it: { t: ['Deficit di memoria anterograda'] }, en: { t: ['Anterograde memory deficit'] } },
+  'giro paraippocampale': { it: { t: ['Deficit di memoria', 'Disorientamento topografico (riconoscimento dei luoghi)'] },
+                            en: { t: ['Memory deficit', 'Topographical disorientation (place recognition)'] } },
+  'ippocampo': { it: { t: ['Amnesia anterograda'], s: ['Soprattutto memoria verbale'], d: ['Soprattutto memoria visuospaziale'] },
+                 en: { t: ['Anterograde amnesia'], s: ['Mainly verbal memory'], d: ['Mainly visuospatial memory'] } },
+  'amigdala': { it: { t: ['Alterata elaborazione della paura e delle emozioni', 'Crisi epilettiche'] }, en: { t: ['Impaired fear and emotion processing', 'Seizures'] } },
+  'corteccia pericalcarina': { it: { t: ['Emianopsia omonima {C}, spesso con risparmio maculare'] }, en: { t: ['{C} homonymous hemianopia, often with macular sparing'] } },
+  'cuneo': { it: { t: ['Quadrantanopsia inferiore omonima {C}'] }, en: { t: ['{C} inferior homonymous quadrantanopia'] } },
+  'giro linguale': { it: { t: ['Quadrantanopsia superiore omonima {C}', 'Acromatopsia'] }, en: { t: ['{C} superior homonymous quadrantanopia', 'Achromatopsia'] } },
+  'corteccia occipitale laterale': { it: { t: ['Agnosia visiva', 'Deficit di percezione del movimento (area MT/V5)'] }, en: { t: ['Visual agnosia', 'Impaired motion perception (MT/V5)'] } },
+  'lobulo parietale superiore': { it: { t: ['Atassia ottica (errori di raggiungimento visivo)', 'Deficit sensitivi corticali {C}'] },
+                                  en: { t: ['Optic ataxia (visually guided reaching errors)', '{C} cortical sensory deficits'] } },
+  'lobulo parietale inferiore': { it: { s: ['Sindrome di Gerstmann: agrafia, acalculia, agnosia digitale, disorientamento destra-sinistra', 'Alessia con agrafia'], d: ['Neglect spaziale sinistro', 'Anosognosia'] },
+                                  en: { s: ['Gerstmann syndrome: agraphia, acalculia, finger agnosia, left-right disorientation', 'Alexia with agraphia'], d: ['Left spatial neglect', 'Anosognosia'] } },
+  'giro sopramarginale': { it: { s: ['Afasia di conduzione (ripetizione compromessa)', 'Aprassia ideomotoria'], d: ['Neglect spaziale sinistro'] },
+                           en: { s: ['Conduction aphasia (impaired repetition)', 'Ideomotor apraxia'], d: ['Left spatial neglect'] } },
+  'precuneo': { it: { t: ['Deficit visuospaziali e di memoria episodica'] }, en: { t: ['Visuospatial and episodic memory deficits'] } },
+  'insula': { it: { t: ['Disturbi autonomici e del gusto'], s: ['Aprassia del linguaggio, disartria'], d: ['Anosognosia, alterata consapevolezza corporea'] },
+              en: { t: ['Autonomic and taste disturbances'], s: ['Apraxia of speech, dysarthria'], d: ['Anosognosia, altered body awareness'] } },
+  'insula (o corteccia non classificata)': { it: { t: ['Disturbi autonomici e del gusto'], s: ['Aprassia del linguaggio, disartria'], d: ['Anosognosia'] },
+                                             en: { t: ['Autonomic and taste disturbances'], s: ['Apraxia of speech, dysarthria'], d: ['Anosognosia'] } },
+  'talamo': { it: { t: ['Ipoestesia {C} (emisoma)', 'Dolore talamico (sindrome di Dejerine-Roussy)', 'Se anteriore o mediale: amnesia, apatia'], s: ['Afasia talamica'], d: ['Neglect'] },
+              en: { t: ['{C} hemisensory loss', 'Thalamic pain (Dejerine-Roussy syndrome)', 'If anterior or medial: amnesia, apathy'], s: ['Thalamic aphasia'], d: ['Neglect'] } },
+  'nucleo caudato': { it: { t: ['Abulia, apatia, alterazioni del comportamento', 'Movimenti involontari (corea) {C}'] }, en: { t: ['Abulia, apathy, behavioural changes', '{C} involuntary movements (chorea)'] } },
+  'putamen': { it: { t: ['Emiparesi {C} (capsula interna adiacente)', 'Distonia o emicorea {C}'] }, en: { t: ['{C} hemiparesis (adjacent internal capsule)', '{C} dystonia or hemichorea'] } },
+  'globo pallido': { it: { t: ['Parkinsonismo, distonia {C}', 'Abulia'] }, en: { t: ['{C} parkinsonism, dystonia', 'Abulia'] } },
+  'nucleo accumbens': { it: { t: ['Apatia, riduzione della motivazione'] }, en: { t: ['Apathy, reduced motivation'] } },
+  'diencefalo ventrale': { it: { t: ['Nucleo subtalamico: emiballismo {C}', 'Ipotalamo: disturbi endocrini, della temperatura e del sonno'] },
+                           en: { t: ['Subthalamic nucleus: {C} hemiballismus', 'Hypothalamus: endocrine, temperature and sleep disturbances'] } },
+  'sostanza bianca cerebrale': { it: { t: ['Dipende dai fasci attraversati: corona radiata o capsula interna → emiparesi {C}; radiazioni ottiche → emianopsia {C}'], s: ['Fascicolo arcuato → afasia di conduzione'], d: ['Fasci fronto-parietali → neglect spaziale sinistro'] },
+                                 en: { t: ['Depends on the tracts involved: corona radiata or internal capsule → {C} hemiparesis; optic radiations → {C} hemianopia'], s: ['Arcuate fasciculus → conduction aphasia'], d: ['Fronto-parietal tracts → left spatial neglect'] } },
+  'tronco encefalico': { it: { t: ['Sindromi alterne: deficit dei nervi cranici {O} e deficit motori o sensitivi {C}', 'Atassia, diplopia, disartria, disfagia', 'Alterazioni della coscienza'] },
+                         en: { t: ['Crossed syndromes: {O} cranial nerve deficits with {C} motor or sensory deficits', 'Ataxia, diplopia, dysarthria, dysphagia', 'Altered consciousness'] } },
+  'mesencefalo': { it: { t: ['Sindrome di Weber: paralisi del III nervo {O} ed emiparesi {C}', 'Paralisi dello sguardo verticale'] }, en: { t: ['Weber syndrome: {O} third nerve palsy and {C} hemiparesis', 'Vertical gaze palsy'] } },
+  'ponte': { it: { t: ['Emiparesi {C}, paralisi del VI e VII nervo {O}', 'Se ventrale bilaterale: sindrome locked-in'] }, en: { t: ['{C} hemiparesis, {O} sixth and seventh nerve palsy', 'If bilateral ventral: locked-in syndrome'] } },
+  'bulbo': { it: { t: ['Sindrome di Wallenberg (bulbo laterale): ipoestesia termodolorifica del volto {O} e del corpo {C}, Horner {O}, disfagia, atassia {O}'] },
+             en: { t: ['Wallenberg syndrome (lateral medulla): {O} facial and {C} body pain-temperature loss, {O} Horner, dysphagia, {O} ataxia'] } },
+  'corteccia cerebellare': { it: { t: ['Atassia degli arti {O}, dismetria, tremore intenzionale', 'Se vermiana: atassia del tronco e della marcia', 'Disartria'] },
+                             en: { t: ['{O} limb ataxia, dysmetria, intention tremor', 'If vermian: truncal and gait ataxia', 'Dysarthria'] } },
+  'sostanza bianca cerebellare': { it: { t: ['Atassia {O}, dismetria'] }, en: { t: ['{O} ataxia, dysmetria'] } },
+  'chiasma ottico': { it: { t: ['Emianopsia bitemporale'] }, en: { t: ['Bitemporal hemianopia'] } },
+};
+const SENZA_DEFICIT = new Set(['sfondo', 'ventricolo laterale', 'corno temporale del ventricolo laterale', 'terzo ventricolo', 'quarto ventricolo', 'plesso corioideo', 'corteccia cerebrale non classificata']);
+let ultimaLesione = null;
+function puntoNelPoligono(x, y, p) {
+  let dentro = false;
+  for (let i = 0, j = p.length - 1; i < p.length; j = i++)
+    if ((p[i].y > y) !== (p[j].y > y) && x < (p[j].x - p[i].x) * (y - p[i].y) / (p[j].y - p[i].y) + p[i].x) dentro = !dentro;
+  return dentro;
+}
+function analizzaLesione(poligono) {          // poligono in pixel dell'immagine; in futuro può arrivare da un modello di lesioni
+  if (!risultato) return null;
+  const g = risultato.geo, fw = fotogramma.width, fh = fotogramma.height, soglia = +$('soglia').value / 100;
+  const P = poligono.map(q => ({ x: g.dx + q.x / fw * g.dw, y: g.dy + q.y / fh * g.dh }));
+  const xs = P.map(q => q.x), ys = P.map(q => q.y);
+  const u0 = Math.max(0, Math.floor(Math.min(...xs))), u1 = Math.min(LATO - 1, Math.ceil(Math.max(...xs)));
+  const v0 = Math.max(0, Math.floor(Math.min(...ys))), v1 = Math.min(LATO - 1, Math.ceil(Math.max(...ys)));
+  // linea mediana: baricentro orizzontale del cervello etichettato
+  let sx = 0, n = 0;
+  for (let i = 0; i < N; i++) if (risultato.classe[i] && risultato.conf[i] >= soglia) { sx += i % LATO; n++; }
+  const mediana = n ? sx / n : LATO / 2;
+  const conteggio = new Map(); let tot = 0, sinImg = 0;
+  for (let v = v0; v <= v1; v++) for (let u = u0; u <= u1; u++) {
+    if (!puntoNelPoligono(u + .5, v + .5, P)) continue;
+    tot++; if (u + .5 < mediana) sinImg++;
+    const i = v * LATO + u, c = risultato.conf[i] >= soglia ? risultato.classe[i] : 0;
+    conteggio.set(c, (conteggio.get(c) || 0) + 1);
+  }
+  if (!tot) return null;
+  // convenzione radiologica: la sinistra dell'immagine è la destra del paziente
+  const neuro = $('lesNeuro').checked, fSin = sinImg / tot;
+  const lato = fSin > .8 ? (neuro ? 'sx' : 'dx') : fSin < .2 ? (neuro ? 'dx' : 'sx') : 'bi';
+  const strutture = [...conteggio].map(([c, k]) => ({ nome: CLASSI[c], pct: k / tot })).filter(x => x.pct >= .03).sort((a, b) => b.pct - a.pct);
+  return { lato, strutture, areaPx: areaPoligono(poligono) };
+}
+function testoLesione(L) {
+  if (!L) return '';
+  const lg = lingua === 'en' ? 'en' : 'it';
+  const parola = l => tr(l === 'sx' ? 'latoSx' : 'latoDx');
+  const C = L.lato === 'sx' ? parola('dx') : L.lato === 'dx' ? parola('sx') : tr('latoEntrambi');
+  const O = L.lato === 'bi' ? tr('latoEntrambi') : parola(L.lato);
+  const sost = t => t.replaceAll('{C}', C).replaceAll('{O}', O);
+  const esc = t => t.replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+  let h = `<p class="les-testa">${tr('lesEmisfero')}: <b>${tr(L.lato === 'sx' ? 'emisferoSx' : L.lato === 'dx' ? 'emisferoDx' : 'emisferoBi')}</b> · ${fmtA(L.areaPx)}</p>`;
+  for (const s of L.strutture) {
+    const kb = DEFICIT[s.nome] && DEFICIT[s.nome][lg];
+    let voci = [];
+    if (kb) { voci = [...(kb.t || [])];
+      if (L.lato !== 'dx' && kb.s) voci.push(...kb.s.map(x => (L.lato === 'bi' ? tr('seSx') : '') + x));
+      if (L.lato !== 'sx' && kb.d) voci.push(...kb.d.map(x => (L.lato === 'bi' ? tr('seDx') : '') + x)); }
+    if (s.nome === 'sfondo') continue;
+    h += `<div class="les-str"><div class="les-nome">${esc(trNome(s.nome))}<span>${Math.round(s.pct * 100)} %</span></div>`;
+    if (voci.length) h += '<ul>' + voci.map(v => `<li>${esc(sost(v))}</li>`).join('') + '</ul>';
+    else if (SENZA_DEFICIT.has(s.nome)) h += `<p class="les-nulla">${tr('lesNessuno')}</p>`;
+    h += '</div>';
+  }
+  return h;
+}
+$('lesNeuro').addEventListener('change', () => { if (!ultimaLesione) return; const p = ultimaLesione.poligono, r = analizzaLesione(p); if (r) ultimaLesione = { ...r, poligono: p }; aggiornaPannelloStrum(); });
+
+// ---------------- Miniguida delle strutture (modalità didattica) ----------------
+const FUNZIONI = {
+  'sostanza bianca cerebrale': ['Fasci di fibre che collegano aree corticali tra loro e con le strutture profonde (associazione, commissurali, proiezione).', 'Fibre tracts connecting cortical areas with each other and with deep structures (association, commissural, projection).'],
+  'ventricolo laterale': ['Cavità contenente liquor; i plessi corioidei lo producono. Dilatato nell\'idrocefalo e nell\'atrofia.', 'CSF-filled cavity; the choroid plexus produces CSF. Enlarged in hydrocephalus and atrophy.'],
+  'corno temporale del ventricolo laterale': ['Porzione temporale del ventricolo laterale, adiacente all\'ippocampo; si dilata precocemente nell\'idrocefalo e nell\'atrofia ippocampale.', 'Temporal part of the lateral ventricle, next to the hippocampus; enlarges early in hydrocephalus and hippocampal atrophy.'],
+  'terzo ventricolo': ['Cavità mediana tra i due talami; comunica con i laterali (forami di Monro) e con il quarto (acquedotto).', 'Midline cavity between the thalami; connects to the lateral ventricles (foramina of Monro) and the fourth (aqueduct).'],
+  'quarto ventricolo': ['Cavità tra tronco e cervelletto; il liquor esce verso lo spazio subaracnoideo dai forami di Luschka e Magendie.', 'Cavity between brainstem and cerebellum; CSF exits to the subarachnoid space through the foramina of Luschka and Magendie.'],
+  'plesso corioideo': ['Tessuto vascolare che produce il liquor; spesso calcificato negli adulti.', 'Vascular tissue that produces CSF; often calcified in adults.'],
+  'talamo': ['Stazione di relè sensitiva e motoria verso la corteccia; partecipa a vigilanza, memoria e linguaggio.', 'Sensory and motor relay to the cortex; involved in arousal, memory and language.'],
+  'nucleo caudato': ['Nucleo della base: controllo motorio, apprendimento di abitudini, funzioni cognitive e motivazione.', 'Basal ganglion: motor control, habit learning, cognition and motivation.'],
+  'putamen': ['Nucleo della base: selezione e avvio dei movimenti; con il caudato forma lo striato.', 'Basal ganglion: selection and initiation of movement; forms the striatum with the caudate.'],
+  'globo pallido': ['Principale uscita dei nuclei della base verso il talamo; modula il movimento.', 'Main output of the basal ganglia to the thalamus; modulates movement.'],
+  'ippocampo': ['Formazione di nuove memorie dichiarative e orientamento spaziale.', 'Formation of new declarative memories and spatial navigation.'],
+  'amigdala': ['Elaborazione delle emozioni, in particolare della paura, e memoria emotiva.', 'Emotion processing, especially fear, and emotional memory.'],
+  'nucleo accumbens': ['Circuito della ricompensa: motivazione e piacere.', 'Reward circuit: motivation and pleasure.'],
+  'diencefalo ventrale': ['Comprende ipotalamo e nucleo subtalamico: controllo endocrino e autonomico, modulazione del movimento.', 'Includes hypothalamus and subthalamic nucleus: endocrine and autonomic control, movement modulation.'],
+  'tronco encefalico': ['Nuclei dei nervi cranici, vie motorie e sensitive, centri di respiro, circolo e vigilanza.', 'Cranial nerve nuclei, motor and sensory pathways, respiratory, cardiovascular and arousal centres.'],
+  'mesencefalo': ['Nuclei del III e IV nervo, sostanza nera, vie motorie (peduncoli cerebrali), controllo dello sguardo verticale.', 'Nuclei of cranial nerves III and IV, substantia nigra, motor pathways (cerebral peduncles), vertical gaze control.'],
+  'ponte': ['Nuclei dei nervi V–VIII, vie motorie e sensitive, collegamenti con il cervelletto.', 'Nuclei of cranial nerves V–VIII, motor and sensory pathways, connections with the cerebellum.'],
+  'bulbo': ['Nuclei dei nervi IX–XII, centri di respiro e circolo, decussazione delle piramidi.', 'Nuclei of cranial nerves IX–XII, respiratory and cardiovascular centres, pyramidal decussation.'],
+  'corteccia cerebellare': ['Coordinazione dei movimenti, equilibrio, tono e apprendimento motorio.', 'Coordination of movement, balance, tone and motor learning.'],
+  'sostanza bianca cerebellare': ['Fibre del cervelletto e nuclei profondi (dentato), uscita verso tronco e talamo.', 'Cerebellar fibres and deep nuclei (dentate), output to brainstem and thalamus.'],
+  'chiasma ottico': ['Incrocio delle fibre nasali dei due nervi ottici.', 'Crossing of the nasal fibres of the two optic nerves.'],
+  'corteccia cerebrale non classificata': ['Corteccia che il modello non attribuisce a un giro specifico.', 'Cortex the model does not assign to a specific gyrus.'],
+  'insula (o corteccia non classificata)': ['Insula: integrazione di sensazioni corporee, gusto, funzioni autonomiche, linguaggio ed emozioni.', 'Insula: interoception, taste, autonomic function, speech and emotion.'],
+  'insula': ['Integrazione di sensazioni corporee, gusto, funzioni autonomiche, linguaggio ed emozioni.', 'Interoception, taste, autonomic function, speech and emotion.'],
+  'banca del solco temporale superiore': ['Integrazione multisensoriale, percezione sociale e comprensione del linguaggio.', 'Multisensory integration, social perception and language comprehension.'],
+  'cingolo anteriore caudale': ['Monitoraggio degli errori, controllo cognitivo e motivazione all\'azione.', 'Error monitoring, cognitive control and motivation to act.'],
+  'cingolo anteriore rostrale': ['Regolazione emotiva e autonomica.', 'Emotional and autonomic regulation.'],
+  'cingolo posteriore': ['Rete di default: memoria autobiografica, orientamento e attenzione interna.', 'Default mode network: autobiographical memory, orientation and internal attention.'],
+  'istmo del cingolo': ['Zona retrospleniale: memoria e navigazione spaziale.', 'Retrosplenial area: memory and spatial navigation.'],
+  'giro frontale medio caudale': ['Contiene il campo oculare frontale: movimenti saccadici volontari dello sguardo.', 'Contains the frontal eye field: voluntary saccadic eye movements.'],
+  'giro frontale medio rostrale': ['Corteccia prefrontale dorsolaterale: memoria di lavoro, pianificazione e flessibilità.', 'Dorsolateral prefrontal cortex: working memory, planning and flexibility.'],
+  'giro frontale superiore': ['Area motoria supplementare (parte mediale posteriore) e funzioni esecutive.', 'Supplementary motor area (posterior medial part) and executive functions.'],
+  'polo frontale': ['Pianificazione complessa, gestione di più obiettivi.', 'Complex planning and handling of multiple goals.'],
+  'pars opercularis': ['Parte dell\'area di Broca (a sinistra): produzione del linguaggio.', 'Part of Broca\'s area (left): speech production.'],
+  'pars triangularis': ['Parte dell\'area di Broca (a sinistra): produzione e sintassi del linguaggio.', 'Part of Broca\'s area (left): speech production and syntax.'],
+  'pars orbitalis': ['Elaborazione semantica e controllo inibitorio.', 'Semantic processing and inhibitory control.'],
+  'corteccia orbitofrontale laterale': ['Controllo inibitorio e adattamento del comportamento alle conseguenze.', 'Inhibitory control and adapting behaviour to outcomes.'],
+  'corteccia orbitofrontale mediale': ['Valutazione della ricompensa, decisioni e comportamento sociale.', 'Reward valuation, decision making and social behaviour.'],
+  'giro precentrale': ['Corteccia motoria primaria: movimenti volontari del lato opposto (omuncolo motorio).', 'Primary motor cortex: voluntary movement of the opposite side (motor homunculus).'],
+  'lobulo paracentrale': ['Parte mediale delle aree motoria e sensitiva: arto inferiore opposto; controllo della minzione.', 'Medial part of the motor and sensory areas: opposite leg; bladder control.'],
+  'giro postcentrale': ['Corteccia somatosensitiva primaria: tatto, posizione e dolore del lato opposto.', 'Primary somatosensory cortex: touch, position and pain of the opposite side.'],
+  'lobulo parietale superiore': ['Integrazione visuo-motoria: guida dei movimenti di raggiungimento e schema corporeo.', 'Visuomotor integration: guiding reaching movements and body schema.'],
+  'lobulo parietale inferiore': ['Giro angolare: lettura, scrittura e calcolo (sinistra); attenzione spaziale (destra).', 'Angular gyrus: reading, writing and calculation (left); spatial attention (right).'],
+  'giro sopramarginale': ['Elaborazione fonologica e prassia (sinistra); attenzione spaziale (destra).', 'Phonological processing and praxis (left); spatial attention (right).'],
+  'precuneo': ['Immaginazione visuospaziale, memoria episodica e coscienza di sé.', 'Visuospatial imagery, episodic memory and self-awareness.'],
+  'giro temporale superiore': ['Elaborazione uditiva; la parte posteriore sinistra contiene l\'area di Wernicke (comprensione).', 'Auditory processing; the left posterior part contains Wernicke\'s area (comprehension).'],
+  'giro temporale trasverso (Heschl)': ['Corteccia uditiva primaria.', 'Primary auditory cortex.'],
+  'giro temporale medio': ['Significato delle parole e riconoscimento visivo (via ventrale).', 'Word meaning and visual recognition (ventral stream).'],
+  'giro temporale inferiore': ['Riconoscimento visivo degli oggetti (via ventrale).', 'Visual object recognition (ventral stream).'],
+  'giro fusiforme': ['Riconoscimento di volti (destra), parole scritte (sinistra) e colori.', 'Recognition of faces (right), written words (left) and colours.'],
+  'polo temporale': ['Conoscenza semantica e riconoscimento delle persone.', 'Semantic knowledge and person recognition.'],
+  'corteccia entorinale': ['Porta d\'ingresso all\'ippocampo; prima area colpita nella malattia di Alzheimer.', 'Gateway to the hippocampus; first area affected in Alzheimer\'s disease.'],
+  'giro paraippocampale': ['Memoria e riconoscimento di luoghi e scene.', 'Memory and recognition of places and scenes.'],
+  'corteccia pericalcarina': ['Corteccia visiva primaria (V1) attorno alla scissura calcarina: emicampo visivo opposto.', 'Primary visual cortex (V1) around the calcarine fissure: opposite visual hemifield.'],
+  'cuneo': ['Corteccia visiva sopra la calcarina: quadrante visivo inferiore opposto.', 'Visual cortex above the calcarine: opposite lower visual quadrant.'],
+  'giro linguale': ['Corteccia visiva sotto la calcarina: quadrante visivo superiore opposto; colori.', 'Visual cortex below the calcarine: opposite upper visual quadrant; colour.'],
+  'corteccia occipitale laterale': ['Riconoscimento delle forme e percezione del movimento (area MT/V5).', 'Shape recognition and motion perception (MT/V5).'],
+};
+function testoGuidaStruttura(nome) {
+  const lg = lingua === 'en' ? 1 : 0, kb = DEFICIT[nome] && DEFICIT[nome][lg ? 'en' : 'it'];
+  const sost = t => t.replaceAll('{C}', tr('controlat')).replaceAll('{O}', tr('omolat'));
+  const esc = t => t.replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+  let h = `<p class="did-nome">${esc(trNome(nome))}</p>`;
+  if (FUNZIONI[nome]) h += `<p class="did-tit">${tr('funzione')}</p><p>${esc(FUNZIONI[nome][lg])}</p>`;
+  if (kb) {
+    h += `<p class="did-tit">${tr('deficitLesione')}</p><ul>`;
+    for (const v of kb.t || []) h += `<li>${esc(sost(v))}</li>`;
+    for (const v of kb.s || []) h += `<li><b>${tr('seSx')}</b>${esc(sost(v))}</li>`;
+    for (const v of kb.d || []) h += `<li><b>${tr('seDx')}</b>${esc(sost(v))}</li>`;
+    h += '</ul>';
+  } else if (SENZA_DEFICIT.has(nome)) h += `<p class="did-tit">${tr('deficitLesione')}</p><p class="les-nulla">${tr('lesNessuno')}</p>`;
+  return h;
+}
+let strutturaDidattica = null;
+function scegliStrutturaDidattica(p) {
+  let c = 0;
+  const e = impaginato && impaginato.etichette.find(e => p.x >= e.x && p.x <= e.x + e.w && p.y >= e.y && p.y <= e.y + e.h);
+  if (e) c = e.c;
+  else { const q = inImg(p), g = risultato.geo, u = Math.floor(g.dx + q.x / fotogramma.width * g.dw), v = Math.floor(g.dy + q.y / fotogramma.height * g.dh);
+    if (u >= 0 && v >= 0 && u < LATO && v < LATO) c = calcolaAnalisi().L[v * LATO + u]; }
+  if (c) { strutturaDidattica = CLASSI[c]; aggiornaPannelloStrum(); }
+}
+
+function tastiStrumenti(ev) {
+  if (ev.target.closest('input, textarea') || $('guida').open) return;
+  if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'z') { ev.preventDefault(); $('annullaMisura').click(); }
+  else if (ev.key === 'Escape' && (bozza || strumento)) { if (bozza) { bozza = null; disegna(); } else scegliStrumento(strumento); }
+}
+document.addEventListener('keydown', tastiStrumenti);
+aggiornaSuggerimentiStrum();
 
 // ---------------- Cambio lingua ----------------
 function applicaLingua() {
@@ -1495,7 +2130,7 @@ function applicaLingua() {
     doc.querySelectorAll('[data-t-ph]').forEach(el => { el.placeholder = tr(el.dataset.tPh); });
   }
   document.querySelectorAll('.lingua button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lingua === lingua));
-  aggiornaCursori(); aggiornaSuggerimenti();
+  aggiornaCursori(); aggiornaSuggerimenti(); aggiornaPannelloStrum();
   if (ultimoMessaggio) messaggio(...ultimoMessaggio);
   if (ultimoStato) stato(ultimoStato);
   costruisciOpzioni(); aggiornaScelta(); applicaTema(); testiGuida(); disegna();
