@@ -229,9 +229,9 @@
   /* Strumenti di misura */
   #tela { margin-left: 42px; width: calc(100% - 42px); }
   #strumenti { position: absolute; left: 0; top: 0; bottom: 42px; width: 42px; z-index: 3; display: flex; flex-direction: column;
-               align-items: center; gap: 2px; padding: 6px 0; overflow-y: auto; scrollbar-width: none;
+               align-items: center; gap: 1px; padding: 6px 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--linea) transparent;
                background: var(--pannello); border-right: var(--bordo) solid var(--linea); }
-  .strum { flex: none; display: grid; place-items: center; width: 32px; height: 30px; padding: 0; border: 0; border-radius: 6px;
+  .strum { flex: none; display: grid; place-items: center; width: 32px; height: 28px; padding: 0; border: 0; border-radius: 6px;
            background: transparent; color: var(--tenue); }
   .strum:hover { background: var(--rilievo); color: var(--testo); }
   .strum[aria-pressed=true] { background: var(--accento); color: var(--accento-testo); }
@@ -430,16 +430,15 @@
       </div>
       <button id="ingranaggio" aria-label="Opzioni" title="Opzioni" data-t-aria="opzioni" data-t-title="opzioni" aria-expanded="false" aria-controls="opzioni"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 5.3a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.9 1.5h2.2l.4 1.8 1.3.6 1.6-1 1.5 1.5-1 1.6.6 1.3 1.8.4v2.2l-1.8.4-.6 1.3 1 1.6-1.5 1.5-1.6-1-1.3.6-.4 1.8H6.9l-.4-1.8-1.3-.6-1.6 1-1.5-1.5 1-1.6-.6-1.3-1.8-.4V6.9l1.8-.4.6-1.3-1-1.6 1.5-1.5 1.6 1 1.3-.6z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button>
       <div id="strumenti" role="toolbar" aria-label="Strumenti" data-t-aria="strumenti">
-        <button type="button" class="strum" data-strum="didattica" aria-pressed="false" data-t-title="s_didattica" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3L1 6.5 8 10l7-3.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8v3.2c1.2 1.2 2.6 1.8 4 1.8s2.8-.6 4-1.8V8M15 6.5v4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span><button type="button" class="strum" data-strum="sposta" aria-pressed="false" data-t-title="s_sposta" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v13M1.5 8h13M8 1.5l-2 2M8 1.5l2 2M8 14.5l-2-2M8 14.5l2-2M1.5 8l2-2M1.5 8l2 2M14.5 8l-2-2M14.5 8l-2 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="righello" aria-pressed="false" data-t-title="s_righello" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 12.5L12.5 2l1.5 1.5L3.5 14z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5l1.2 1.2M7 7.5l1.2 1.2M9 5.5l1.2 1.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="angolo" aria-pressed="false" data-t-title="s_angolo" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5h11M2.5 13.5L11 3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 13.5a4 4 0 0 0-1.3-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="area" aria-pressed="false" data-t-title="s_area" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5.5L7.5 2.5l5.5 2-1 6.5-5 3L2.5 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="ellisse" aria-pressed="false" data-t-title="s_ellisse" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6" ry="4.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="penna" aria-pressed="false" data-t-title="s_penna" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5l1-3.5L11 2.5l2.5 2.5L6 12.5z M9.5 4l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="freccia" aria-pressed="false" data-t-title="s_freccia" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13L13 3M13 3H7.5M13 3v5.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="testo" aria-pressed="false" data-t-title="s_testo" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h10M8 3.5v10M6 13.5h4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span>
-        <button type="button" class="strum" data-strum="struttura" aria-pressed="false" data-t-title="s_struttura" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5l8 4-3.5 1.2L6 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11.5" cy="11.5" r="2.5" fill="currentColor"/></svg></button><button type="button" class="strum" data-strum="lesione" aria-pressed="false" data-t-title="s_lesione" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2c3.3 0 6 2.4 6 5.6 0 3.4-2.7 6.4-6 6.4S2 11 2 7.6C2 4.4 4.7 2 8 2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 6.2c1.2.2 1.8 1 1.6 2-.2 1.2-1.4 1.6-2.4 1.2-.9-.4-1.1-1.5-.5-2.4.3-.5.8-.8 1.3-.8z" fill="currentColor"/></svg></button><button type="button" class="strum" data-strum="evans" aria-pressed="false" data-t-title="s_evans" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6.2" ry="6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 6.5h5M2.5 9.5h11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="calibra" aria-pressed="false" data-t-title="s_calibra" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 6h13v4h-13z M4 6v2M6.5 6v2.5M9 6v2M11.5 6v2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="volume" aria-pressed="false" data-t-title="s_volume" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2l6 3-6 3-6-3z M2 8l6 3 6-3 M2 11l6 3 6-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="abc" aria-pressed="false" data-t-title="s_abc" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><text x="8" y="11.2" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" font-family="Segoe UI, sans-serif">ABC</text></svg></button><span class="sep"></span>
-        <button type="button" class="strum" id="annullaMisura" data-t-title="s_annulla" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3.5L2.5 6.5l3 3M2.5 6.5H10a3.5 3.5 0 0 1 0 7H7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" id="cancellaMisure" data-t-title="s_cancella" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5h11M6 4.5V2.5h4v2M4 4.5l.8 9h6.4l.8-9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="strum" data-strum="didattica" aria-pressed="false" data-t-title="s_didattica" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3L1 6.5 8 10l7-3.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8v3.2c1.2 1.2 2.6 1.8 4 1.8s2.8-.6 4-1.8V8M15 6.5v4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span><button type="button" class="strum" id="annullaMisura" data-t-title="s_annulla" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3.5L2.5 6.5l3 3M2.5 6.5H10a3.5 3.5 0 0 1 0 7H7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" id="cancellaMisure" data-t-title="s_cancella" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5h11M6 4.5V2.5h4v2M4 4.5l.8 9h6.4l.8-9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="gomma" aria-pressed="false" data-t-title="s_gomma" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5l4 4-6.5 6.5H4.5l-2-2z M6.5 5.5l4 4 M7 13h6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span><button type="button" class="strum" data-strum="sposta" aria-pressed="false" data-t-title="s_sposta" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v13M1.5 8h13M8 1.5l-2 2M8 1.5l2 2M8 14.5l-2-2M8 14.5l2-2M1.5 8l2-2M1.5 8l2 2M14.5 8l-2-2M14.5 8l-2 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="righello" aria-pressed="false" data-t-title="s_righello" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 12.5L12.5 2l1.5 1.5L3.5 14z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5l1.2 1.2M7 7.5l1.2 1.2M9 5.5l1.2 1.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="angolo" aria-pressed="false" data-t-title="s_angolo" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5h11M2.5 13.5L11 3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 13.5a4 4 0 0 0-1.3-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="area" aria-pressed="false" data-t-title="s_area" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5.5L7.5 2.5l5.5 2-1 6.5-5 3L2.5 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="ellisse" aria-pressed="false" data-t-title="s_ellisse" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6" ry="4.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="penna" aria-pressed="false" data-t-title="s_penna" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5l1-3.5L11 2.5l2.5 2.5L6 12.5z M9.5 4l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="freccia" aria-pressed="false" data-t-title="s_freccia" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13L13 3M13 3H7.5M13 3v5.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="testo" aria-pressed="false" data-t-title="s_testo" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h10M8 3.5v10M6 13.5h4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span>
+        <button type="button" class="strum" data-strum="struttura" aria-pressed="false" data-t-title="s_struttura" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5l8 4-3.5 1.2L6 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11.5" cy="11.5" r="2.5" fill="currentColor"/></svg></button><button type="button" class="strum" data-strum="lesione" aria-pressed="false" data-t-title="s_lesione" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2c3.3 0 6 2.4 6 5.6 0 3.4-2.7 6.4-6 6.4S2 11 2 7.6C2 4.4 4.7 2 8 2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 6.2c1.2.2 1.8 1 1.6 2-.2 1.2-1.4 1.6-2.4 1.2-.9-.4-1.1-1.5-.5-2.4.3-.5.8-.8 1.3-.8z" fill="currentColor"/></svg></button><button type="button" class="strum" data-strum="evans" aria-pressed="false" data-t-title="s_evans" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6.2" ry="6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 6.5h5M2.5 9.5h11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="calibra" aria-pressed="false" data-t-title="s_calibra" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 6h13v4h-13z M4 6v2M6.5 6v2.5M9 6v2M11.5 6v2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="volume" aria-pressed="false" data-t-title="s_volume" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2l6 3-6 3-6-3z M2 8l6 3 6-3 M2 11l6 3 6-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="abc" aria-pressed="false" data-t-title="s_abc" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><text x="8" y="11.2" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" font-family="Segoe UI, sans-serif">ABC</text></svg></button>
       </div>
       <div id="pannelloStrum" hidden>
         <h2 id="psTitolo"></h2>
         <div data-ps="calibra">
           <p class="aiuto-ps" data-t="ps_calibra"></p>
           <label class="riga"><span data-t="lunghezzaNota">Lunghezza nota (mm)</span><input type="number" id="calMm" min="0.1" step="0.1" value="10"></label>
-          <button type="button" id="calApplica" class="primario" data-t="applica">Applica</button>
+          <div class="ps-azioni"><button type="button" id="calApplica" class="primario" data-t="applica">Applica</button><button type="button" id="calRimuovi" data-t="rimuoviCal">Rimuovi calibrazione</button></div>
         </div>
         <div data-ps="volume">
           <p class="aiuto-ps" data-t="ps_volume"></p>
@@ -787,6 +786,7 @@ const TESTI = {
     tema: 'Tema', temaChiaro: 'Passa al tema chiaro', temaScuro: 'Passa al tema scuro',
     s_didattica: 'Guida alle strutture: clicca una struttura per vederne funzione e deficit', didVuoto: 'Clicca una struttura sull\'immagine o la sua etichetta.',
     funzione: 'Funzione', deficitLesione: 'In caso di lesione', controlat: 'controlaterale', omolat: 'omolaterale',
+    s_gomma: 'Gomma: clicca un disegno o una misura per cancellarla', rimuoviCal: 'Rimuovi calibrazione',
     s_lesione: 'Analisi lesione (traccia il contorno della lesione)',
     ps_lesione: 'Traccia il contorno della lesione: vengono indicate le strutture coinvolte e i deficit che potrebbero manifestarsi. Di solito il PACS mostra le immagini in convenzione radiologica (la sinistra dell\'immagine è la destra del paziente).',
     lesNeuro: 'Convenzione neurologica (sinistra = sinistra)', latoSx: 'a sinistra', latoDx: 'a destra', latoEntrambi: 'su entrambi i lati',
@@ -862,6 +862,7 @@ const TESTI = {
     tema: 'Theme', temaChiaro: 'Switch to light theme', temaScuro: 'Switch to dark theme',
     s_didattica: 'Structure guide: click a structure to see its function and deficits', didVuoto: 'Click a structure on the image or its label.',
     funzione: 'Function', deficitLesione: 'If damaged', controlat: 'contralateral', omolat: 'ipsilateral',
+    s_gomma: 'Eraser: click a drawing or measurement to delete it', rimuoviCal: 'Remove calibration',
     s_lesione: 'Lesion analysis (draw the outline of the lesion)',
     ps_lesione: 'Draw the outline of the lesion: the structures involved and the deficits that may appear are listed. PACS usually shows images in radiological convention (the left of the image is the patient\'s right).',
     lesNeuro: 'Neurological convention (left = left)', latoSx: 'left', latoDx: 'right', latoEntrambi: 'bilateral',
@@ -1645,7 +1646,7 @@ let strumento = null, misure = [], bozza = null, calib = null, panning = null, f
 let zoom = { z: 1, px: 0, py: 0 }, eraBloccata = false;
 const DUE_PUNTI = { righello: 1, calibra: 1, abc: 1, evans: 1, freccia: 1, ellisse: 1 };
 const AREE = { area: 1, ellisse: 1, struttura: 1, volume: 1, lesione: 1 };
-let archivioMisure = [], miniCorrente = null;
+let archivioMisure = [], miniCorrente = null, selezionata = null, xBtn = null;
 function misureAttive() { return misure.length > 0 || !!bozza; }
 function applicaZoom(a0) {
   return { x: a0.x + a0.w / 2 * (1 - zoom.z) + zoom.px, y: a0.y + a0.h / 2 * (1 - zoom.z) + zoom.py, w: a0.w * zoom.z, h: a0.h * zoom.z };
@@ -1687,25 +1688,39 @@ $('annullaMisura').onclick = () => { if (bozza) bozza = null; else misure.pop();
 $('cancellaMisure').onclick = () => { misure = []; bozza = null; archivioMisure = []; aggiornaPannelloStrum(); disegna(); };
 
 tela.addEventListener('pointerdown', ev => {
-  if (!strumento || selezionando || !aImg() || ev.button !== 0) return;
-  ev.stopImmediatePropagation(); mostraOpzioni(false);
+  if (selezionando || !aImg() || ev.button !== 0) return;
+  const p = posizione(ev);
+  if (selezionata && xBtn && Math.hypot(p.x - xBtn.x, p.y - xBtn.y) <= 11) { ev.stopImmediatePropagation(); eliminaMisura(selezionata); return; }
+  if (!strumento || strumento === 'sposta') {          // clic su una misura: la seleziona e mostra la ×
+    const k = trovaVicina(p);
+    if (k >= 0) { ev.stopImmediatePropagation(); selezionata = misure[k]; disegna(); return; }
+    if (selezionata) { selezionata = null; disegna(); }
+    if (!strumento) return;
+  }
+  ev.stopImmediatePropagation(); mostraOpzioni(false); selezionata = null;
   try { tela.setPointerCapture(ev.pointerId); } catch {}
-  const p = posizione(ev), q = inImg(p);
+  const q = inImg(p);
   if (strumento === 'sposta') { panning = { x: p.x, y: p.y, px: zoom.px, py: zoom.py }; tela.style.cursor = 'grabbing'; return; }
   if (DUE_PUNTI[strumento]) bozza = { tipo: strumento, p: [q, { ...q }] };
   else if (strumento === 'area' || strumento === 'penna' || strumento === 'volume' || strumento === 'lesione') bozza = { tipo: strumento, p: [q] };
   else if (strumento === 'angolo') {
     if (!bozza) bozza = { tipo: 'angolo', p: [q, { ...q }] };
     else { bozza.p[bozza.p.length - 1] = q;
-      if (bozza.p.length === 3) { misure.push(bozza); bozza = null; } else bozza.p.push({ ...q }); }
-  } else if (strumento === 'testo') misure.push({ tipo: 'testo', p: [q], testo: $('testoNota').value.trim() || '•' });
+      if (bozza.p.length === 3) { misure.push(bozza); selezionata = bozza; bozza = null; } else bozza.p.push({ ...q }); }
+  } else if (strumento === 'testo') { misure.push({ tipo: 'testo', p: [q], testo: $('testoNota').value.trim() || '•' }); selezionata = misure[misure.length - 1]; }
   else if (strumento === 'struttura') misuraStruttura(q);
+  else if (strumento === 'gomma') cancellaVicina(p);
   else if (strumento === 'didattica') scegliStrutturaDidattica(p);
   aggiornaPannelloStrum(); disegna();
 }, true);
 tela.addEventListener('pointermove', ev => {
-  if (!strumento || selezionando || !aImg()) return;
+  if (selezionando || !aImg()) return;
   const p = posizione(ev);
+  if (!panning && !bozza && (!strumento || strumento === 'sposta' || strumento === 'gomma')) {
+    const sopraX = selezionata && xBtn && Math.hypot(p.x - xBtn.x, p.y - xBtn.y) <= 11;
+    tela.style.cursor = sopraX || trovaVicina(p) >= 0 ? 'pointer' : strumento === 'sposta' ? 'grab' : strumento ? 'crosshair' : '';
+  }
+  if (!strumento) return;
   if (panning) { zoom.px = panning.px + p.x - panning.x; zoom.py = panning.py + p.y - panning.y; disegna(); ev.stopImmediatePropagation(); return; }
   if (!bozza) return;
   const q = inImg(p), ult = bozza.p[bozza.p.length - 1];
@@ -1728,8 +1743,9 @@ tela.addEventListener('pointerup', ev => {
     if (stessi.length >= 2) misure = misure.filter(x => x.tipo !== m.tipo);
     m.ruolo = misure.filter(x => x.tipo === m.tipo).length;
   }
-  misure.push(m);
+  misure.push(m); selezionata = m;
   if (m.tipo === 'calibra') { $('calMm').focus(); $('calMm').select(); }
+  if (m.tipo === 'struttura') misure = misure.filter(x => x === m || x.tipo !== 'struttura');
   aggiornaPannelloStrum(); disegna();
 }, true);
 tela.addEventListener('dblclick', ev => { if (strumento === 'sposta' || zoom.z > 1) { zoom = { z: 1, px: 0, py: 0 }; disegna(); } });
@@ -1744,6 +1760,35 @@ tela.addEventListener('wheel', ev => {
   disegna();
 }, { passive: false });
 
+function distSegmento(p, a, b) {
+  const dx = b.x - a.x, dy = b.y - a.y, l = dx * dx + dy * dy;
+  const t = l ? Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / l)) : 0;
+  return Math.hypot(p.x - a.x - t * dx, p.y - a.y - t * dy);
+}
+function cancellaVicina(p) {                 // gomma: elimina la misura più vicina al clic
+  const k = trovaVicina(p); if (k >= 0) eliminaMisura(misure[k]);
+}
+function eliminaMisura(m) {
+  if (m.tipo === 'lesione') ultimaLesione = null;
+  misure = misure.filter(x => x !== m); if (selezionata === m) selezionata = null;
+  aggiornaPannelloStrum(); disegna();
+}
+function trovaVicina(p) {                    // indice della misura più vicina al punto (entro 12 px), -1 se nessuna
+  let migliore = -1, dmin = 12;
+  misure.forEach((m, k) => {
+    let P = m.p.map(inSch);
+    if (m.tipo === 'ellisse') { const cx = (P[0].x + P[1].x) / 2, cy = (P[0].y + P[1].y) / 2, rx = Math.abs(P[1].x - P[0].x) / 2, ry = Math.abs(P[1].y - P[0].y) / 2;
+      P = Array.from({ length: 33 }, (_, i) => ({ x: cx + rx * Math.cos(i / 32 * 2 * Math.PI), y: cy + ry * Math.sin(i / 32 * 2 * Math.PI) })); }
+    let d = P.length === 1 ? Math.hypot(p.x - P[0].x, p.y - P[0].y) - (m.tipo === 'testo' || m.tipo === 'struttura' ? 14 : 0) : Infinity;
+    for (let i = 1; i < P.length; i++) d = Math.min(d, distSegmento(p, P[i - 1], P[i]));
+    if ((m.tipo === 'area' || m.tipo === 'volume' || m.tipo === 'lesione') && P.length > 2) {
+      d = Math.min(d, distSegmento(p, P[P.length - 1], P[0]));
+      if (puntoNelPoligono(p.x, p.y, P)) d = Math.min(d, 6);
+    }
+    if (d < dmin) { dmin = d; migliore = k; }
+  });
+  return migliore;
+}
 function misuraStruttura(q) {
   if (!risultato) return;
   const g = risultato.geo, u = Math.floor(g.dx + q.x / fotogramma.width * g.dw), v = Math.floor(g.dy + q.y / fotogramma.height * g.dh);
@@ -1751,6 +1796,7 @@ function misuraStruttura(q) {
   const A = calcolaAnalisi(), i = v * LATO + u, c = A.L[i]; if (!c) return;
   const comp = A.comp[i]; let n = 0; for (let j = 0; j < N; j++) if (A.comp[j] === comp) n++;
   const k = fotogramma.width / g.dw;
+  misure = misure.filter(x => x.tipo !== 'struttura');      // una struttura alla volta
   misure.push({ tipo: 'struttura', p: [q], nome: trNome(CLASSI[c]), areaPx: n * k * k });
 }
 function evansAutomatico() {
@@ -1777,6 +1823,7 @@ function evansAutomatico() {
   return true;
 }
 $('evansAuto').onclick = () => { if (!evansAutomatico()) $('psRisultato').textContent = tr('evansNo'); else { aggiornaPannelloStrum(); disegna(); } };
+$('calRimuovi').onclick = () => { calib = null; misure = misure.filter(m => m.tipo !== 'calibra'); aggiornaPannelloStrum(); disegna(); };
 $('calApplica').onclick = () => {
   const l = misure.find(m => m.tipo === 'calibra'), mm = parseFloat(String($('calMm').value).replace(',', '.'));
   if (!l) { $('psRisultato').textContent = tr('calLinea'); return; }
@@ -1804,7 +1851,7 @@ function aggiornaPannelloStrum() {
     $('psTitolo').textContent = tr('s_' + k).replace(/\s*[(:].*$/, '');
     ps.querySelectorAll('[data-ps]').forEach(d => { d.hidden = d.dataset.ps !== k; });
     let r = '';
-    if (k === 'calibra') r = '';
+    if (k === 'calibra') { r = ''; $('calRimuovi').disabled = !calib; }
     if (k === 'volume') {
       const passo = (parseFloat($('volSpess').value) || 0) + (parseFloat($('volGap').value) || 0);
       $('volFette').innerHTML = fette.map((a, i) => `<li>${fmtA(a)}<button type="button" data-k="${i}" aria-label="×">×</button></li>`).join('');
@@ -1836,6 +1883,7 @@ function aggiornaPannelloStrum() {
 }
 
 function disegnaMisure() {
+  xBtn = null; if (selezionata && !misure.includes(selezionata)) selezionata = null;
   const a = aImg(); if (!a || !risultato || (!misure.length && !bozza)) return;
   const ctx = tela.getContext('2d');
   const col = getComputedStyle(document.documentElement).getPropertyValue('--accento').trim() || '#F2B33D';
@@ -1877,6 +1925,16 @@ function disegnaMisure() {
       const c = P.reduce((s, q) => ({ x: s.x + q.x / P.length, y: s.y + q.y / P.length }), { x: 0, y: 0 });
       scritta(c.x + 6, c.y, fmtA(areaMisura(m)));
     }
+  }
+  if (selezionata) {                         // contorno di selezione e pulsante × per cancellarla
+    let P = selezionata.p.map(inSch);
+    const xs = P.map(q => q.x), ys = P.map(q => q.y), pad = selezionata.tipo === 'testo' || selezionata.tipo === 'struttura' ? 14 : 8;
+    const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - pad, x1 = Math.max(...xs) + pad + (selezionata.tipo === 'testo' ? ctx.measureText(selezionata.testo).width + 10 : 0), y1 = Math.max(...ys) + pad;
+    ctx.setLineDash([4, 3]); ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,.75)'; ctx.strokeRect(x0, y0, x1 - x0, y1 - y0); ctx.setLineDash([]);
+    xBtn = { x: Math.min(x1, tela.clientWidth - 12), y: Math.max(y0, 12) };
+    ctx.fillStyle = '#E5484D'; ctx.beginPath(); ctx.arc(xBtn.x, xBtn.y, 9, 0, 2 * Math.PI); ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.beginPath();
+    ctx.moveTo(xBtn.x - 3.5, xBtn.y - 3.5); ctx.lineTo(xBtn.x + 3.5, xBtn.y + 3.5); ctx.moveTo(xBtn.x + 3.5, xBtn.y - 3.5); ctx.lineTo(xBtn.x - 3.5, xBtn.y + 3.5); ctx.stroke();
   }
   ctx.restore();
 }
@@ -2113,6 +2171,8 @@ function scegliStrutturaDidattica(p) {
 function tastiStrumenti(ev) {
   if (ev.target.closest('input, textarea') || $('guida').open) return;
   if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'z') { ev.preventDefault(); $('annullaMisura').click(); }
+  else if ((ev.key === 'Delete' || ev.key === 'Backspace') && selezionata) { ev.preventDefault(); eliminaMisura(selezionata); }
+  else if (ev.key === 'Escape' && selezionata && !bozza) { selezionata = null; disegna(); }
   else if (ev.key === 'Escape' && (bozza || strumento)) { if (bozza) { bozza = null; disegna(); } else scegliStrumento(strumento); }
 }
 document.addEventListener('keydown', tastiStrumenti);
