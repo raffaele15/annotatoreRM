@@ -276,7 +276,7 @@
   .scena.attiva .s5-cur { animation-name: s5-cur; }
   @keyframes s5-cur { 0%,4% { transform: translate(336px, 132px); } 18% { transform: translate(258px, 40px); }
                       21% { transform: translate(258px, 40px) scale(.85); } 24% { transform: translate(258px, 40px); }
-                      40%,48% { transform: translate(428px, 162px); } 82%,100% { transform: translate(362px, 100px); } }
+                      40%,48% { transform: translate(442px, 175px); } 82%,100% { transform: translate(362px, 100px); } }
   .scena.attiva .s5-clic { animation-name: anello; animation-delay: 1.65s; animation-duration: .8s; }
   .scena.attiva .s5-tab1, .scena.attiva .s5-app { animation-name: sparisci; animation-delay: 1.8s; animation-duration: .4s; }
   .scena.attiva .s5-tab2, .scena.attiva .s5-pacs { animation-name: compari; animation-delay: 1.8s; animation-duration: .4s; }
@@ -286,8 +286,28 @@
   @keyframes s5-via { 0%,41% { opacity: 1; } 43%,100% { opacity: 0; } }
   @keyframes s5-su { 0%,41% { opacity: 0; } 43%,100% { opacity: 1; } }
   .scena.attiva .s5-scala { animation-name: s5-scala; }
-  .s5-scala { transform: translate(167.44px, 90.16px) scale(.72); }
-  @keyframes s5-scala { 0%,48% { transform: translate(167.44px, 90.16px) scale(.72); } 82%,100% { transform: none; } }
+  .s5-scala { transform: translate(203.32px, 109.48px) scale(.66); }
+  @keyframes s5-scala { 0%,48% { transform: translate(203.32px, 109.48px) scale(.66); } 82%,100% { transform: none; } }
+
+  /* scena 6: finestra sopra l'immagine, rotella ai lati */
+  .scena.attiva[data-s="5"] * { animation-duration: 8.5s; }
+  .scena.attiva .s6-cur { animation-name: s6-cur; }
+  @keyframes s6-cur { 0% { transform: translate(362px, 100px); } 15% { transform: translate(470px, 108px); }
+                      18% { transform: translate(470px, 108px) scale(.85); } 45% { transform: translate(310px, 112px) scale(.85); }
+                      50% { transform: translate(310px, 112px); } 60%,100% { transform: translate(150px, 230px); } }
+  .scena.attiva .s6-sposta { animation-name: s6-sposta; }
+  @keyframes s6-sposta { 0%,18% { transform: none; } 45%,100% { transform: translate(-160px, 4px); } }
+  .scena.attiva .s6-rotella { animation-name: s6-rotella; }
+  @keyframes s6-rotella { 0%,59% { opacity: 0; } 61%,100% { opacity: 1; } }
+  .scena.attiva .s6-ruota { animation-name: s6-ruota; animation-duration: .5s; animation-iteration-count: infinite; animation-delay: 5.2s; animation-fill-mode: none; }
+  @keyframes s6-ruota { to { transform: translateY(4px); } }
+  .scena.attiva .s6-im14 { animation-name: s6-a; } .scena.attiva .s6-im15 { animation-name: s6-b; } .scena.attiva .s6-im16 { animation-name: s6-c; }
+  @keyframes s6-a { 0%,68% { opacity: 1; } 69%,100% { opacity: 0; } }
+  @keyframes s6-b { 0%,68% { opacity: 0; } 69%,82% { opacity: 1; } 83%,100% { opacity: 0; } }
+  @keyframes s6-c { 0%,82% { opacity: 0; } 83%,100% { opacity: 1; } }
+  .s6-vent { transform-box: fill-box; transform-origin: center; }
+  .scena.attiva .s6-vent { animation-name: s6-vent; }
+  @keyframes s6-vent { 0%,68% { transform: none; } 69%,82% { transform: scale(1.12); } 83%,100% { transform: scale(1.24); } }
 
   @media (prefers-reduced-motion: reduce) {
     .scena.attiva * { animation-duration: 1ms !important; animation-delay: 0s !important; }
@@ -417,9 +437,9 @@
           <rect x="30" y="82" width="580" height="254" fill="#0b0d10"/>
           <rect x="30" y="82" width="580" height="16" fill="#2a3036"/>
           <rect x="38" y="88" width="30" height="4" rx="2" fill="#5d666e"/><rect x="74" y="88" width="30" height="4" rx="2" fill="#5d666e"/>
-          <rect x="38" y="104" width="300" height="226" fill="#000"/>
-          <use href="#cervello" x="108" y="118" width="160" height="200"/>
-          <text x="44" y="116" fill="#8aa" font-size="7" font-family="Segoe UI">AX T1  SE 3  IM 14</text>
+          <rect x="110" y="104" width="420" height="226" fill="#000"/>
+          <use href="#cervello" x="240" y="117" width="160" height="200"/>
+          <text x="116" y="116" fill="#8aa" font-size="7" font-family="Segoe UI">AX T1  SE 3</text>
         </g>
       </defs>
 
@@ -471,7 +491,7 @@
         <rect x="154" y="118" width="116" height="22" rx="11" class="g-ok"/><text x="166" y="132" class="g-ok-t" data-t="seleziona">Seleziona riquadro</text>
         <rect x="276" y="118" width="122" height="22" rx="11" class="g-acc"/><text x="288" y="132" class="g-acc-t" data-t="pip">Finestra fluttuante</text>
         <circle cx="340" cy="129" r="14" class="clic s4-clic"/>
-        <g class="s4-pip" opacity="0"><use href="#pipBase" transform="translate(167.44 90.16) scale(.72)"/></g>
+        <g class="s4-pip" opacity="0"><use href="#pipBase" transform="translate(203.32 109.48) scale(.66)"/></g>
         <g class="cursore s4-cur"><use href="#freccia"/></g>
       </g>
 
@@ -483,14 +503,31 @@
           <rect x="44" y="118" width="104" height="22" rx="11" class="g-ok"/><text x="56" y="132" class="g-ok-t" data-t="avvia">Avvia cattura</text>
           <rect x="154" y="118" width="116" height="22" rx="11" class="g-ok"/><text x="166" y="132" class="g-ok-t" data-t="seleziona">Seleziona riquadro</text>
           <rect x="276" y="118" width="122" height="22" rx="11" class="g-ok"/><text x="288" y="132" class="g-ok-t" data-t="pip">Finestra fluttuante</text></g>
-        <g class="s5-pacs" opacity="0"><use href="#pacsPagina"/></g>
+        <g class="s5-pacs" opacity="0"><use href="#pacsPagina"/><text x="168" y="116" fill="#8aa" font-size="7" font-family="Segoe UI">IM 14</text></g>
         <circle cx="262" cy="42" r="14" class="clic s5-clic"/>
         <g class="s5-scala"><use href="#pipBase"/></g>
-        <circle cx="428" cy="162" r="9" class="clic s5-angolo"/>
+        <circle cx="442" cy="175" r="9" class="clic s5-angolo"/>
         <g class="cursore s5-cur">
           <g class="s5-freccia"><use href="#freccia"/></g>
           <g class="s5-ridim" opacity="0"><path d="M-8 -8 L-1.5 -8 L-8 -1.5 Z M8 8 L1.5 8 L8 1.5 Z M-6 -6 L6 6" fill="#fff" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/>
             <path d="M-8 -8 L-1.5 -8 L-8 -1.5 Z M8 8 L1.5 8 L8 1.5 Z M-6 -6 L6 6" fill="#111" stroke="#111" stroke-width="1" stroke-linejoin="round"/></g>
+        </g>
+      </g>
+
+      <g class="scena" data-s="5">
+        <use href="#browser"/><use href="#schedaApp0"/><use href="#schedaPacs"/>
+        <use href="#pacsPagina"/>
+        <g font-size="7" font-family="Segoe UI" fill="#8aa"><text x="168" y="116" class="s6-im14">IM 14</text><text x="168" y="116" class="s6-im15" opacity="0">IM 15</text><text x="168" y="116" class="s6-im16" opacity="0">IM 16</text></g>
+        <g class="s6-sposta">
+          <use href="#pipBase"/>
+          <g class="s6-vent"><path transform="translate(425 150) scale(1.1)" d="M47 40 q-12 8 -9 26 q3 6 7 3 q-3 -14 3 -27z M53 40 q12 8 9 26 q-3 6 -7 3 q3 -14 -3 -27z" fill="#3D8FE0"/></g>
+        </g>
+        <g class="cursore s6-cur"><use href="#freccia"/>
+          <g class="s6-rotella" opacity="0" transform="translate(16 16)">
+            <rect x="0" y="0" width="11" height="16" rx="5.5" fill="#1d2226" stroke="#fff" stroke-width="1.4"/>
+            <rect x="4.5" y="3" width="2" height="4" rx="1" fill="#fff" class="s6-ruota"/>
+            <path d="M2 20 l3.5 3.5 l3.5 -3.5 M2 25 l3.5 3.5 l3.5 -3.5" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+          </g>
         </g>
       </g>
     </svg>
@@ -600,6 +637,8 @@ const TESTI = {
     guida4: 'Clicca <b>Finestra fluttuante</b>: compare sopra questa stessa scheda, sempre in primo piano.',
     guidaNota4: 'Con l\'ingranaggio scegli il modello, mostri le maschere e nascondi le strutture che non ti servono.',
     guida5: 'Torna alla finestra del <b>PACS</b> e ingrandisci la finestra fluttuante trascinando uno degli <b>angoli in alto</b>.',
+    guida6: 'Trascina la finestra fluttuante sopra l\'immagine, tenendola dalla barra in alto. Per scorrere le sezioni usa la rotella <b>ai lati della finestra fluttuante</b>, sulla pagina del PACS sotto.',
+    guidaNota6: 'Con il mouse sopra la finestra fluttuante la rotella non fa scorrere il PACS.',
     gScegli: 'Scegli cosa condividere', gSchedaChrome: 'Scheda di Chrome', gFinestra: 'Finestra', gSchermo: 'Schermo intero',
     gPosta: 'Posta in arrivo', gReferti: 'Referti', gAnnulla: 'Annulla', gCondividi: 'Condividi',
     gVentricolo: 'ventricolo', gTalamo: 'talamo', gSostanzaBianca: 'sost. bianca', gFrontale: 'frontale sup.', gCuneo: 'cuneo',
@@ -642,6 +681,8 @@ const TESTI = {
     guida4: 'Click <b>Floating window</b>: it opens on top of this same tab and stays always on top.',
     guidaNota4: 'Use the gear to pick the model, show the masks and hide the structures you do not need.',
     guida5: 'Go back to the <b>PACS</b> window and enlarge the floating window by dragging one of its <b>top corners</b>.',
+    guida6: 'Drag the floating window over the image by its top bar. To scroll through the slices, use the wheel <b>beside the floating window</b>, on the PACS page underneath.',
+    guidaNota6: 'With the mouse over the floating window, the wheel does not scroll the PACS.',
     gScegli: 'Choose what to share', gSchedaChrome: 'Chrome tab', gFinestra: 'Window', gSchermo: 'Entire screen',
     gPosta: 'Inbox', gReferti: 'Reports', gAnnulla: 'Cancel', gCondividi: 'Share',
     gVentricolo: 'ventricle', gTalamo: 'thalamus', gSostanzaBianca: 'white matter', gFrontale: 'sup. frontal', gCuneo: 'cuneus',
@@ -1294,7 +1335,7 @@ $('temaBtn').onclick = () => { tema = tema === 'chiaro' ? 'scuro' : 'chiaro';
   try { localStorage.setItem('annotatore-tema', tema); } catch {} applicaTema(); disegna(); };
 
 // ---------------- Guida animata ----------------
-const SCENE = 5, DURATA = [6800, 6800, 6800, 5200, 9000];
+const SCENE = 6, DURATA = [6800, 6800, 6800, 5200, 8800, 9200];
 let scenaG = 0, timerG = null, guidaInPlay = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 function mostraScena(i) {
   scenaG = (i + SCENE) % SCENE;
