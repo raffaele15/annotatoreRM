@@ -7,29 +7,20 @@
 <link rel="icon" type="image/png" href="icona.png">
 <script src="coi-serviceworker.min.js"></script>
 <script src="ort/ort.wasm.min.js"></script>
-<script>try{const t=localStorage.getItem("annotatore-tema");if(t)document.documentElement.dataset.tema=t;}catch{}</script>
+<script>try{if(localStorage.getItem("annotatore-tema")==="chiaro")document.documentElement.dataset.tema="chiaro";}catch{}</script>
 <style id="stili">
-  :root, :root[data-tema="ambra"] {
-    --fondo: #12171B; --pannello: #1A2026; --rilievo: #212930; --linea: #2C353D; --testo: #DDE4E9; --tenue: #8D99A4;
-    --accento: #E0A526; --accento-testo: #1A1405; --ok: #6CC08B; --ok-fondo: #1C3226; --ok-bordo: #3F7A55; --errore: #F07A6E;
+  :root, :root[data-tema="scuro"] {
+    --fondo: #07090A; --pannello: #101315; --rilievo: #181C1F; --linea: #3A4247; --testo: #F2F5F7; --tenue: #B3BEC6;
+    --accento: #F2B33D; --accento-testo: #140E02; --ok: #74D49A; --ok-fondo: #0F2A1B; --ok-bordo: #4C9A6A; --errore: #F07A6E;
     --ombra: 0 10px 30px rgba(0,0,0,.45); --bordo: 1px; --logo-filtro: none;
     --num: "Bahnschrift", "DIN Alternate", "Segoe UI", system-ui, sans-serif;
     --corpo: "Segoe UI", system-ui, -apple-system, sans-serif;
     color-scheme: dark;
   }
-  :root[data-tema="ardesia"] {
-    --fondo: #0E1420; --pannello: #151D2B; --rilievo: #1C2637; --linea: #283447; --testo: #DCE5F2; --tenue: #8796AD;
-    --accento: #5B9DF5; --accento-testo: #06101F; --ok: #5CC3A0; --ok-fondo: #12302A; --ok-bordo: #2F7562; --errore: #F27C7C;
-  }
   :root[data-tema="chiaro"] {
-    --fondo: #EDF0F3; --pannello: #FFFFFF; --rilievo: #F4F6F8; --linea: #D3DAE1; --testo: #18222D; --tenue: #5B6976;
+    --fondo: #FFFFFF; --pannello: #FFFFFF; --rilievo: #F4F6F8; --linea: #D3DAE1; --testo: #18222D; --tenue: #5B6976;
     --accento: #1E5FAF; --accento-testo: #FFFFFF; --ok: #1F7A4D; --ok-fondo: #E3F2E9; --ok-bordo: #9DCDB0; --errore: #B3261E;
     --ombra: 0 10px 30px rgba(24,34,45,.14); --logo-filtro: brightness(.42) contrast(1.25); color-scheme: light;
-  }
-  :root[data-tema="contrasto"] {
-    --fondo: #000000; --pannello: #000000; --rilievo: #141414; --linea: #9A9A9A; --testo: #FFFFFF; --tenue: #D6D6D6;
-    --accento: #FFD60A; --accento-testo: #000000; --ok: #4BE08A; --ok-fondo: #002B14; --ok-bordo: #4BE08A; --errore: #FF7070;
-    --ombra: none; --bordo: 2px;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--fondo); color: var(--testo); font: 15px/1.45 var(--corpo); }
@@ -199,21 +190,6 @@
   #sostieniBtn { box-shadow: var(--ombra); border-width: var(--bordo); }
   #sostieniPannello { border-radius: 10px; border-width: var(--bordo); box-shadow: var(--ombra); }
 
-  /* Scelta dello stile */
-  .menu-stile { position: relative; }
-  #temi { position: absolute; right: 0; top: calc(100% + 8px); z-index: 40; width: 250px; padding: 6px;
-          background: var(--pannello); border: var(--bordo) solid var(--linea); border-radius: 10px; box-shadow: var(--ombra); }
-  #temi[hidden] { display: none; }
-  #temi button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 6px;
-                 background: transparent; text-align: left; font-weight: 500; }
-  #temi button:hover { background: var(--rilievo); }
-  #temi button[aria-checked=true] { background: var(--rilievo); font-weight: 600; }
-  #temi button[aria-checked=true]::after { content: "✓"; margin-left: auto; color: var(--accento); }
-  #temi small { display: block; color: var(--tenue); font-weight: 400; font-size: .76rem; }
-  .campione { flex: none; display: grid; grid-template-columns: 1fr 1fr; width: 30px; height: 30px; border-radius: 6px; overflow: hidden;
-              border: 1px solid var(--linea); }
-  .campione i:nth-child(3) { grid-column: span 2; }
-
   /* Guida animata */
   #guida { width: min(780px, calc(100vw - 32px)); padding: 0; border: var(--bordo) solid var(--linea); border-radius: 14px;
            background: var(--pannello); color: var(--testo); box-shadow: 0 24px 70px rgba(0,0,0,.55); }
@@ -312,10 +288,7 @@
   <div class="marchio"><img src="logo-marchio.png" alt=""><h1><span>Atlante</span><span class="rm"><span>RM</span><i class="rombo"></i><span class="minuscolo">Live</span></span></h1></div>
     <div class="strumenti">
       <button type="button" id="guidaBtn" class="discreto"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 5.2v5.6L11 8z" fill="currentColor"/></svg><span data-t="guida">Guida</span></button>
-      <div class="menu-stile">
-        <button type="button" id="stileBtn" class="discreto" aria-haspopup="menu" aria-expanded="false" aria-controls="temi"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1a7 7 0 0 1 0 14z" fill="currentColor"/></svg><span data-t="stile">Stile</span></button>
-        <div id="temi" role="menu" aria-labelledby="stileBtn" hidden></div>
-      </div>
+      <button type="button" id="temaBtn" class="discreto" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1a7 7 0 0 1 0 14z" fill="currentColor"/></svg><span id="temaTesto">Tema</span></button>
       <div class="lingua" role="group" aria-label="Lingua / Language"><button type="button" data-lingua="it" aria-pressed="true">IT</button><button type="button" data-lingua="en" aria-pressed="false">EN</button></div>
     </div>
   </header>
@@ -581,14 +554,11 @@ const TESTI = {
     sostieniBtn: 'Sostieni il progetto', sostieniTitolo: 'Sostieni il progetto',
     sostieniTesto: 'Atlante RM Live è gratuito e lo sviluppo nel tempo libero. Se ti è utile per studiare o lavorare, una donazione aiuta a coprire l\'addestramento dei modelli e lo sviluppo di nuove versioni. Grazie!',
     dona: 'Dona con PayPal ↗', qr: 'oppure inquadra con il telefono',
-    guida: 'Guida', stile: 'Stile', chiudi: 'Chiudi', guidaTitolo: 'Come si usa Atlante RM Live',
+    guida: 'Guida', chiudi: 'Chiudi', guidaTitolo: 'Come si usa Atlante RM Live',
     indietro: 'Indietro', avanti: 'Avanti', fine: 'Ho capito', pausaGuida: 'Pausa', riproduci: 'Riproduci',
     vuotoTesto: 'Clicca <b>Avvia cattura</b> e scegli la scheda del PACS: l\'immagine comparirà qui con le strutture etichettate.',
     vuotoGuida: 'Guarda come si fa',
-    tema_ambra: 'Sala refertazione', temaDescr_ambra: 'Scuro, accento ambra',
-    tema_ardesia: 'Ardesia', temaDescr_ardesia: 'Scuro blu, accento azzurro',
-    tema_chiaro: 'Clinico chiaro', temaDescr_chiaro: 'Chiaro, per stanze illuminate',
-    tema_contrasto: 'Alto contrasto', temaDescr_contrasto: 'Massima leggibilità',
+    tema: 'Tema', temaChiaro: 'Passa al tema chiaro', temaScuro: 'Passa al tema scuro',
     guida1: 'Clicca <b>Avvia cattura</b>.',
     guida2: 'Chrome chiede cosa condividere: nella scheda <b>Scheda di Chrome</b> scegli il <b>PACS</b> e clicca <b>Condividi</b>.',
     guidaNota2: 'Il PACS non è nell\'elenco? Se è aperto in incognito, apri Atlante nella stessa finestra in incognito, oppure scegli <b>Finestra</b>.',
@@ -623,14 +593,11 @@ const TESTI = {
     sostieniBtn: 'Support the project', sostieniTitolo: 'Support the project',
     sostieniTesto: 'Atlante RM Live is free and developed in my spare time. If it helps you study or work, a donation helps cover training the models and developing new versions. Thank you!',
     dona: 'Donate with PayPal ↗', qr: 'or scan with your phone',
-    guida: 'Guide', stile: 'Style', chiudi: 'Close', guidaTitolo: 'How to use Atlante RM Live',
+    guida: 'Guide', chiudi: 'Close', guidaTitolo: 'How to use Atlante RM Live',
     indietro: 'Back', avanti: 'Next', fine: 'Got it', pausaGuida: 'Pause', riproduci: 'Play',
     vuotoTesto: 'Click <b>Start capture</b> and choose the PACS tab: the image will appear here with labelled structures.',
     vuotoGuida: 'See how it works',
-    tema_ambra: 'Reading room', temaDescr_ambra: 'Dark, amber accent',
-    tema_ardesia: 'Slate', temaDescr_ardesia: 'Dark blue, light blue accent',
-    tema_chiaro: 'Clinical light', temaDescr_chiaro: 'Light, for bright rooms',
-    tema_contrasto: 'High contrast', temaDescr_contrasto: 'Maximum legibility',
+    tema: 'Theme', temaChiaro: 'Switch to light theme', temaScuro: 'Switch to dark theme',
     guida1: 'Click <b>Start capture</b>.',
     guida2: 'Chrome asks what to share: in the <b>Chrome tab</b> section pick the <b>PACS</b> and click <b>Share</b>.',
     guidaNota2: 'PACS not in the list? If it is open in incognito, open Atlante in the same incognito window, or choose <b>Window</b>.',
@@ -671,7 +638,7 @@ const NOMI_EN = {          // strutture (nomi di config_app.json) e gruppi del p
 };
 let lingua = (() => {
   try { const l = localStorage.getItem('annotatore-lingua'); if (l === 'it' || l === 'en') return l; } catch {}
-  return (navigator.language || 'it').toLowerCase().startsWith('it') ? 'it' : 'en';
+  return 'it';
 })();
 const tr = (k, p = {}) => { const t = TESTI[lingua][k] ?? TESTI.it[k] ?? k; return typeof t === 'function' ? t(p) : t; };
 const trNome = x => lingua === 'en' ? (NOMI_EN[x] || x) : x;
@@ -914,7 +881,7 @@ function disegnaSelezione() {
     const w = Math.abs(trascina.x1 - trascina.x0), h = Math.abs(trascina.y1 - trascina.y0);
     ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(0, 0, tela.clientWidth, tela.clientHeight);
     ctx.drawImage(video, (x - a.x) / a.s, (y - a.y) / a.s, w / a.s, h / a.s, x, y, w, h);
-    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accento').trim() || '#E0A526'; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accento').trim() || '#F2B33D'; ctx.lineWidth = 2; ctx.strokeRect(x, y, w, h);
   }
 }
 function posizione(ev) { const r = tela.getBoundingClientRect(); return { x: ev.clientX - r.left, y: ev.clientY - r.top }; }
@@ -1271,7 +1238,7 @@ function applicaLingua() {
   $('pausa').textContent = tr(inPausa ? 'riprendi' : 'pausa');
   if (ultimoMessaggio) messaggio(...ultimoMessaggio);
   if (ultimoStato) stato(ultimoStato);
-  costruisciOpzioni(); aggiornaScelta(); costruisciTemi(); testiGuida(); disegna();
+  costruisciOpzioni(); aggiornaScelta(); applicaTema(); testiGuida(); disegna();
 }
 document.querySelector('.lingua').addEventListener('click', ev => {
   const b = ev.target.closest('button[data-lingua]'); if (!b || b.dataset.lingua === lingua) return;
@@ -1279,41 +1246,15 @@ document.querySelector('.lingua').addEventListener('click', ev => {
   try { localStorage.setItem('annotatore-lingua', lingua); } catch {}
   applicaLingua();
 });
-// ---------------- Stile (tema) ----------------
-const TEMI = ['ambra', 'ardesia', 'chiaro', 'contrasto'];
-const CAMPIONI = { ambra: ['#12171B', '#E0A526', '#2C353D'], ardesia: ['#0E1420', '#5B9DF5', '#283447'],
-                   chiaro: ['#FFFFFF', '#1E5FAF', '#D3DAE1'], contrasto: ['#000000', '#FFD60A', '#FFFFFF'] };
-let tema = (() => { try { const t = localStorage.getItem('annotatore-tema'); if (TEMI.includes(t)) return t; } catch {} return 'ambra'; })();
+// ---------------- Tema chiaro / scuro ----------------
+let tema = (() => { try { return localStorage.getItem('annotatore-tema') === 'chiaro' ? 'chiaro' : 'scuro'; } catch { return 'scuro'; } })();
 function applicaTema() {
   for (const doc of [document, pipWin && pipWin.document]) if (doc) doc.documentElement.dataset.tema = tema;
-  document.querySelectorAll('#temi button').forEach(b => b.setAttribute('aria-checked', b.dataset.tema === tema));
+  $('temaBtn').setAttribute('aria-pressed', tema === 'chiaro');
+  $('temaTesto').textContent = tr('tema'); $('temaBtn').title = tr(tema === 'chiaro' ? 'temaScuro' : 'temaChiaro');
 }
-function costruisciTemi() {
-  const box = $('temi'); box.textContent = '';
-  for (const t of TEMI) {
-    const b = document.createElement('button'); b.type = 'button'; b.dataset.tema = t; b.setAttribute('role', 'menuitemradio');
-    const c = document.createElement('span'); c.className = 'campione';
-    for (const col of CAMPIONI[t]) { const i = document.createElement('i'); i.style.background = col; c.append(i); }
-    const txt = document.createElement('span'); txt.append(tr('tema_' + t));
-    const d = document.createElement('small'); d.textContent = tr('temaDescr_' + t); txt.append(d);
-    b.append(c, txt); box.append(b);
-  }
-  applicaTema();
-}
-const menuTemi = apri => { $('temi').hidden = !apri; $('stileBtn').setAttribute('aria-expanded', apri);
-  if (apri) (document.querySelector('#temi button[aria-checked=true]') || document.querySelector('#temi button')).focus(); };
-$('stileBtn').onclick = ev => { ev.stopPropagation(); menuTemi($('temi').hidden); };
-$('temi').addEventListener('click', ev => {
-  const b = ev.target.closest('button[data-tema]'); if (!b) return;
-  tema = b.dataset.tema; try { localStorage.setItem('annotatore-tema', tema); } catch {}
-  applicaTema(); menuTemi(false); $('stileBtn').focus(); disegna();
-});
-$('temi').addEventListener('keydown', ev => {
-  const bs = [...document.querySelectorAll('#temi button')], i = bs.indexOf(document.activeElement);
-  if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); bs[(i + (ev.key === 'ArrowDown' ? 1 : -1) + bs.length) % bs.length].focus(); }
-  if (ev.key === 'Escape') { menuTemi(false); $('stileBtn').focus(); }
-});
-document.addEventListener('click', ev => { if (!ev.target.closest('.menu-stile')) menuTemi(false); });
+$('temaBtn').onclick = () => { tema = tema === 'chiaro' ? 'scuro' : 'chiaro';
+  try { localStorage.setItem('annotatore-tema', tema); } catch {} applicaTema(); disegna(); };
 
 // ---------------- Guida animata ----------------
 const SCENE = 4, DURATA = 6800;
@@ -1351,7 +1292,7 @@ $('guida').addEventListener('click', ev => { if (ev.target === $('guida')) $('gu
 $('guida').addEventListener('keydown', ev => { if (ev.key === 'ArrowRight') mostraScena(scenaG + 1); if (ev.key === 'ArrowLeft') mostraScena(scenaG - 1); });
 $('guidaBtn').onclick = apriGuida;
 $('vuotoGuida').onclick = apriGuida;
-costruisciTemi();
+applicaTema();
 messaggio(() => tr('caricamentoIniziale'), false, true);
 applicaLingua();
 if (typeof ort === 'undefined') messaggio(() => tr('ortMancante'), true);
