@@ -227,6 +227,7 @@
   .scena.attiva { display: inline; }
   .scena.attiva * { animation-duration: 6s; animation-timing-function: ease-in-out; animation-fill-mode: both; }
   .cursore { animation-name: none; }
+  .scena.attiva .clic { animation-fill-mode: forwards; }   /* niente anello prima del clic */
   .clic { fill: none; stroke: var(--accento); stroke-width: 2; opacity: 0; transform-box: fill-box; transform-origin: center; }
 
   /* scena 1: clic su Avvia cattura */
@@ -265,8 +266,7 @@
   /* scena 4: la finestra fluttuante compare sopra la stessa scheda */
   .scena.attiva .s4-cur { animation-name: s4-cur; }
   @keyframes s4-cur { 0%,5% { transform: translate(470px, 250px); } 26% { transform: translate(336px, 132px); }
-                      30% { transform: translate(336px, 132px) scale(.85); } 34%,55% { transform: translate(336px, 132px); }
-                      75%,100% { transform: translate(300px, 230px); } }
+                      30% { transform: translate(336px, 132px) scale(.85); } 34%,100% { transform: translate(336px, 132px); } }
   .scena.attiva .s4-clic { animation-name: anello; animation-delay: 1.8s; animation-duration: .8s; }
   .scena.attiva .s4-pip { animation-name: s4-pip; animation-delay: 2.3s; animation-duration: .5s; transform-box: fill-box; transform-origin: center; }
   @keyframes s4-pip { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
@@ -274,7 +274,7 @@
   /* scena 5: torna al PACS e allarga la finestra dagli angoli in alto */
   .scena.attiva[data-s="4"] * { animation-duration: 8s; }
   .scena.attiva .s5-cur { animation-name: s5-cur; }
-  @keyframes s5-cur { 0%,4% { transform: translate(300px, 230px); } 18% { transform: translate(258px, 40px); }
+  @keyframes s5-cur { 0%,4% { transform: translate(336px, 132px); } 18% { transform: translate(258px, 40px); }
                       21% { transform: translate(258px, 40px) scale(.85); } 24% { transform: translate(258px, 40px); }
                       40%,48% { transform: translate(428px, 162px); } 82%,100% { transform: translate(362px, 100px); } }
   .scena.attiva .s5-clic { animation-name: anello; animation-delay: 1.65s; animation-duration: .8s; }
@@ -600,7 +600,6 @@ const TESTI = {
     guida4: 'Clicca <b>Finestra fluttuante</b>: compare sopra questa stessa scheda, sempre in primo piano.',
     guidaNota4: 'Con l\'ingranaggio scegli il modello, mostri le maschere e nascondi le strutture che non ti servono.',
     guida5: 'Torna alla finestra del <b>PACS</b> e ingrandisci la finestra fluttuante trascinando uno degli <b>angoli in alto</b>.',
-    guidaNota5: 'Usa gli angoli superiori: quelli inferiori hanno un\'area troppo piccola per essere afferrati bene.',
     gScegli: 'Scegli cosa condividere', gSchedaChrome: 'Scheda di Chrome', gFinestra: 'Finestra', gSchermo: 'Schermo intero',
     gPosta: 'Posta in arrivo', gReferti: 'Referti', gAnnulla: 'Annulla', gCondividi: 'Condividi',
     gVentricolo: 'ventricolo', gTalamo: 'talamo', gSostanzaBianca: 'sost. bianca', gFrontale: 'frontale sup.', gCuneo: 'cuneo',
@@ -643,7 +642,6 @@ const TESTI = {
     guida4: 'Click <b>Floating window</b>: it opens on top of this same tab and stays always on top.',
     guidaNota4: 'Use the gear to pick the model, show the masks and hide the structures you do not need.',
     guida5: 'Go back to the <b>PACS</b> window and enlarge the floating window by dragging one of its <b>top corners</b>.',
-    guidaNota5: 'Use the top corners: the bottom ones have too small an area to grab reliably.',
     gScegli: 'Choose what to share', gSchedaChrome: 'Chrome tab', gFinestra: 'Window', gSchermo: 'Entire screen',
     gPosta: 'Inbox', gReferti: 'Reports', gAnnulla: 'Cancel', gCondividi: 'Share',
     gVentricolo: 'ventricle', gTalamo: 'thalamus', gSostanzaBianca: 'white matter', gFrontale: 'sup. frontal', gCuneo: 'cuneus',
@@ -1296,7 +1294,7 @@ $('temaBtn').onclick = () => { tema = tema === 'chiaro' ? 'scuro' : 'chiaro';
   try { localStorage.setItem('annotatore-tema', tema); } catch {} applicaTema(); disegna(); };
 
 // ---------------- Guida animata ----------------
-const SCENE = 5, DURATA = [6800, 6800, 6800, 6800, 9000];
+const SCENE = 5, DURATA = [6800, 6800, 6800, 5200, 9000];
 let scenaG = 0, timerG = null, guidaInPlay = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 function mostraScena(i) {
   scenaG = (i + SCENE) % SCENE;
