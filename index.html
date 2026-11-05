@@ -186,6 +186,8 @@
   .vuoto button:hover { background: #1b2024; }
   body.in-pip .vuoto button { display: none; }
 
+  .privacy { display: flex; align-items: center; gap: 8px; margin: 12px 0 0; color: var(--tenue); font-size: .85rem; }
+  .privacy svg { width: 14px; height: 14px; flex: none; color: var(--ok); }
   /* Sostieni: più sobrio */
   #sostieniBtn { box-shadow: var(--ombra); border-width: var(--bordo); }
   #sostieniPannello { border-radius: 10px; border-width: var(--bordo); box-shadow: var(--ombra); }
@@ -236,6 +238,7 @@
   @keyframes anello { 0% { opacity: .9; transform: scale(.3); } 100% { opacity: 0; transform: scale(1.6); } }
   @keyframes premi { 50% { transform: scale(.94); } }
   @keyframes compari { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes sparisci { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
 
   /* scena 2: scelta della scheda del PACS */
   .scena.attiva .s2-cur { animation-name: s2-cur; }
@@ -259,22 +262,32 @@
   .scena.attiva .s3-buio { animation-name: s3-buio; }
   @keyframes s3-buio { 0%,30% { opacity: 0; } 40%,100% { opacity: .5; } }
 
-  /* scena 4: finestra fluttuante sopra il PACS */
+  /* scena 4: la finestra fluttuante compare sopra la stessa scheda */
   .scena.attiva .s4-cur { animation-name: s4-cur; }
   @keyframes s4-cur { 0%,5% { transform: translate(470px, 250px); } 26% { transform: translate(336px, 132px); }
-                      30% { transform: translate(336px, 132px) scale(.85); } 34%,100% { transform: translate(336px, 132px); } }
+                      30% { transform: translate(336px, 132px) scale(.85); } 34%,55% { transform: translate(336px, 132px); }
+                      75%,100% { transform: translate(300px, 230px); } }
   .scena.attiva .s4-clic { animation-name: anello; animation-delay: 1.8s; animation-duration: .8s; }
-  .scena.attiva .s4-app { animation-name: sparisci; animation-delay: 2.2s; animation-duration: .4s; }
-  @keyframes sparisci { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
-  .scena.attiva .s4-pacs, .scena.attiva .s4-tab2 { animation-name: compari; animation-delay: 2.2s; animation-duration: .4s; }
-  .scena.attiva .s4-tab1 { animation-name: sparisci; animation-delay: 2.2s; animation-duration: .4s; }
-  .scena.attiva .s4-pip { animation-name: s4-pip; animation-delay: 2.6s; animation-duration: .5s; transform-box: fill-box; transform-origin: center; }
+  .scena.attiva .s4-pip { animation-name: s4-pip; animation-delay: 2.3s; animation-duration: .5s; transform-box: fill-box; transform-origin: center; }
   @keyframes s4-pip { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
-  .scena.attiva .s4-et { animation-name: compari; animation-duration: .4s; }
-  .scena.attiva .s4-et:nth-of-type(1) { animation-delay: 3.3s; } .scena.attiva .s4-et:nth-of-type(2) { animation-delay: 3.6s; }
-  .scena.attiva .s4-et:nth-of-type(3) { animation-delay: 3.9s; } .scena.attiva .s4-et:nth-of-type(4) { animation-delay: 4.2s; }
-  .scena.attiva .s4-et:nth-of-type(5) { animation-delay: 4.5s; }
-  .scena.attiva .s4-cur2 { animation-name: sparisci; animation-delay: 2.4s; animation-duration: .3s; }
+
+  /* scena 5: torna al PACS e allarga la finestra dagli angoli in alto */
+  .scena.attiva[data-s="4"] * { animation-duration: 8s; }
+  .scena.attiva .s5-cur { animation-name: s5-cur; }
+  @keyframes s5-cur { 0%,4% { transform: translate(300px, 230px); } 18% { transform: translate(258px, 40px); }
+                      21% { transform: translate(258px, 40px) scale(.85); } 24% { transform: translate(258px, 40px); }
+                      40%,48% { transform: translate(428px, 162px); } 82%,100% { transform: translate(362px, 100px); } }
+  .scena.attiva .s5-clic { animation-name: anello; animation-delay: 1.65s; animation-duration: .8s; }
+  .scena.attiva .s5-tab1, .scena.attiva .s5-app { animation-name: sparisci; animation-delay: 1.8s; animation-duration: .4s; }
+  .scena.attiva .s5-tab2, .scena.attiva .s5-pacs { animation-name: compari; animation-delay: 1.8s; animation-duration: .4s; }
+  .scena.attiva .s5-angolo { animation-name: anello; animation-delay: 3.2s; animation-duration: .9s; }
+  .scena.attiva .s5-freccia { animation-name: s5-via; }
+  .scena.attiva .s5-ridim { animation-name: s5-su; }
+  @keyframes s5-via { 0%,41% { opacity: 1; } 43%,100% { opacity: 0; } }
+  @keyframes s5-su { 0%,41% { opacity: 0; } 43%,100% { opacity: 1; } }
+  .scena.attiva .s5-scala { animation-name: s5-scala; }
+  .s5-scala { transform: translate(167.44px, 90.16px) scale(.72); }
+  @keyframes s5-scala { 0%,48% { transform: translate(167.44px, 90.16px) scale(.72); } 82%,100% { transform: none; } }
 
   @media (prefers-reduced-motion: reduce) {
     .scena.attiva * { animation-duration: 1ms !important; animation-delay: 0s !important; }
@@ -334,6 +347,7 @@
     </div>
   </div>
 
+  <p class="privacy"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.5" fill="currentColor"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><span data-t="privacy">Le immagini restano nel tuo browser: l'analisi avviene sul tuo computer e nessun dato viene inviato o salvato altrove.</span></p>
 </main>
 
 <dialog id="guida" aria-labelledby="guidaTitolo">
@@ -382,6 +396,31 @@
           <text x="56" y="178" fill="#8aa" font-size="6.5" font-family="Segoe UI">AX T1  SE 3  IM 14</text>
           <text x="318" y="178" fill="#8aa" font-size="6.5" font-family="Segoe UI">AX FLAIR  SE 5  IM 14</text>
         </g>
+        <g id="pipBase">
+            <rect x="362" y="100" width="236" height="222" rx="8" class="g-pann g-linea" stroke-width="1.5"/>
+            <rect x="362" y="100" width="236" height="16" rx="8" class="g-fondo"/><text x="372" y="111" class="g-tenue">Atlante RM live</text>
+            <rect x="363" y="117" width="234" height="204" fill="#000"/>
+            <use href="#cervello" x="425" y="150" width="110" height="132"/>
+            <ellipse cx="480" cy="172" rx="30" ry="15" fill="#E58A3A" opacity=".45"/>
+            <ellipse cx="480" cy="263" rx="26" ry="12" fill="#9B6BE0" opacity=".45"/>
+            <ellipse cx="471" cy="234" rx="6.6" ry="8.8" fill="#4FB37A" opacity=".7"/><ellipse cx="489" cy="234" rx="6.6" ry="8.8" fill="#4FB37A" opacity=".7"/>
+            <path transform="translate(425 150) scale(1.1)" d="M47 40 q-12 8 -9 26 q3 6 7 3 q-3 -14 3 -27z M53 40 q12 8 9 26 q-3 6 -7 3 q3 -14 -3 -27z" fill="#3D8FE0" opacity=".9"/>
+            <g>
+              <g><path d="M462 170 L420 140" stroke="#E58A3A"/><circle cx="462" cy="170" r="2" fill="#E58A3A"/><text x="372" y="143" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gFrontale">frontale sup.</text></g>
+              <g><path d="M472 205 L420 196" stroke="#3D8FE0"/><circle cx="472" cy="205" r="2" fill="#3D8FE0"/><text x="372" y="199" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gVentricolo">ventricolo</text></g>
+              <g><path d="M493 234 L542 214" stroke="#4FB37A"/><circle cx="493" cy="234" r="2" fill="#4FB37A"/><text x="546" y="217" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gTalamo">talamo</text></g>
+              <g><path d="M500 263 L542 292" stroke="#9B6BE0"/><circle cx="500" cy="263" r="2" fill="#9B6BE0"/><text x="546" y="295" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gCuneo">cuneo</text></g>
+              <g><path d="M452 216 L420 252" stroke="#C9C9C9"/><circle cx="452" cy="216" r="2" fill="#C9C9C9"/><text x="372" y="255" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gSostanzaBianca">sost. bianca</text></g>
+            </g>
+          </g>
+        <g id="pacsPagina">
+          <rect x="30" y="82" width="580" height="254" fill="#0b0d10"/>
+          <rect x="30" y="82" width="580" height="16" fill="#2a3036"/>
+          <rect x="38" y="88" width="30" height="4" rx="2" fill="#5d666e"/><rect x="74" y="88" width="30" height="4" rx="2" fill="#5d666e"/>
+          <rect x="38" y="104" width="300" height="226" fill="#000"/>
+          <use href="#cervello" x="108" y="118" width="160" height="200"/>
+          <text x="44" y="116" fill="#8aa" font-size="7" font-family="Segoe UI">AX T1  SE 3  IM 14</text>
+        </g>
       </defs>
 
       <g class="scena" data-s="0">
@@ -427,40 +466,32 @@
       </g>
 
       <g class="scena" data-s="3">
+        <use href="#browser"/><use href="#schedaApp"/><use href="#schedaPacs0"/><use href="#appTesta"/>
+        <rect x="44" y="118" width="104" height="22" rx="11" class="g-ok"/><text x="56" y="132" class="g-ok-t" data-t="avvia">Avvia cattura</text>
+        <rect x="154" y="118" width="116" height="22" rx="11" class="g-ok"/><text x="166" y="132" class="g-ok-t" data-t="seleziona">Seleziona riquadro</text>
+        <rect x="276" y="118" width="122" height="22" rx="11" class="g-acc"/><text x="288" y="132" class="g-acc-t" data-t="pip">Finestra fluttuante</text>
+        <circle cx="340" cy="129" r="14" class="clic s4-clic"/>
+        <g class="s4-pip" opacity="0"><use href="#pipBase" transform="translate(167.44 90.16) scale(.72)"/></g>
+        <g class="cursore s4-cur"><use href="#freccia"/></g>
+      </g>
+
+      <g class="scena" data-s="4">
         <use href="#browser"/>
-        <g class="s4-tab1"><use href="#schedaApp"/><use href="#schedaPacs0"/></g>
-        <g class="s4-tab2" opacity="0"><use href="#schedaApp0"/><use href="#schedaPacs"/></g>
-        <g class="s4-app"><use href="#appTesta"/>
+        <g class="s5-tab1"><use href="#schedaApp"/><use href="#schedaPacs0"/></g>
+        <g class="s5-tab2" opacity="0"><use href="#schedaApp0"/><use href="#schedaPacs"/></g>
+        <g class="s5-app"><use href="#appTesta"/>
           <rect x="44" y="118" width="104" height="22" rx="11" class="g-ok"/><text x="56" y="132" class="g-ok-t" data-t="avvia">Avvia cattura</text>
           <rect x="154" y="118" width="116" height="22" rx="11" class="g-ok"/><text x="166" y="132" class="g-ok-t" data-t="seleziona">Seleziona riquadro</text>
-          <rect x="276" y="118" width="122" height="22" rx="11" class="g-acc"/><text x="288" y="132" class="g-acc-t" data-t="pip">Finestra fluttuante</text>
-          <circle cx="340" cy="129" r="14" class="clic s4-clic"/></g>
-        <g class="s4-pacs" opacity="0">
-          <rect x="30" y="82" width="580" height="254" fill="#0b0d10"/>
-          <rect x="30" y="82" width="580" height="16" fill="#2a3036"/>
-          <rect x="38" y="88" width="30" height="4" rx="2" fill="#5d666e"/><rect x="74" y="88" width="30" height="4" rx="2" fill="#5d666e"/>
-          <rect x="38" y="104" width="300" height="226" fill="#000"/>
-          <use href="#cervello" x="108" y="118" width="160" height="200"/>
-          <text x="44" y="116" fill="#8aa" font-size="7" font-family="Segoe UI">AX T1  SE 3  IM 14</text>
+          <rect x="276" y="118" width="122" height="22" rx="11" class="g-ok"/><text x="288" y="132" class="g-ok-t" data-t="pip">Finestra fluttuante</text></g>
+        <g class="s5-pacs" opacity="0"><use href="#pacsPagina"/></g>
+        <circle cx="262" cy="42" r="14" class="clic s5-clic"/>
+        <g class="s5-scala"><use href="#pipBase"/></g>
+        <circle cx="428" cy="162" r="9" class="clic s5-angolo"/>
+        <g class="cursore s5-cur">
+          <g class="s5-freccia"><use href="#freccia"/></g>
+          <g class="s5-ridim" opacity="0"><path d="M-8 -8 L-1.5 -8 L-8 -1.5 Z M8 8 L1.5 8 L8 1.5 Z M-6 -6 L6 6" fill="#fff" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/>
+            <path d="M-8 -8 L-1.5 -8 L-8 -1.5 Z M8 8 L1.5 8 L8 1.5 Z M-6 -6 L6 6" fill="#111" stroke="#111" stroke-width="1" stroke-linejoin="round"/></g>
         </g>
-        <g class="s4-pip" opacity="0">
-          <rect x="362" y="100" width="236" height="222" rx="8" class="g-pann g-linea" stroke-width="1.5"/>
-          <rect x="362" y="100" width="236" height="16" rx="8" class="g-fondo"/><text x="372" y="111" class="g-tenue">Atlante RM live</text>
-          <rect x="363" y="117" width="234" height="204" fill="#000"/>
-          <use href="#cervello" x="425" y="150" width="110" height="132"/>
-          <ellipse cx="480" cy="172" rx="30" ry="15" fill="#E58A3A" opacity=".45"/>
-          <ellipse cx="480" cy="263" rx="26" ry="12" fill="#9B6BE0" opacity=".45"/>
-          <ellipse cx="471" cy="234" rx="6.6" ry="8.8" fill="#4FB37A" opacity=".7"/><ellipse cx="489" cy="234" rx="6.6" ry="8.8" fill="#4FB37A" opacity=".7"/>
-          <path transform="translate(425 150) scale(1.1)" d="M47 40 q-12 8 -9 26 q3 6 7 3 q-3 -14 3 -27z M53 40 q12 8 9 26 q-3 6 -7 3 q3 -14 -3 -27z" fill="#3D8FE0" opacity=".9"/>
-          <g>
-            <g class="s4-et"><path d="M462 170 L420 140" stroke="#E58A3A"/><circle cx="462" cy="170" r="2" fill="#E58A3A"/><text x="372" y="143" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gFrontale">frontale sup.</text></g>
-            <g class="s4-et"><path d="M472 205 L420 196" stroke="#3D8FE0"/><circle cx="472" cy="205" r="2" fill="#3D8FE0"/><text x="372" y="199" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gVentricolo">ventricolo</text></g>
-            <g class="s4-et"><path d="M493 234 L542 214" stroke="#4FB37A"/><circle cx="493" cy="234" r="2" fill="#4FB37A"/><text x="546" y="217" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gTalamo">talamo</text></g>
-            <g class="s4-et"><path d="M500 263 L542 292" stroke="#9B6BE0"/><circle cx="500" cy="263" r="2" fill="#9B6BE0"/><text x="546" y="295" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gCuneo">cuneo</text></g>
-            <g class="s4-et"><path d="M452 216 L420 252" stroke="#C9C9C9"/><circle cx="452" cy="216" r="2" fill="#C9C9C9"/><text x="372" y="255" fill="#E8EEF1" font-size="7.5" font-family="Segoe UI" font-weight="600" data-t="gSostanzaBianca">sost. bianca</text></g>
-          </g>
-        </g>
-        <g class="cursore s4-cur"><use href="#freccia"/></g>
       </g>
     </svg>
   </div>
@@ -559,13 +590,17 @@ const TESTI = {
     vuotoTesto: 'Clicca <b>Avvia cattura</b> e scegli la scheda del PACS: l\'immagine comparirà qui con le strutture etichettate.',
     vuotoGuida: 'Guarda come si fa',
     tema: 'Tema', temaChiaro: 'Passa al tema chiaro', temaScuro: 'Passa al tema scuro',
+    privacy: 'Le immagini restano nel tuo browser: l\'analisi avviene sul tuo computer e nessun dato viene inviato o salvato altrove.',
     guida1: 'Clicca <b>Avvia cattura</b>.',
+    guidaNota1: 'In alternativa alla scheda del PACS puoi condividere anche una <b>finestra</b> o lo <b>schermo intero</b> del PC.',
     guida2: 'Chrome chiede cosa condividere: nella scheda <b>Scheda di Chrome</b> scegli il <b>PACS</b> e clicca <b>Condividi</b>.',
-    guidaNota2: 'Il PACS non è nell\'elenco? Se è aperto in incognito, apri Atlante nella stessa finestra in incognito, oppure scegli <b>Finestra</b>.',
+    guidaNota2: 'Il PACS non è nell\'elenco? Se è aperto in incognito, apri Atlante nella stessa finestra in incognito, oppure scegli <b>Finestra</b> o <b>Schermo intero</b>.',
     guida3: 'Trascina un rettangolo <b>solo sull\'immagine RM</b>, senza menu né scritte.',
     guidaNota3: 'Per cambiare zona in seguito clicca di nuovo <b>Seleziona riquadro</b>.',
-    guida4: 'Clicca <b>Finestra fluttuante</b> e torna al PACS: le etichette seguono l\'immagine mentre scorri le sezioni.',
+    guida4: 'Clicca <b>Finestra fluttuante</b>: compare sopra questa stessa scheda, sempre in primo piano.',
     guidaNota4: 'Con l\'ingranaggio scegli il modello, mostri le maschere e nascondi le strutture che non ti servono.',
+    guida5: 'Torna alla finestra del <b>PACS</b> e ingrandisci la finestra fluttuante trascinando uno degli <b>angoli in alto</b>.',
+    guidaNota5: 'Usa gli angoli superiori: quelli inferiori hanno un\'area troppo piccola per essere afferrati bene.',
     gScegli: 'Scegli cosa condividere', gSchedaChrome: 'Scheda di Chrome', gFinestra: 'Finestra', gSchermo: 'Schermo intero',
     gPosta: 'Posta in arrivo', gReferti: 'Referti', gAnnulla: 'Annulla', gCondividi: 'Condividi',
     gVentricolo: 'ventricolo', gTalamo: 'talamo', gSostanzaBianca: 'sost. bianca', gFrontale: 'frontale sup.', gCuneo: 'cuneo',
@@ -598,13 +633,17 @@ const TESTI = {
     vuotoTesto: 'Click <b>Start capture</b> and choose the PACS tab: the image will appear here with labelled structures.',
     vuotoGuida: 'See how it works',
     tema: 'Theme', temaChiaro: 'Switch to light theme', temaScuro: 'Switch to dark theme',
+    privacy: 'Images stay in your browser: the analysis runs on your computer and no data is sent or stored elsewhere.',
     guida1: 'Click <b>Start capture</b>.',
+    guidaNota1: 'Instead of the PACS tab you can also share a <b>window</b> or your <b>entire screen</b>.',
     guida2: 'Chrome asks what to share: in the <b>Chrome tab</b> section pick the <b>PACS</b> and click <b>Share</b>.',
-    guidaNota2: 'PACS not in the list? If it is open in incognito, open Atlante in the same incognito window, or choose <b>Window</b>.',
+    guidaNota2: 'PACS not in the list? If it is open in incognito, open Atlante in the same incognito window, or choose <b>Window</b> or <b>Entire screen</b>.',
     guida3: 'Drag a rectangle <b>over the MRI image only</b>, without menus or text.',
     guidaNota3: 'To change the area later, click <b>Select area</b> again.',
-    guida4: 'Click <b>Floating window</b> and go back to the PACS: the labels follow the image as you scroll through the slices.',
+    guida4: 'Click <b>Floating window</b>: it opens on top of this same tab and stays always on top.',
     guidaNota4: 'Use the gear to pick the model, show the masks and hide the structures you do not need.',
+    guida5: 'Go back to the <b>PACS</b> window and enlarge the floating window by dragging one of its <b>top corners</b>.',
+    guidaNota5: 'Use the top corners: the bottom ones have too small an area to grab reliably.',
     gScegli: 'Choose what to share', gSchedaChrome: 'Chrome tab', gFinestra: 'Window', gSchermo: 'Entire screen',
     gPosta: 'Inbox', gReferti: 'Reports', gAnnulla: 'Cancel', gCondividi: 'Share',
     gVentricolo: 'ventricle', gTalamo: 'thalamus', gSostanzaBianca: 'white matter', gFrontale: 'sup. frontal', gCuneo: 'cuneus',
@@ -1257,7 +1296,7 @@ $('temaBtn').onclick = () => { tema = tema === 'chiaro' ? 'scuro' : 'chiaro';
   try { localStorage.setItem('annotatore-tema', tema); } catch {} applicaTema(); disegna(); };
 
 // ---------------- Guida animata ----------------
-const SCENE = 4, DURATA = 6800;
+const SCENE = 5, DURATA = [6800, 6800, 6800, 6800, 9000];
 let scenaG = 0, timerG = null, guidaInPlay = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 function mostraScena(i) {
   scenaG = (i + SCENE) % SCENE;
@@ -1270,7 +1309,7 @@ function mostraScena(i) {
   document.querySelectorAll('#guidaPunti button').forEach((b, k) => b.setAttribute('aria-current', k === scenaG));
   testiGuida();
   clearTimeout(timerG);
-  if (guidaInPlay) timerG = setTimeout(() => mostraScena(scenaG + 1), DURATA);
+  if (guidaInPlay) timerG = setTimeout(() => mostraScena(scenaG + 1), DURATA[scenaG]);
 }
 function testiGuida() {
   $('guidaAvanti').textContent = tr(scenaG === SCENE - 1 ? 'fine' : 'avanti');
