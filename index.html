@@ -804,7 +804,7 @@ const TESTI = {
     tema: 'Tema', temaChiaro: 'Passa al tema chiaro', temaScuro: 'Passa al tema scuro',
     s_didattica: 'Guida alle strutture: clicca una struttura per vederne funzione e deficit', didVuoto: 'Clicca una struttura sull\'immagine o la sua etichetta.',
     funzione: 'Funzione', deficitLesione: 'In caso di lesione', controlat: 'controlaterale', omolat: 'omolaterale',
-    s_mano: 'Seleziona e modifica: sposta le figure, trascina le estremità, doppio clic su un testo per cambiarlo', s_cerca: 'Cerca uno strumento (tasto /)', cercaStrumPh: 'Cerca uno strumento…', nessunoStrum: 'Nessuno strumento trovato.',
+    nessunaStruttura: 'Nessuna struttura qui', s_mano: 'Seleziona e modifica: sposta le figure, trascina le estremità, doppio clic su un testo per cambiarlo', s_cerca: 'Cerca uno strumento (tasto /)', cercaStrumPh: 'Cerca uno strumento…', nessunoStrum: 'Nessuno strumento trovato.',
     s_gomma: 'Gomma: clicca un disegno o una misura per cancellarla', rimuoviCal: 'Rimuovi calibrazione',
     s_lesione: 'Analisi lesione (traccia il contorno della lesione)',
     ps_lesione: 'Traccia il contorno della lesione: vengono indicate le strutture coinvolte e i deficit che potrebbero manifestarsi. Di solito il PACS mostra le immagini in convenzione radiologica (la sinistra dell\'immagine è la destra del paziente).',
@@ -881,7 +881,7 @@ const TESTI = {
     tema: 'Theme', temaChiaro: 'Switch to light theme', temaScuro: 'Switch to dark theme',
     s_didattica: 'Structure guide: click a structure to see its function and deficits', didVuoto: 'Click a structure on the image or its label.',
     funzione: 'Function', deficitLesione: 'If damaged', controlat: 'contralateral', omolat: 'ipsilateral',
-    s_mano: 'Select and edit: move shapes, drag their ends, double-click a text to change it', s_cerca: 'Find a tool (key /)', cercaStrumPh: 'Find a tool…', nessunoStrum: 'No tool found.',
+    nessunaStruttura: 'No structure here', s_mano: 'Select and edit: move shapes, drag their ends, double-click a text to change it', s_cerca: 'Find a tool (key /)', cercaStrumPh: 'Find a tool…', nessunoStrum: 'No tool found.',
     s_gomma: 'Eraser: click a drawing or measurement to delete it', rimuoviCal: 'Remove calibration',
     s_lesione: 'Lesion analysis (draw the outline of the lesion)',
     ps_lesione: 'Draw the outline of the lesion: the structures involved and the deficits that may appear are listed. PACS usually shows images in radiological convention (the left of the image is the patient\'s right).',
@@ -1687,7 +1687,7 @@ function areaPoligono(p) { let s = 0; for (let i = 0; i < p.length; i++) { const
 function areaMisura(m) {
   if (m.tipo === 'area' || m.tipo === 'volume' || m.tipo === 'lesione') return areaPoligono(m.p);
   if (m.tipo === 'ellisse') return Math.PI * Math.abs(m.p[1].x - m.p[0].x) / 2 * Math.abs(m.p[1].y - m.p[0].y) / 2;
-  if (m.tipo === 'struttura') return m.areaPx;
+  if (m.tipo === 'struttura') return m.nome ? m.areaPx : null;
   return null;
 }
 function angolo(p) {
@@ -1748,7 +1748,8 @@ tela.addEventListener('pointermove', ev => {
   if (spostando) {
     const q = inImg(p), dx = q.x - spostando.q0.x, dy = q.y - spostando.q0.y, s = spostando;
     s.m.p = s.orig.map((o, i) => s.vertice < 0 || s.vertice === i ? { x: o.x + dx, y: o.y + dy } : { ...o });
-    s.mosso = true; tela.style.cursor = 'grabbing'; ev.stopImmediatePropagation(); disegna(); return;
+    if (s.m.tipo === 'struttura') { const r = calcolaStruttura(s.m.p[0]); s.m.nome = r ? r.nome : null; s.m.areaPx = r ? r.areaPx : null; }
+    s.mosso = true; tela.style.cursor = 'grabbing'; ev.stopImmediatePropagation(); disegna(); aggiornaPannelloStrum(); return;
   }
   if (!panning && !bozza && (!strumento || strumento === 'sposta' || strumento === 'gomma' || strumento === 'mano')) {
     const sopraX = selezionata && xBtn && Math.hypot(p.x - xBtn.x, p.y - xBtn.y) <= 11;
@@ -1767,7 +1768,6 @@ tela.addEventListener('pointerup', ev => {
   if (spostando) {
     const { m, mosso } = spostando; spostando = null; ev.stopImmediatePropagation(); tela.style.cursor = 'pointer';
     if (mosso) {
-      if (m.tipo === 'struttura') { misuraStruttura(m.p[0]); selezionata = misure[misure.length - 1]; }
       if (m.tipo === 'lesione') { const r = analizzaLesione(m.p); ultimaLesione = r && { ...r, poligono: m.p }; }
       aggiornaPannelloStrum(); disegna();
     }
@@ -1846,15 +1846,19 @@ function trovaVicina(p) {                    // indice della misura più vicina 
   });
   return migliore;
 }
-function misuraStruttura(q) {
-  if (!risultato) return;
+function calcolaStruttura(q) {               // struttura sotto il punto e sua area; null se non c'è nulla
+  if (!risultato) return null;
   const g = risultato.geo, u = Math.floor(g.dx + q.x / fotogramma.width * g.dw), v = Math.floor(g.dy + q.y / fotogramma.height * g.dh);
-  if (u < 0 || v < 0 || u >= LATO || v >= LATO) return;
-  const A = calcolaAnalisi(), i = v * LATO + u, c = A.L[i]; if (!c) return;
+  if (u < 0 || v < 0 || u >= LATO || v >= LATO) return null;
+  const A = calcolaAnalisi(), i = v * LATO + u, c = A.L[i]; if (!c) return null;
   const comp = A.comp[i]; let n = 0; for (let j = 0; j < N; j++) if (A.comp[j] === comp) n++;
   const k = fotogramma.width / g.dw;
+  return { nome: trNome(CLASSI[c]), areaPx: n * k * k };
+}
+function misuraStruttura(q) {
+  const r = calcolaStruttura(q); if (!r) return;
   misure = misure.filter(x => x.tipo !== 'struttura');      // una struttura alla volta
-  misure.push({ tipo: 'struttura', p: [q], nome: trNome(CLASSI[c]), areaPx: n * k * k });
+  misure.push({ tipo: 'struttura', p: [q], ...r }); selezionata = misure[misure.length - 1];
 }
 function evansAutomatico() {
   if (!risultato) return false;
@@ -1929,7 +1933,7 @@ function aggiornaPannelloStrum() {
     }
     if (k === 'struttura') {
       const m = [...misure].reverse().find(x => x.tipo === 'struttura');
-      r = m ? `${m.nome}: ${fmtA(m.areaPx)}` : ''; $('strutturaVolume').disabled = !m;
+      r = !m ? '' : m.nome ? `${m.nome}: ${fmtA(m.areaPx)}` : tr('nessunaStruttura'); $('strutturaVolume').disabled = !m || !m.nome;
     }
     if (k === 'lesione') $('lesRisultato').innerHTML = testoLesione(ultimaLesione);
     if (k === 'didattica') $('didRisultato').innerHTML = strutturaDidattica ? testoGuidaStruttura(strutturaDidattica) : `<p class="aiuto-ps">${tr('didVuoto')}</p>`;
@@ -1960,7 +1964,7 @@ function disegnaMisure() {
     const P = m.p.map(inSch);
     if (m.tipo === 'testo') { scritta(P[0].x, P[0].y, m.testo); continue; }
     if (m.tipo === 'struttura') { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(P[0].x, P[0].y, 4, 0, 2 * Math.PI); ctx.fill();
-      scritta(P[0].x + 8, P[0].y, `${m.nome}: ${fmtA(m.areaPx)}`); continue; }
+      scritta(P[0].x + 8, P[0].y, m.nome ? `${m.nome}: ${fmtA(m.areaPx)}` : tr('nessunaStruttura')); continue; }
     ctx.setLineDash(m.tipo === 'calibra' ? [6, 4] : []);
     ctx.beginPath();
     if (m.tipo === 'ellisse') {
