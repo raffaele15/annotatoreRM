@@ -288,6 +288,8 @@
   #ispettore[hidden] { display: none; }
   #ispettore .r { display: flex; gap: 8px; } #ispettore .k { flex: none; min-width: 84px; color: #B3BEC6; } #ispettore .v { font-weight: 600; }
   #ispettore i { display: inline-block; width: 9px; height: 9px; margin-right: 5px; border-radius: 2px; }
+  #quizPiani button { padding: 5px 6px; font-size: .78rem; align-items: center; }
+  #quizPiani { margin-bottom: 4px; }
   .quiz-domanda { font: 600 1rem var(--corpo); margin: 4px 0 8px; }
   .quiz-esito { font-weight: 600; margin: 8px 0; } .quiz-esito.ok { color: var(--ok); } .quiz-esito.no { color: var(--errore); }
   .quiz-punti { font: 700 1.3rem var(--num); margin: 4px 0 8px; }
@@ -517,6 +519,9 @@
           <button type="button" id="strutturaVolume" data-t="aggiungiVolume" disabled>Aggiungi al volume</button></div>
         <div data-ps="quiz" id="quiz">
           <div id="quizScelta"><p class="aiuto-ps" data-t="ps_quiz"></p>
+            <p class="liv-tit" data-t="quizPiano">Piano della sezione</p>
+            <div class="scelta" id="quizPiani"><button type="button" data-piano="auto" aria-pressed="true" data-t="pianoAuto">Automatico</button><button type="button" data-piano="ax" aria-pressed="false" data-t="pianoAx">Assiale</button><button type="button" data-piano="cor" aria-pressed="false" data-t="pianoCor">Coronale</button><button type="button" data-piano="sag" aria-pressed="false" data-t="pianoSag">Sagittale</button></div>
+            <p id="quizPianoRil" class="aiuto-ps"></p>
             <div class="ps-azioni"><button type="button" class="primario" data-quiz="dove" data-t="quizDoveBtn">Dov'è?</button><button type="button" data-quiz="cosa" data-t="quizCosaBtn">Che cos'è?</button></div></div>
           <div id="quizCorso" hidden>
             <p id="quizNum" class="aiuto-ps"></p><p id="quizDomanda" class="quiz-domanda"></p>
@@ -863,6 +868,8 @@ const TESTI = {
     s_quiz: 'Quiz: riconosci le strutture', ps_quiz: 'Dieci domande sulla sezione che hai davanti. Durante il quiz etichette e maschere sono nascoste.',
     quizDoveBtn: 'Dov\'è?', quizCosaBtn: 'Che cos\'è?', quizScrivi: 'Scrivi il nome…', quizEsci: 'Esci', quizRisultati: 'Vedi il risultato',
     quizDove: p => `Clicca su: <b>${p.s}</b>`, quizCosa: 'Come si chiama la struttura evidenziata?', quizPunti: p => `${p.p} punti`,
+    quizSbagliatoDove: p => `Sbagliato: hai cliccato ${p.c}, era ${p.g} (in verde).`, quizFuori: 'una zona senza struttura',
+    quizPiano: 'Piano della sezione', pianoAuto: 'Automatico', pianoAx: 'Assiale', pianoCor: 'Coronale', pianoSag: 'Sagittale', pianoRilevato: p => `Piano riconosciuto: ${p.p.toLowerCase()}. Se è sbagliato sceglilo tu.`,
     quizGiusto: 'Giusto!', quizSbagliato: p => `Sbagliato: era ${p.g}.`, quizVuoto: 'Nessuna struttura abbastanza grande in questa sezione: cambia sezione.',
     quizRisultato: p => `${p.p} / ${p.n}`, quizRipassa: 'Da ripassare:', quizHaiDetto: 'hai risposto', quizPerfetto: 'Tutte giuste!', quizAncora: 'Altre 10',
     nessunaStruttura: 'Nessuna struttura qui', s_mano: 'Seleziona e modifica: sposta le figure, trascina le estremità, doppio clic su un testo per cambiarlo', s_cerca: 'Cerca uno strumento (tasto /)', cercaStrumPh: 'Cerca uno strumento…', nessunoStrum: 'Nessuno strumento trovato.',
@@ -949,6 +956,8 @@ const TESTI = {
     s_quiz: 'Quiz: recognise the structures', ps_quiz: 'Ten questions on the slice in front of you. Labels and masks are hidden during the quiz.',
     quizDoveBtn: 'Where is it?', quizCosaBtn: 'What is it?', quizScrivi: 'Type the name…', quizEsci: 'Exit', quizRisultati: 'See the result',
     quizDove: p => `Click on: <b>${p.s}</b>`, quizCosa: 'What is the highlighted structure called?', quizPunti: p => `${p.p} points`,
+    quizSbagliatoDove: p => `Wrong: you clicked ${p.c}, it was ${p.g} (in green).`, quizFuori: 'an area with no structure',
+    quizPiano: 'Slice plane', pianoAuto: 'Automatic', pianoAx: 'Axial', pianoCor: 'Coronal', pianoSag: 'Sagittal', pianoRilevato: p => `Detected plane: ${p.p.toLowerCase()}. If wrong, pick it yourself.`,
     quizGiusto: 'Correct!', quizSbagliato: p => `Wrong: it was ${p.g}.`, quizVuoto: 'No structure large enough on this slice: change slice.',
     quizRisultato: p => `${p.p} / ${p.n}`, quizRipassa: 'To review:', quizHaiDetto: 'you answered', quizPerfetto: 'All correct!', quizAncora: '10 more',
     nessunaStruttura: 'No structure here', s_mano: 'Select and edit: move shapes, drag their ends, double-click a text to change it', s_cerca: 'Find a tool (key /)', cercaStrumPh: 'Find a tool…', nessunoStrum: 'No tool found.',
@@ -1318,7 +1327,7 @@ let cicloAttivo = false;
 async function ciclo() {
   if (cicloAttivo) return; cicloAttivo = true;
   try { while (stream) {
-    if (!inPausa && !bozza && !(quizAttivo() && quiz.corrente && !quiz.risposto) && riquadro && sessione && !inCorso && video.videoWidth) {
+    if (!inPausa && !bozza && !(quizAttivo() && quiz.corrente) && riquadro && sessione && !inCorso && video.videoWidth) {
       const m = miniatura();
       if (!ultimaMiniatura || differenza(m, ultimaMiniatura) > SOGLIA_CAMBIO) {
         ultimaMiniatura = m;
@@ -2470,7 +2479,10 @@ function disegnaExtra(ctx, g, a) {
   ctx.imageSmoothingEnabled = false; ctx.drawImage(sovrapposizione, g.dx, g.dy, g.dw, g.dh, a.x, a.y, a.w, a.h);
 }
 function maschereEvidenziate() {
-  if (quizAttivo()) return quiz.maschere || [];
+  if (quizAttivo()) {                          // nel "Dov'è?" si illumina la struttura sotto il mouse, senza nome
+    const h = quiz.tipo === 'dove' && quiz.corrente && !quiz.risposto && quiz.hover;
+    return h ? [{ classe: risultato.classe, conf: risultato.conf, c: h, col: [150, 190, 255] }] : (quiz.maschere || []);
+  }
   if (!ispezione || !risultato) return [];
   const out = [];
   if (ispezione.anat) out.push({ classe: risultato.classe, conf: risultato.conf, c: ispezione.anat, col: colori[ispezione.anat] || [255, 255, 255] });
@@ -2521,8 +2533,82 @@ function poolQuiz() {                          // strutture presenti in questa s
   const soglia = +$('soglia').value / 100, n = new Map();
   for (let i = 0; i < N; i++) { const c = risultato.classe[i]; if (c && risultato.conf[i] >= soglia) n.set(c, (n.get(c) || 0) + 1); }
   const escluse = ['sfondo', 'sostanza bianca cerebrale', 'corteccia cerebrale non classificata'];   // troppo ovvie o generiche
-  return [...n].filter(([c, k]) => k >= AREA_QUIZ && !escluse.includes(CLASSI[c])).map(([c]) => c);
+  const piano = pianoCorrente();
+  return [...n].filter(([c, k]) => k >= AREA_QUIZ && !escluse.includes(CLASSI[c]) && inPiano(CLASSI[c], piano)).map(([c]) => c);
 }
+
+// ---------------- Quiz: strutture tipiche di ogni piano ----------------
+var PIANI_QUIZ = {
+  ax: ['ventricolo laterale', 'terzo ventricolo', 'quarto ventricolo', 'plesso corioideo', 'nucleo caudato', 'putamen', 'globo pallido', 'talamo', 'insula',
+       'insula (o corteccia non classificata)', 'giro frontale superiore', 'giro frontale medio rostrale', 'giro frontale medio caudale', 'pars opercularis',
+       'pars triangularis', 'pars orbitalis', 'corteccia orbitofrontale laterale', 'corteccia orbitofrontale mediale', 'polo frontale', 'giro precentrale',
+       'giro postcentrale', 'lobulo paracentrale', 'giro sopramarginale', 'lobulo parietale inferiore', 'lobulo parietale superiore', 'precuneo', 'cuneo',
+       'corteccia pericalcarina', 'giro linguale', 'corteccia occipitale laterale', 'giro temporale superiore', 'giro temporale medio', 'giro temporale inferiore',
+       'giro temporale trasverso (Heschl)', 'polo temporale', 'ippocampo', 'amigdala', 'cingolo anteriore rostrale', 'cingolo anteriore caudale',
+       'cingolo posteriore', 'mesencefalo', 'ponte', 'bulbo', 'tronco encefalico', 'corteccia cerebellare', 'sostanza bianca cerebellare'],
+  cor: ['ippocampo', 'amigdala', 'corno temporale del ventricolo laterale', 'giro paraippocampale', 'corteccia entorinale', 'giro fusiforme',
+        'giro temporale superiore', 'giro temporale medio', 'giro temporale inferiore', 'giro temporale trasverso (Heschl)', 'insula',
+        'insula (o corteccia non classificata)', 'nucleo caudato', 'putamen', 'globo pallido', 'talamo', 'nucleo accumbens', 'diencefalo ventrale',
+        'ventricolo laterale', 'terzo ventricolo', 'quarto ventricolo', 'cingolo anteriore rostrale', 'cingolo anteriore caudale', 'cingolo posteriore',
+        'giro frontale superiore', 'giro frontale medio rostrale', 'giro frontale medio caudale', 'pars opercularis', 'pars triangularis', 'pars orbitalis',
+        'corteccia orbitofrontale laterale', 'corteccia orbitofrontale mediale', 'giro precentrale', 'giro postcentrale', 'giro sopramarginale',
+        'lobulo parietale superiore', 'lobulo parietale inferiore', 'precuneo', 'chiasma ottico', 'mesencefalo', 'ponte', 'bulbo', 'tronco encefalico',
+        'corteccia cerebellare', 'sostanza bianca cerebellare'],
+  sag: ['cingolo anteriore rostrale', 'cingolo anteriore caudale', 'cingolo posteriore', 'istmo del cingolo', 'precuneo', 'cuneo', 'corteccia pericalcarina',
+        'giro linguale', 'lobulo paracentrale', 'giro frontale superiore', 'corteccia orbitofrontale mediale', 'polo frontale', 'talamo', 'terzo ventricolo',
+        'quarto ventricolo', 'ventricolo laterale', 'diencefalo ventrale', 'mesencefalo', 'ponte', 'bulbo', 'tronco encefalico', 'corteccia cerebellare',
+        'sostanza bianca cerebellare', 'chiasma ottico', 'giro paraippocampale', 'ippocampo', 'giro fusiforme', 'insula', 'giro temporale superiore',
+        'giro temporale medio', 'giro temporale inferiore', 'giro precentrale', 'giro postcentrale', 'giro sopramarginale'],
+};
+var pianoQuiz = 'auto';
+const inPiano = (nome, p) => PIANI_QUIZ[p].includes(nome) || nome.startsWith('cervelletto');   // lobuli del cervelletto (v3): in tutti i piani
+function rilevaPiano() {                       // stima del piano dalle strutture riconosciute (in futuro dalle coordinate MNI della v4)
+  if (!risultato) return 'ax';
+  const soglia = +$('soglia').value / 100, cl = risultato.classe, cf = risultato.conf;
+  let sx = 0, n = 0, y0 = LATO, y1 = 0, x0 = LATO, x1 = 0;
+  for (let i = 0; i < N; i++) if (cl[i] && cf[i] >= soglia) { const x = i % LATO, y = (i / LATO) | 0; sx += x; n++;
+    if (y < y0) y0 = y; if (y > y1) y1 = y; if (x < x0) x0 = x; if (x > x1) x1 = x; }
+  if (n < 500) return 'ax';
+  const mx = sx / n, h = Math.max(1, y1 - y0), w = Math.max(1, x1 - x0);
+  const st = new Map();                        // per classe: pixel a sinistra e a destra della mediana, somma di x e y
+  for (let i = 0; i < N; i++) { const c = cl[i]; if (!c || cf[i] < soglia) continue; const x = i % LATO;
+    const e = st.get(c) || { l: 0, r: 0, x: 0, y: 0 }; if (x < mx) e.l++; else e.r++; e.x += x; e.y += (i / LATO) | 0; st.set(c, e); }
+  const centro = nomi => { let k = 0, x = 0, y = 0; for (const [c, e] of st) if (nomi.includes(CLASSI[c])) { k += e.l + e.r; x += e.x; y += e.y; }
+    return k > 80 ? { x: (x / k - x0) / w, y: (y / k - y0) / h } : null; };
+  const F = centro(['giro frontale superiore', 'giro frontale medio rostrale', 'giro frontale medio caudale', 'corteccia orbitofrontale laterale', 'corteccia orbitofrontale mediale', 'polo frontale', 'pars triangularis']);
+  const O = centro(['cuneo', 'corteccia pericalcarina', 'giro linguale', 'corteccia occipitale laterale']);
+  // frontale e occipitale nella stessa sezione: in alto/in basso = assiale, a destra/sinistra = sagittale
+  if (F && O) return Math.abs(F.x - O.x) > Math.abs(F.y - O.y) ? 'sag' : 'ax';
+  const T = centro(['giro temporale superiore', 'giro temporale medio', 'giro temporale inferiore', 'polo temporale', 'ippocampo', 'amigdala', 'giro fusiforme', 'corteccia entorinale']);
+  const S = centro(['giro frontale superiore', 'giro frontale medio rostrale', 'giro frontale medio caudale', 'lobulo parietale superiore', 'lobulo paracentrale', 'giro precentrale', 'giro postcentrale', 'precuneo', 'cingolo anteriore caudale', 'cingolo posteriore']);
+  // strutture pari (talamo, caudato…): nell'assiale e nel coronale sono due blocchi ai lati, nel sagittale uno solo
+  const A = calcolaAnalisi(), pari = ['talamo', 'nucleo caudato', 'putamen', 'globo pallido', 'ventricolo laterale', 'ippocampo', 'amigdala', 'insula'];
+  const blocchi = new Map();
+  for (let i = 0; i < N; i++) { const c = A.L[i]; if (!c || !pari.includes(CLASSI[c])) continue; const k = A.comp[i];
+    const e = blocchi.get(k) || { c, n: 0, x: 0 }; e.n++; e.x += i % LATO; blocchi.set(k, e); }
+  const perClasse = new Map();
+  for (const e of blocchi.values()) if (e.n >= 30) { const v = perClasse.get(e.c) || []; v.push(e.x / e.n); perClasse.set(e.c, v); }
+  let presenti = 0, doppie = 0;
+  for (const xs of perClasse.values()) { presenti++; if (xs.some(x => x < mx - 4) && xs.some(x => x > mx + 4)) doppie++; }
+  if (presenti >= 2 && doppie / presenti < .34) return 'sag';
+  let grandi = 0, simm = 0;                    // sagittale laterale: quasi nessuna struttura sui due lati del centro
+  for (const [c, e] of st) { const t = e.l + e.r; if (t < 60) continue; grandi++; if (Math.min(e.l, e.r) / t > .25) simm++; }
+  if (grandi >= 3 && simm / grandi < .3) return 'sag';
+  const C = centro(['corteccia cerebellare', 'sostanza bianca cerebellare']);
+  if (F && C && Math.abs(F.x - C.x) > .15) return 'sag';
+  if (T && S && T.y - S.y > .25) return 'cor';
+  const D = centro(['talamo', 'diencefalo ventrale', 'tronco encefalico', 'mesencefalo', 'ponte', 'ippocampo', 'amigdala']);
+  const Sv = centro(['lobulo paracentrale', 'giro precentrale', 'giro postcentrale', 'lobulo parietale superiore']);
+  if (D && Sv && D.y - Sv.y > .25 && !O) return 'cor';
+  return 'ax';
+}
+const pianoCorrente = () => pianoQuiz === 'auto' ? rilevaPiano() : pianoQuiz;
+function mostraPianoQuiz() {
+  document.querySelectorAll('#quizPiani button').forEach(b => b.setAttribute('aria-pressed', b.dataset.piano === pianoQuiz));
+  $('quizPianoRil').textContent = pianoQuiz === 'auto' && risultato ? tr('pianoRilevato', { p: tr({ ax: 'pianoAx', cor: 'pianoCor', sag: 'pianoSag' }[rilevaPiano()]) }) : '';
+}
+$('quizPiani').addEventListener('click', ev => { const b = ev.target.closest('button[data-piano]'); if (!b) return; pianoQuiz = b.dataset.piano; mostraPianoQuiz(); });
+
 function iniziaQuiz(tipo) {
   quiz = { tipo, n: 0, punti: 0, errori: [], maschere: [], corrente: null, risposto: false, fine: false };
   nuovaDomanda();
@@ -2542,18 +2628,21 @@ function rispondi(ok, data) {
   quiz.maschere = [];                          // prima la struttura cliccata (rossa), sopra quella giusta (verde)
   if (!ok && quiz.tipo === 'dove' && data && data.c) quiz.maschere.push({ classe: risultato.classe, conf: risultato.conf, c: data.c, col: rosso });
   quiz.maschere.push({ classe: risultato.classe, conf: risultato.conf, c: quiz.corrente.c, col: verde });
-  quiz.msg = ok ? tr('quizGiusto') : tr('quizSbagliato', { g: trNome(quiz.corrente.nome) });
+  quiz.msg = ok ? tr('quizGiusto') : quiz.tipo === 'dove' ? tr('quizSbagliatoDove', { c: data.testo, g: trNome(quiz.corrente.nome) }) : tr('quizSbagliato', { g: trNome(quiz.corrente.nome) });
   aggiornaQuiz(); disegna(); $('quizAvanti').focus();
 }
 function avantiQuiz() {
   if (quiz.n >= QUIZ_N) { quiz.fine = true; quiz.maschere = []; aggiornaQuiz(); disegna(); return; }
-  ultimaMiniatura = null; nuovaDomanda();
+  quiz.corrente = null; quiz.maschere = []; ultimaMiniatura = null; disegna();
+  aspettaAnalisi().then(nuovaDomanda);          // prima aggiorna la sezione, poi la domanda
 }
+async function aspettaAnalisi() { const r0 = risultato; for (let k = 0; k < 20 && risultato === r0; k++) await aspetta(100); }
 function aggiornaQuiz() {
   const q = quiz, esc = t => String(t).replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
   $('quizScelta').hidden = !!q && !q.fine;
   $('quizCorso').hidden = !q || q.fine;
   $('quizFine').hidden = !q || !q.fine;
+  if (!q || q.fine) mostraPianoQuiz();
   if (!q) return;
   if (q.fine) {
     $('quizFine').innerHTML = `<p class="quiz-punti">${tr('quizRisultato', { p: q.punti, n: QUIZ_N })}</p>` +
@@ -2573,13 +2662,25 @@ $('quiz').addEventListener('click', ev => {
   iniziaQuiz(b.dataset.quiz);
 });
 $('quizAvanti').onclick = avantiQuiz;
+tela.addEventListener('pointermove', ev => {
+  if (!quizAttivo() || quiz.tipo !== 'dove' || !quiz.corrente || quiz.risposto) return;
+  const i = puntoLato(posizione(ev)), soglia = +$('soglia').value / 100;
+  const c = i >= 0 && risultato.conf[i] >= soglia ? risultato.classe[i] : 0;
+  if (c !== quiz.hover) { quiz.hover = c; cancelAnimationFrame(rafIsp); rafIsp = requestAnimationFrame(disegna); }
+});
+tela.addEventListener('pointerleave', () => { if (quiz && quiz.hover) { quiz.hover = 0; disegna(); } });
 // risposta "Dov'è?": clic sull'immagine
 tela.addEventListener('pointerdown', ev => {
   if (!quizAttivo() || !quiz.corrente || quiz.risposto || quiz.tipo !== 'dove' || ev.button !== 0) return;
   ev.stopImmediatePropagation();
   const i = puntoLato(posizione(ev)); if (i < 0) return;
-  const soglia = +$('soglia').value / 100, c = risultato.conf[i] >= soglia ? risultato.classe[i] : 0;
-  rispondi(c && CLASSI[c] === quiz.corrente.nome, { c, testo: c ? trNome(CLASSI[c]) : '—' });
+  const soglia = +$('soglia').value / 100, cl = j => risultato.conf[j] >= soglia ? risultato.classe[j] : 0, c = cl(i);
+  // tolleranza: giusto anche se la struttura è entro 3 pixel della griglia (≈ 1-2 mm) dal punto cliccato
+  const x0 = i % LATO, y0 = (i / LATO) | 0, R = 3; let vicino = false;
+  for (let dy = -R; dy <= R && !vicino; dy++) for (let dx = -R; dx <= R; dx++) {
+    const x = x0 + dx, y = y0 + dy; if (x < 0 || y < 0 || x >= LATO || y >= LATO || dx * dx + dy * dy > R * R) continue;
+    if (CLASSI[cl(y * LATO + x)] === quiz.corrente.nome) { vicino = true; break; } }
+  rispondi(vicino, { c, testo: c ? trNome(CLASSI[c]) : tr('quizFuori') });
 }, true);
 // risposta "Che cos'è?": nome con suggerimenti
 let selSugg = -1;
