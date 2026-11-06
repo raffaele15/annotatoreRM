@@ -278,7 +278,12 @@
   .carta-liv:hover { background: var(--rilievo); }
   .carta-liv.base { cursor: default; background: var(--rilievo); }
   .carta-liv.assente { opacity: .55; cursor: default; }
-  .carta-liv .testi { flex: 1; min-width: 0; } .carta-liv b { display: block; font-size: .85rem; }
+  .carta-liv .testi { flex: 1; min-width: 0; }
+  .ico-liv { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px; background: var(--rilievo); border: 1px solid var(--linea); }
+  .ico-liv svg { width: 18px; height: 18px; }
+  .ico-vasi { color: #E5677A; } .ico-fasci { color: #5B9DF5; } .ico-tratti { color: #4FB37A; } .ico-aree { color: #E58A3A; }
+  .ico-profondo { color: #3DBFBF; } .ico-brainnetome { color: #9B6BE0; } .ico-lesioni { color: #E5484D; } .ico-tumore { color: #E0C23A; } .ico-anat { color: var(--testo); }
+  .carta-liv.base .ico-liv { background: var(--pannello); } .carta-liv b { display: block; font-size: .85rem; }
   .carta-liv small { display: block; color: var(--tenue); font-size: .74rem; line-height: 1.35; }
   .stato-liv { flex: none; color: var(--tenue); font: 600 .7rem var(--num); text-align: right; max-width: 80px; }
   .carta-liv .prog { display: block; height: 3px; margin-top: 4px; border-radius: 2px; background: var(--linea); overflow: hidden; }
@@ -299,6 +304,13 @@
   #quizSugg li { padding: 4px 8px; border-radius: 4px; cursor: pointer; }
   #quizSugg li[aria-selected=true] { background: var(--accento); color: var(--accento-testo); }
   #quizFine ul { margin: 4px 0 8px; padding-left: 18px; }
+  .chiudi-pann { position: absolute; top: 6px; right: 6px; z-index: 1; display: grid; place-items: center; width: 24px; height: 24px; padding: 0;
+                 border: 0; border-radius: 6px; background: transparent; color: var(--tenue); }
+  .chiudi-pann:hover { background: var(--rilievo); color: var(--testo); }
+  .chiudi-pann svg { width: 13px; height: 13px; }
+  #pannelloStrum h2, #livelliLista .liv-tit:first-child { padding-right: 26px; }
+  #opzioni h2:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; padding-right: 26px; }
+  #cercaStrum { padding-top: 34px; }
   .modifica-testo { position: absolute; z-index: 6; width: 200px; padding: 2px 5px; font: 600 12px "Segoe UI", system-ui, sans-serif;
                     color: #fff; background: rgba(0,0,0,.85); border: 1px solid var(--accento); border-radius: 3px; outline: none; }
   .les-nulla { margin: 3px 0 0; color: var(--tenue); }
@@ -477,7 +489,7 @@
         </div>
       </div>
       <button type="button" id="livelliBtn" aria-expanded="false" aria-controls="livelli"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2l6 3-6 3-6-3z M2 8l6 3 6-3 M2 11l6 3 6-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-t="livelli">Livelli</span></button>
-      <div id="livelli" hidden><div id="livelliLista"></div><p id="livPiede" class="aiuto-ps"></p></div>
+      <div id="livelli" hidden><button type="button" class="chiudi-pann" id="chiudiLivelli" aria-label="Chiudi" data-t-aria="chiudi" data-t-title="chiudi" title="Chiudi"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button><div id="livelliLista"></div><p id="livPiede" class="aiuto-ps"></p></div>
       <div id="ispettore" hidden></div>
       <button id="ingranaggio" aria-label="Opzioni" title="Opzioni" data-t-aria="opzioni" data-t-title="opzioni" aria-expanded="false" aria-controls="opzioni"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 5.3a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.9 1.5h2.2l.4 1.8 1.3.6 1.6-1 1.5 1.5-1 1.6.6 1.3 1.8.4v2.2l-1.8.4-.6 1.3 1 1.6-1.5 1.5-1.6-1-1.3.6-.4 1.8H6.9l-.4-1.8-1.3-.6-1.6 1-1.5-1.5 1-1.6-.6-1.3-1.8-.4V6.9l1.8-.4.6-1.3-1-1.6 1.5-1.5 1.6 1 1.3-.6z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button>
       <div id="strumenti" role="toolbar" aria-label="Strumenti" data-t-aria="strumenti">
@@ -485,10 +497,12 @@
         <button type="button" class="strum" data-strum="struttura" aria-pressed="false" data-t-title="s_struttura" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5l8 4-3.5 1.2L6 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11.5" cy="11.5" r="2.5" fill="currentColor"/></svg></button><button type="button" class="strum" data-strum="lesione" aria-pressed="false" data-t-title="s_lesione" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2c3.3 0 6 2.4 6 5.6 0 3.4-2.7 6.4-6 6.4S2 11 2 7.6C2 4.4 4.7 2 8 2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 6.2c1.2.2 1.8 1 1.6 2-.2 1.2-1.4 1.6-2.4 1.2-.9-.4-1.1-1.5-.5-2.4.3-.5.8-.8 1.3-.8z" fill="currentColor"/></svg></button><button type="button" class="strum" data-strum="evans" aria-pressed="false" data-t-title="s_evans" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6.2" ry="6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 6.5h5M2.5 9.5h11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="calibra" aria-pressed="false" data-t-title="s_calibra" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 6h13v4h-13z M4 6v2M6.5 6v2.5M9 6v2M11.5 6v2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="volume" aria-pressed="false" data-t-title="s_volume" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2l6 3-6 3-6-3z M2 8l6 3 6-3 M2 11l6 3 6-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="abc" aria-pressed="false" data-t-title="s_abc" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><text x="8" y="11.2" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" font-family="Segoe UI, sans-serif">ABC</text></svg></button>
       </div>
       <div id="cercaStrum" hidden>
+        <button type="button" class="chiudi-pann" id="chiudiCerca" aria-label="Chiudi" data-t-aria="chiudi" data-t-title="chiudi" title="Chiudi"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         <input type="search" id="cercaStrumInput" autocomplete="off" data-t-ph="cercaStrumPh" placeholder="Cerca uno strumento…">
         <ul id="cercaStrumLista" role="listbox"></ul>
       </div>
       <div id="pannelloStrum" hidden>
+        <button type="button" class="chiudi-pann" id="chiudiStrum" aria-label="Chiudi" data-t-aria="chiudi" data-t-title="chiudi" title="Chiudi"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         <h2 id="psTitolo"></h2>
         <div data-ps="calibra">
           <p class="aiuto-ps" data-t="ps_calibra"></p>
@@ -522,12 +536,12 @@
             <p class="liv-tit" data-t="quizPiano">Piano della sezione</p>
             <div class="scelta" id="quizPiani"><button type="button" data-piano="auto" aria-pressed="true" data-t="pianoAuto">Automatico</button><button type="button" data-piano="ax" aria-pressed="false" data-t="pianoAx">Assiale</button><button type="button" data-piano="cor" aria-pressed="false" data-t="pianoCor">Coronale</button><button type="button" data-piano="sag" aria-pressed="false" data-t="pianoSag">Sagittale</button></div>
             <p id="quizPianoRil" class="aiuto-ps"></p>
-            <div class="ps-azioni"><button type="button" class="primario" data-quiz="dove" data-t="quizDoveBtn">Dov'è?</button><button type="button" data-quiz="cosa" data-t="quizCosaBtn">Che cos'è?</button></div></div>
+            <div class="ps-azioni"><button type="button" data-quiz="dove" data-t="quizDoveBtn">Trova struttura</button><button type="button" data-quiz="cosa" data-t="quizCosaBtn">Nomina struttura</button></div></div>
           <div id="quizCorso" hidden>
             <p id="quizNum" class="aiuto-ps"></p><p id="quizDomanda" class="quiz-domanda"></p>
             <div id="quizRisposta" hidden><input type="text" id="quizInput" autocomplete="off" data-t-ph="quizScrivi" placeholder="Scrivi il nome…"><ul id="quizSugg" hidden></ul></div>
             <p id="quizEsito" class="quiz-esito"></p>
-            <div class="ps-azioni"><button type="button" id="quizAvanti" class="primario" hidden>Avanti</button><button type="button" data-quiz="esci" data-t="quizEsci">Esci</button></div>
+            <div class="ps-azioni"><button type="button" id="quizAvanti" class="primario" hidden>Avanti</button><button type="button" id="quizSalta" data-t="quizSalta">Non la trovo</button><button type="button" data-quiz="esci" data-t="quizEsci">Esci</button></div>
           </div>
           <div id="quizFine" hidden></div>
         </div>
@@ -539,6 +553,7 @@
         <p id="psCal" class="aiuto-ps"></p>
       </div>
       <div id="opzioni" hidden>
+        <button type="button" class="chiudi-pann" id="chiudiOpzioni" aria-label="Chiudi" data-t-aria="chiudi" data-t-title="chiudi" title="Chiudi"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
         <h2 data-t="hModello">Modello</h2>
         <div class="scelta" id="sceltaModello" role="group" aria-label="Versione del modello" data-t-aria="versioneModello"></div>
         <h2 data-t="hVisual">Visualizzazione</h2>
@@ -865,9 +880,9 @@ const TESTI = {
     livMostra: 'Mostra', ispettore: 'Ispettore del punto', ispettoreD: 'al passaggio del mouse: tutti i livelli in quel punto, con le loro maschere',
     livScarica: 'scaricamento…', livAttivo: 'attivo', livPronto: 'scaricato', livAssente: 'non ancora disponibile', livErr: 'errore',
     livPiede: p => `Livelli attivi: ${p.n} · scaricati ${p.mb} MB`, livErrore: p => `Livello ${p.m} non caricato: ${p.e}`,
-    s_quiz: 'Quiz: riconosci le strutture', ps_quiz: 'Dieci domande sulla sezione che hai davanti. Durante il quiz etichette e maschere sono nascoste.',
-    quizDoveBtn: 'Dov\'è?', quizCosaBtn: 'Che cos\'è?', quizScrivi: 'Scrivi il nome…', quizEsci: 'Esci', quizRisultati: 'Vedi il risultato',
-    quizDove: p => `Clicca su: <b>${p.s}</b>`, quizCosa: 'Come si chiama la struttura evidenziata?', quizPunti: p => `${p.p} punti`,
+    s_quiz: 'Quiz: riconosci le strutture', ps_quiz: 'Dieci domande sulle strutture che si riconoscono di solito nel piano scelto. Puoi scorrere le sezioni; etichette e maschere restano nascoste.',
+    quizDoveBtn: 'Trova struttura', quizCosaBtn: 'Nomina struttura', quizScrivi: 'Scrivi il nome…', quizEsci: 'Esci', quizRisultati: 'Vedi il risultato',
+    quizDove: p => `Trova e clicca: <b>${p.s}</b><br><small class="aiuto-ps">Puoi scorrere le sezioni per cercarla.</small>`, quizSalta: 'Non la trovo', quizSaltata: 'nessuna risposta', quizMostrata: p => `Eccola: ${p.g} è in verde.`, quizNonQui: p => `Non trovata: ${p.g} non è in questa sezione, cercala scorrendo le sezioni (sarà in verde).`, quizCosa: 'Come si chiama la struttura evidenziata?', quizPunti: p => `${p.p} punti`,
     quizSbagliatoDove: p => `Sbagliato: hai cliccato ${p.c}, era ${p.g} (in verde).`, quizFuori: 'una zona senza struttura',
     quizPiano: 'Piano della sezione', pianoAuto: 'Automatico', pianoAx: 'Assiale', pianoCor: 'Coronale', pianoSag: 'Sagittale', pianoRilevato: p => `Piano riconosciuto: ${p.p.toLowerCase()}. Se è sbagliato sceglilo tu.`,
     quizGiusto: 'Giusto!', quizSbagliato: p => `Sbagliato: era ${p.g}.`, quizVuoto: 'Nessuna struttura abbastanza grande in questa sezione: cambia sezione.',
@@ -953,9 +968,9 @@ const TESTI = {
     livMostra: 'Show', ispettore: 'Point inspector', ispettoreD: 'on mouse over: every layer at that point, with its masks',
     livScarica: 'downloading…', livAttivo: 'on', livPronto: 'downloaded', livAssente: 'not available yet', livErr: 'error',
     livPiede: p => `Active layers: ${p.n} · downloaded ${p.mb} MB`, livErrore: p => `Layer ${p.m} not loaded: ${p.e}`,
-    s_quiz: 'Quiz: recognise the structures', ps_quiz: 'Ten questions on the slice in front of you. Labels and masks are hidden during the quiz.',
-    quizDoveBtn: 'Where is it?', quizCosaBtn: 'What is it?', quizScrivi: 'Type the name…', quizEsci: 'Exit', quizRisultati: 'See the result',
-    quizDove: p => `Click on: <b>${p.s}</b>`, quizCosa: 'What is the highlighted structure called?', quizPunti: p => `${p.p} points`,
+    s_quiz: 'Quiz: recognise the structures', ps_quiz: 'Ten questions on the structures usually identified in the chosen plane. You can scroll the slices; labels and masks stay hidden.',
+    quizDoveBtn: 'Find structure', quizCosaBtn: 'Name structure', quizScrivi: 'Type the name…', quizEsci: 'Exit', quizRisultati: 'See the result',
+    quizDove: p => `Find and click: <b>${p.s}</b><br><small class="aiuto-ps">You can scroll through the slices to look for it.</small>`, quizSalta: 'I can\'t find it', quizSaltata: 'no answer', quizMostrata: p => `Here it is: ${p.g} is in green.`, quizNonQui: p => `Not found: ${p.g} is not on this slice, scroll to find it (it will be green).`, quizCosa: 'What is the highlighted structure called?', quizPunti: p => `${p.p} points`,
     quizSbagliatoDove: p => `Wrong: you clicked ${p.c}, it was ${p.g} (in green).`, quizFuori: 'an area with no structure',
     quizPiano: 'Slice plane', pianoAuto: 'Automatic', pianoAx: 'Axial', pianoCor: 'Coronal', pianoSag: 'Sagittal', pianoRilevato: p => `Detected plane: ${p.p.toLowerCase()}. If wrong, pick it yourself.`,
     quizGiusto: 'Correct!', quizSbagliato: p => `Wrong: it was ${p.g}.`, quizVuoto: 'No structure large enough on this slice: change slice.',
@@ -1327,7 +1342,7 @@ let cicloAttivo = false;
 async function ciclo() {
   if (cicloAttivo) return; cicloAttivo = true;
   try { while (stream) {
-    if (!inPausa && !bozza && !(quizAttivo() && quiz.corrente) && riquadro && sessione && !inCorso && video.videoWidth) {
+    if (!inPausa && !bozza && riquadro && sessione && !inCorso && video.videoWidth) {
       const m = miniatura();
       if (!ultimaMiniatura || differenza(m, ultimaMiniatura) > SOGLIA_CAMBIO) {
         ultimaMiniatura = m;
@@ -2377,10 +2392,21 @@ var LIVELLI = [
   { id: 'tratti', gruppo: 'mappe', mb: 20, nome: { it: 'Tratti', en: 'Tracts' }, d: { it: 'tratti di sostanza bianca', en: 'white matter tracts' } },
   { id: 'aree', gruppo: 'mappe', mb: 20, nome: { it: 'Aree funzionali', en: 'Functional areas' }, d: { it: 'aree citoarchitettoniche, talamo', en: 'cytoarchitectonic areas, thalamus' } },
   { id: 'profondo', gruppo: 'mappe', mb: 20, nome: { it: 'Tronco e nuclei profondi', en: 'Brainstem and deep nuclei' }, d: { it: 'Brainstem Navigator', en: 'Brainstem Navigator' } },
-  { id: 'brainnetome', gruppo: 'mappe', mb: 20, nome: { it: 'Brainnetome', en: 'Brainnetome' }, d: { it: '246 regioni', en: '246 regions' } },
+  { id: 'brainnetome', gruppo: 'mappe', mb: 20, nome: { it: 'Parcellizzazione fine', en: 'Fine parcellation' }, d: { it: '246 regioni · atlante Brainnetome', en: '246 regions · Brainnetome atlas' } },
   { id: 'lesioni', gruppo: 'rilev', mb: 20, nome: { it: 'Lesione ischemica', en: 'Ischemic lesion' }, d: { it: 'DWI / ADC · ISLES 2022', en: 'DWI / ADC · ISLES 2022' } },
   { id: 'tumore', gruppo: 'rilev', mb: 20, nome: { it: 'Tumore ed edema', en: 'Tumour and oedema' }, d: { it: 'T1, T1c, T2, FLAIR · BraTS', en: 'T1, T1c, T2, FLAIR · BraTS' } },
 ];
+const ICONE_LIV = {                          // icone dei livelli (stile delle altre icone dell'app)
+  vasi: '<path d="M8 15v-4.5M8 10.5L6 10M8 10.5l2-.5M6 10L3.5 11.3 2 13.5M10 10l2.5 1.3 1.5 2.2M6 10l-.5-3M10 10l.5-3M5.5 7L2.2 6.4 1 4.8M10.5 7l3.3-.6L15 4.8M5.5 7l1.7-2.2h1.6L10.5 7M7.2 4.8L7 1.5M8.8 4.8L9 1.5"/><circle cx="5.5" cy="7" r=".9" fill="currentColor"/><circle cx="10.5" cy="7" r=".9" fill="currentColor"/>',   /* circolo di Willis visto dal basso */
+  fasci: '<path d="M2 12c3-6 9-6 12 0M2.5 9c3-5 8-5 11 0M3.5 6c2.5-3.5 6.5-3.5 9 0"/>',
+  tratti: '<path d="M2 11c2-4 4 2 6-2s4 2 6-2M11.5 4.5L14 5l-.5 2.5"/>',
+  aree: '<path d="M8 2c3.6 0 6 2.6 6 6s-2.4 6-6 6-6-2.6-6-6 2.4-6 6-6zM8 2v12M2.5 6.5h5.5M8 10h5.5"/>',
+  profondo: '<path d="M8 5.2C7 3.5 4.5 2 3 3.5 1.5 5 2 9 4 11.5c1.5 2 6.5 2 8 0 2-2.5 2.5-6.5 1-8C11.5 2 9 3.5 8 5.2z"/><path d="M4.3 5.4c.7 2 2 2.9 2.8 3M11.7 5.4c-.7 2-2 2.9-2.8 3"/><circle cx="8" cy="11" r=".9"/>',   /* mesencefalo in sezione assiale: peduncoli, sostanza nera, acquedotto */
+  brainnetome: '<path d="M8 2.5c3.3 0 5.5 2.4 5.5 5.5S11.3 13.5 8 13.5 2.5 11.1 2.5 8 4.7 2.5 8 2.5z"/><circle cx="6" cy="6" r=".7"/><circle cx="10" cy="6" r=".7"/><circle cx="5.5" cy="9.5" r=".7"/><circle cx="8" cy="8" r=".7"/><circle cx="10.5" cy="10" r=".7"/>',
+  lesioni: '<path d="M8 2.5c3.3 0 5.5 2.4 5.5 5.5S11.3 13.5 8 13.5 2.5 11.1 2.5 8 4.7 2.5 8 2.5z"/><path d="M8.5 5L6.5 8.5h3L7.5 12" stroke-width="1.6"/>',
+  tumore: '<path d="M7.5 3.2c2.2-.6 4.6.8 5 3 .4 2-.8 3.2-1 4.6-.3 1.8-2.4 2.8-4.2 2.2-2-.6-3.7-1.6-3.9-3.7-.2-2.4 1.6-5.5 4.1-6.1z"/><circle cx="7.5" cy="8" r="1.5"/>',
+};
+const icoLiv = id => `<span class="ico-liv ico-${id}"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">${ICONE_LIV[id] || ''}</svg></span>`;
 const fileLiv = (id, f) => `modelli/livelli/${id}/${f}`;
 var livelliAttivi = (() => { try { return new Set(JSON.parse(localStorage.getItem('annotatore-livelli')) || []); } catch { return new Set(); } })();
 var statoLiv = {}, sessioniLiv = new Map(), risLiv = new Map();
@@ -2425,10 +2451,10 @@ function costruisciLivelli() {
     const st = statoLiv[L.id] || '?', on = livelliAttivi.has(L.id), no = st === 'assente';
     const dest = st === 'scaricando' ? tr('livScarica') : sessioniLiv.has(L.id) ? (on ? tr('livAttivo') : tr('livPronto'))
                : no ? tr('livAssente') : st === 'errore' ? tr('livErr') : `${L.mb} MB`;
-    return `<label class="carta-liv${no ? ' assente' : ''}" data-id="${L.id}"><span class="testi"><b>${nomeLiv(L)}</b><small>${L.d[lingua] || L.d.it}</small>
+    return `<label class="carta-liv${no ? ' assente' : ''}" data-id="${L.id}">${icoLiv(L.id)}<span class="testi"><b>${nomeLiv(L)}</b><small>${L.d[lingua] || L.d.it}</small>
       <span class="prog"${st === 'scaricando' ? '' : ' hidden'}><i></i></span></span><span class="stato-liv">${dest}</span>
       <input type="checkbox" class="switch" ${on ? 'checked' : ''} ${no || st === 'scaricando' ? 'disabled' : ''}></label>`; }).join('');
-  box.innerHTML = `<p class="liv-tit">${tr('livBase')}</p><div class="carta-liv base"><span class="testi"><b>${tr('livAnat')}</b><small>${modelloAttivo ? modelloAttivo.nome + ' · ' + (modelloAttivo.descr[lingua] || '') : ''}</small></span><span class="stato-liv">${tr('livSempre')}</span></div>
+  box.innerHTML = `<p class="liv-tit">${tr('livBase')}</p><div class="carta-liv base"><span class="ico-liv ico-anat"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3c-1-1.2-3.5-1-4.3.8C2 4 1.6 6.5 2.6 7.6c-.8 1.4 0 3.4 1.6 3.6.4 1.6 2.5 2.2 3.8 1.1M8 3c1-1.2 3.5-1 4.3.8 1.7.2 2.1 2.7 1.1 3.8.8 1.4 0 3.4-1.6 3.6-.4 1.6-2.5 2.2-3.8 1.1M8 3v9.5"/></svg></span><span class="testi"><b>${tr('livAnat')}</b><small>${modelloAttivo ? modelloAttivo.nome + ' · ' + (modelloAttivo.descr[lingua] || '') : ''}</small></span><span class="stato-liv">${tr('livSempre')}</span></div>
     <p class="liv-tit">${tr('livMappe')}</p>${blocco('mappe')}<p class="liv-tit">${tr('livRilev')}</p>${blocco('rilev')}
     <p class="liv-tit">${tr('livMostra')}</p><label class="carta-liv"><span class="testi"><b>${tr('ispettore')}</b><small>${tr('ispettoreD')}</small></span><input type="checkbox" class="switch" id="ispOn" ${ispettoreOn ? 'checked' : ''}></label>`;
   const tot = [...sessioniLiv.keys()].reduce((s, id) => s + LIVELLI.find(L => L.id === id).mb, 0);
@@ -2481,7 +2507,7 @@ function disegnaExtra(ctx, g, a) {
 function maschereEvidenziate() {
   if (quizAttivo()) {                          // nel "Dov'è?" si illumina la struttura sotto il mouse, senza nome
     const h = quiz.tipo === 'dove' && quiz.corrente && !quiz.risposto && quiz.hover;
-    return h ? [{ classe: risultato.classe, conf: risultato.conf, c: h, col: [150, 190, 255] }] : (quiz.maschere || []);
+    return (h ? [{ c: h, col: [150, 190, 255] }] : (quiz.maschere || [])).map(m => ({ classe: risultato.classe, conf: risultato.conf, c: m.c, col: m.col }));
   }
   if (!ispezione || !risultato) return [];
   const out = [];
@@ -2528,13 +2554,16 @@ tela.addEventListener('pointerleave', chiudiIspettore);
 // ---------------- Quiz ----------------
 var quiz = null, QUIZ_N = 10, AREA_QUIZ = 60;
 function quizAttivo() { return !!(quiz && strumento === 'quiz'); }
-function poolQuiz() {                          // strutture presenti in questa sezione e abbastanza grandi
+function poolQuiz() {
+  // Trova: tutte le strutture che il modello conosce e che si identificano di solito in quel piano (si cercano scorrendo le sezioni)
+  // Nomina: solo quelle visibili ora, abbastanza grandi
   if (!risultato) return [];
+  const escluse = ['sfondo', 'sostanza bianca cerebrale', 'corteccia cerebrale non classificata'];   // troppo ovvie o generiche
+  const piano = pianoCorrente(), ok = c => !escluse.includes(CLASSI[c]) && inPiano(CLASSI[c], piano) && !quiz.chieste.has(CLASSI[c]);
+  if (quiz.tipo === 'dove') return [...new Set(CLASSI.map((n, c) => c).filter(c => c && ok(c)).map(c => CLASSI[c]))].map(n => CLASSI.indexOf(n));
   const soglia = +$('soglia').value / 100, n = new Map();
   for (let i = 0; i < N; i++) { const c = risultato.classe[i]; if (c && risultato.conf[i] >= soglia) n.set(c, (n.get(c) || 0) + 1); }
-  const escluse = ['sfondo', 'sostanza bianca cerebrale', 'corteccia cerebrale non classificata'];   // troppo ovvie o generiche
-  const piano = pianoCorrente();
-  return [...n].filter(([c, k]) => k >= AREA_QUIZ && !escluse.includes(CLASSI[c]) && inPiano(CLASSI[c], piano)).map(([c]) => c);
+  return [...n].filter(([c, k]) => k >= AREA_QUIZ && ok(c)).map(([c]) => c);
 }
 
 // ---------------- Quiz: strutture tipiche di ogni piano ----------------
@@ -2551,8 +2580,7 @@ var PIANI_QUIZ = {
         'insula (o corteccia non classificata)', 'nucleo caudato', 'putamen', 'globo pallido', 'talamo', 'nucleo accumbens', 'diencefalo ventrale',
         'ventricolo laterale', 'terzo ventricolo', 'quarto ventricolo', 'cingolo anteriore rostrale', 'cingolo anteriore caudale', 'cingolo posteriore',
         'giro frontale superiore', 'giro frontale medio rostrale', 'giro frontale medio caudale', 'pars opercularis', 'pars triangularis', 'pars orbitalis',
-        'corteccia orbitofrontale laterale', 'corteccia orbitofrontale mediale', 'giro precentrale', 'giro postcentrale', 'giro sopramarginale',
-        'lobulo parietale superiore', 'lobulo parietale inferiore', 'precuneo', 'chiasma ottico', 'mesencefalo', 'ponte', 'bulbo', 'tronco encefalico',
+        'corteccia orbitofrontale laterale', 'corteccia orbitofrontale mediale', 'giro retto', 'chiasma ottico', 'mesencefalo', 'ponte', 'bulbo', 'tronco encefalico',
         'corteccia cerebellare', 'sostanza bianca cerebellare'],
   sag: ['cingolo anteriore rostrale', 'cingolo anteriore caudale', 'cingolo posteriore', 'istmo del cingolo', 'precuneo', 'cuneo', 'corteccia pericalcarina',
         'giro linguale', 'lobulo paracentrale', 'giro frontale superiore', 'corteccia orbitofrontale mediale', 'polo frontale', 'talamo', 'terzo ventricolo',
@@ -2610,15 +2638,15 @@ function mostraPianoQuiz() {
 $('quizPiani').addEventListener('click', ev => { const b = ev.target.closest('button[data-piano]'); if (!b) return; pianoQuiz = b.dataset.piano; mostraPianoQuiz(); });
 
 function iniziaQuiz(tipo) {
-  quiz = { tipo, n: 0, punti: 0, errori: [], maschere: [], corrente: null, risposto: false, fine: false };
+  quiz = { tipo, n: 0, punti: 0, errori: [], maschere: [], corrente: null, risposto: false, fine: false, chieste: new Set(), hover: 0 };
   nuovaDomanda();
 }
 function nuovaDomanda() {
-  const pool = poolQuiz().filter(c => !quiz.corrente || c !== quiz.corrente.c);
+  const pool = poolQuiz();
   if (!pool.length) { quiz.msg = tr('quizVuoto'); quiz.corrente = null; aggiornaQuiz(); return; }
   const c = pool[Math.floor(Math.random() * pool.length)];
-  quiz.corrente = { c, nome: CLASSI[c] }; quiz.risposto = false; quiz.n++; quiz.msg = '';
-  quiz.maschere = quiz.tipo === 'cosa' ? [{ classe: risultato.classe, conf: risultato.conf, c, col: [242, 179, 61] }] : [];
+  quiz.corrente = { c, nome: CLASSI[c] }; quiz.chieste.add(CLASSI[c]); quiz.risposto = false; quiz.n++; quiz.msg = '';
+  quiz.maschere = quiz.tipo === 'cosa' ? [{ c, col: [242, 179, 61] }] : [];
   aggiornaQuiz(); disegna();
   if (quiz.tipo === 'cosa') { $('quizInput').value = ''; $('quizInput').focus(); mostraSugg(); }
 }
@@ -2626,15 +2654,14 @@ function rispondi(ok, data) {
   quiz.risposto = true; if (ok) quiz.punti++; else quiz.errori.push({ giusta: trNome(quiz.corrente.nome), data });
   const verde = [76, 200, 120], rosso = [229, 72, 77];
   quiz.maschere = [];                          // prima la struttura cliccata (rossa), sopra quella giusta (verde)
-  if (!ok && quiz.tipo === 'dove' && data && data.c) quiz.maschere.push({ classe: risultato.classe, conf: risultato.conf, c: data.c, col: rosso });
-  quiz.maschere.push({ classe: risultato.classe, conf: risultato.conf, c: quiz.corrente.c, col: verde });
+  if (!ok && quiz.tipo === 'dove' && data && data.c) quiz.maschere.push({ c: data.c, col: rosso });
+  quiz.maschere.push({ c: quiz.corrente.c, col: verde });
   quiz.msg = ok ? tr('quizGiusto') : quiz.tipo === 'dove' ? tr('quizSbagliatoDove', { c: data.testo, g: trNome(quiz.corrente.nome) }) : tr('quizSbagliato', { g: trNome(quiz.corrente.nome) });
   aggiornaQuiz(); disegna(); $('quizAvanti').focus();
 }
 function avantiQuiz() {
   if (quiz.n >= QUIZ_N) { quiz.fine = true; quiz.maschere = []; aggiornaQuiz(); disegna(); return; }
-  quiz.corrente = null; quiz.maschere = []; ultimaMiniatura = null; disegna();
-  aspettaAnalisi().then(nuovaDomanda);          // prima aggiorna la sezione, poi la domanda
+  quiz.maschere = []; nuovaDomanda();
 }
 async function aspettaAnalisi() { const r0 = risultato; for (let k = 0; k < 20 && risultato === r0; k++) await aspetta(100); }
 function aggiornaQuiz() {
@@ -2654,7 +2681,7 @@ function aggiornaQuiz() {
   $('quizDomanda').innerHTML = !q.corrente ? '' : q.tipo === 'dove' ? tr('quizDove', { s: esc(trNome(q.corrente.nome)) }) : tr('quizCosa');
   $('quizRisposta').hidden = q.tipo !== 'cosa' || q.risposto || !q.corrente;
   $('quizEsito').textContent = q.msg || ''; $('quizEsito').className = 'quiz-esito' + (q.risposto ? (q.msg === tr('quizGiusto') ? ' ok' : ' no') : '');
-  $('quizAvanti').hidden = !q.risposto; $('quizAvanti').textContent = tr(q.n >= QUIZ_N ? 'quizRisultati' : 'avanti');
+  $('quizAvanti').hidden = !q.risposto; $('quizSalta').hidden = q.risposto || !q.corrente; $('quizAvanti').textContent = tr(q.n >= QUIZ_N ? 'quizRisultati' : 'avanti');
 }
 $('quiz').addEventListener('click', ev => {
   const b = ev.target.closest('button[data-quiz]'); if (!b) return;
@@ -2662,6 +2689,9 @@ $('quiz').addEventListener('click', ev => {
   iniziaQuiz(b.dataset.quiz);
 });
 $('quizAvanti').onclick = avantiQuiz;
+$('quizSalta').onclick = () => { if (!quiz || !quiz.corrente || quiz.risposto) return;
+  const presente = risultato && risultato.classe.some((c, i) => c === quiz.corrente.c && risultato.conf[i] >= +$('soglia').value / 100);
+  rispondi(false, { testo: tr('quizSaltata') }); quiz.msg = tr(presente ? 'quizMostrata' : 'quizNonQui', { g: trNome(quiz.corrente.nome) }); aggiornaQuiz(); };
 tela.addEventListener('pointermove', ev => {
   if (!quizAttivo() || quiz.tipo !== 'dove' || !quiz.corrente || quiz.risposto) return;
   const i = puntoLato(posizione(ev)), soglia = +$('soglia').value / 100;
@@ -2708,6 +2738,13 @@ $('quizSugg').addEventListener('mousedown', ev => { const li = ev.target.closest
 $('quizSugg').addEventListener('mousemove', ev => { const li = ev.target.closest('li'); if (!li) return; const k = [...$('quizSugg').children].indexOf(li); if (k !== selSugg) { selSugg = k; mostraSugg(); } });
 $('quizSugg').addEventListener('mouseleave', () => { if (selSugg !== -1) { selSugg = -1; mostraSugg(); } });
 document.addEventListener('keydown', ev => { if (quizAttivo() && quiz.risposto && ev.key === 'Enter' && !ev.target.closest('input')) { ev.preventDefault(); avantiQuiz(); } });
+
+
+// ---------------- Pulsanti × dei pannelli ----------------
+$('chiudiStrum').onclick = () => { if (strumento) scegliStrumento(strumento); else $('pannelloStrum').hidden = true; };
+$('chiudiOpzioni').onclick = () => mostraOpzioni(false);
+$('chiudiLivelli').onclick = () => mostraLivelli(false);
+$('chiudiCerca').onclick = () => apriCercaStrum(false);
 
 function tastiStrumenti(ev) {
   if (ev.target.closest('input, textarea') || $('guida').open) return;
