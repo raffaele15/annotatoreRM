@@ -229,7 +229,7 @@
   /* Strumenti di misura */
   #tela { margin-left: 42px; width: calc(100% - 42px); }
   #strumenti { position: absolute; left: 0; top: 0; bottom: 42px; width: 42px; z-index: 3; display: flex; flex-direction: column;
-               align-items: center; gap: 1px; padding: 6px 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--linea) transparent;
+               align-items: center; gap: 1px; padding: 6px 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: var(--linea) transparent;
                background: var(--pannello); border-right: var(--bordo) solid var(--linea); }
   .strum { flex: none; display: grid; place-items: center; width: 32px; height: 28px; padding: 0; border: 0; border-radius: 6px;
            background: transparent; color: var(--tenue); }
@@ -265,6 +265,38 @@
   #cercaStrumLista li[aria-selected=true] { background: var(--accento); color: var(--accento-testo); }
   #cercaStrumLista li[aria-selected=true] .ico { color: var(--accento-testo); }
   #cercaStrumLista .nessuno { color: var(--tenue); cursor: default; }
+  #livelliBtn { position: absolute; top: 8px; right: 50px; z-index: 3; height: 34px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px;
+                border-radius: 999px; font-size: .82rem; background: color-mix(in srgb, var(--pannello) 90%, transparent); color: var(--testo); }
+  #livelliBtn.con-livelli { border-color: var(--accento); }
+  #livelliBtn[aria-expanded=true] { background: var(--accento); border-color: var(--accento); color: var(--accento-testo); }
+  #livelli { position: absolute; top: 48px; right: 8px; z-index: 5; width: min(330px, calc(100% - 60px)); max-height: calc(100% - 100px); overflow-y: auto;
+             padding: 8px 10px; background: var(--pannello); border: var(--bordo) solid var(--linea); border-radius: 10px; box-shadow: var(--ombra); font-size: .85rem; }
+  #livelli[hidden] { display: none; }
+  .liv-tit { margin: 10px 0 4px; color: var(--tenue); font-size: .76rem; font-weight: 600; }
+  .liv-tit:first-child { margin-top: 2px; }
+  .carta-liv { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 8px; cursor: pointer; }
+  .carta-liv:hover { background: var(--rilievo); }
+  .carta-liv.base { cursor: default; background: var(--rilievo); }
+  .carta-liv.assente { opacity: .55; cursor: default; }
+  .carta-liv .testi { flex: 1; min-width: 0; } .carta-liv b { display: block; font-size: .85rem; }
+  .carta-liv small { display: block; color: var(--tenue); font-size: .74rem; line-height: 1.35; }
+  .stato-liv { flex: none; color: var(--tenue); font: 600 .7rem var(--num); text-align: right; max-width: 80px; }
+  .carta-liv .prog { display: block; height: 3px; margin-top: 4px; border-radius: 2px; background: var(--linea); overflow: hidden; }
+  .carta-liv .prog[hidden] { display: none; } .carta-liv .prog i { display: block; height: 100%; width: 0; background: var(--accento); }
+  #ispettore { position: absolute; z-index: 4; pointer-events: none; min-width: 200px; max-width: 300px; padding: 7px 10px; font-size: .8rem; line-height: 1.5;
+               background: rgba(10,12,14,.94); color: #F2F5F7; border: 1px solid #3A4247; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,.5); }
+  #ispettore[hidden] { display: none; }
+  #ispettore .r { display: flex; gap: 8px; } #ispettore .k { flex: none; min-width: 84px; color: #B3BEC6; } #ispettore .v { font-weight: 600; }
+  #ispettore i { display: inline-block; width: 9px; height: 9px; margin-right: 5px; border-radius: 2px; }
+  .quiz-domanda { font: 600 1rem var(--corpo); margin: 4px 0 8px; }
+  .quiz-esito { font-weight: 600; margin: 8px 0; } .quiz-esito.ok { color: var(--ok); } .quiz-esito.no { color: var(--errore); }
+  .quiz-punti { font: 700 1.3rem var(--num); margin: 4px 0 8px; }
+  #quizInput { width: 100% !important; }
+  #quizSugg { list-style: none; margin: 4px 0 0; padding: 4px; border: var(--bordo) solid var(--linea); border-radius: 6px; background: var(--rilievo); }
+  #quizSugg[hidden] { display: none; }
+  #quizSugg li { padding: 4px 8px; border-radius: 4px; cursor: pointer; }
+  #quizSugg li[aria-selected=true] { background: var(--accento); color: var(--accento-testo); }
+  #quizFine ul { margin: 4px 0 8px; padding-left: 18px; }
   .modifica-testo { position: absolute; z-index: 6; width: 200px; padding: 2px 5px; font: 600 12px "Segoe UI", system-ui, sans-serif;
                     color: #fff; background: rgba(0,0,0,.85); border: 1px solid var(--accento); border-radius: 3px; outline: none; }
   .les-nulla { margin: 3px 0 0; color: var(--tenue); }
@@ -442,9 +474,12 @@
           <button type="button" id="demoBtn" class="discreto" data-t="demoBtn" disabled>Prova con un esempio</button>
         </div>
       </div>
+      <button type="button" id="livelliBtn" aria-expanded="false" aria-controls="livelli"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2l6 3-6 3-6-3z M2 8l6 3 6-3 M2 11l6 3 6-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-t="livelli">Livelli</span></button>
+      <div id="livelli" hidden><div id="livelliLista"></div><p id="livPiede" class="aiuto-ps"></p></div>
+      <div id="ispettore" hidden></div>
       <button id="ingranaggio" aria-label="Opzioni" title="Opzioni" data-t-aria="opzioni" data-t-title="opzioni" aria-expanded="false" aria-controls="opzioni"><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 5.3a2.7 2.7 0 1 0 0 5.4 2.7 2.7 0 0 0 0-5.4z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.9 1.5h2.2l.4 1.8 1.3.6 1.6-1 1.5 1.5-1 1.6.6 1.3 1.8.4v2.2l-1.8.4-.6 1.3 1 1.6-1.5 1.5-1.6-1-1.3.6-.4 1.8H6.9l-.4-1.8-1.3-.6-1.6 1-1.5-1.5 1-1.6-.6-1.3-1.8-.4V6.9l1.8-.4.6-1.3-1-1.6 1.5-1.5 1.6 1 1.3-.6z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button>
       <div id="strumenti" role="toolbar" aria-label="Strumenti" data-t-aria="strumenti">
-        <button type="button" class="strum" id="cercaStrumBtn" aria-expanded="false" aria-controls="cercaStrum" data-t-title="s_cerca" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3h12l-4.6 5.4V13l-2.8 1.2V8.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span><button type="button" class="strum" data-strum="didattica" aria-pressed="false" data-t-title="s_didattica" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3L1 6.5 8 10l7-3.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8v3.2c1.2 1.2 2.6 1.8 4 1.8s2.8-.6 4-1.8V8M15 6.5v4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span><button type="button" class="strum" id="annullaMisura" data-t-title="s_annulla" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3.5L2.5 6.5l3 3M2.5 6.5H10a3.5 3.5 0 0 1 0 7H7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" id="cancellaMisure" data-t-title="s_cancella" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5h11M6 4.5V2.5h4v2M4 4.5l.8 9h6.4l.8-9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="gomma" aria-pressed="false" data-t-title="s_gomma" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5l4 4-6.5 6.5H4.5l-2-2z M6.5 5.5l4 4 M7 13h6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span><button type="button" class="strum" data-strum="mano" aria-pressed="false" data-t-title="s_mano" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 8.5V3.2a1 1 0 0 1 2 0V7.5M7.5 7V2.2a1 1 0 0 1 2 0V7M9.5 7V3a1 1 0 0 1 2 0v4.5M11.5 6a1 1 0 0 1 2 0v3.5c0 2.8-1.8 4.5-4.5 4.5H8.3c-1.4 0-2.4-.6-3.2-1.7L2.6 9.2a1 1 0 0 1 1.6-1.2l1.3 1.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="sposta" aria-pressed="false" data-t-title="s_sposta" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v13M1.5 8h13M8 1.5l-2 2M8 1.5l2 2M8 14.5l-2-2M8 14.5l2-2M1.5 8l2-2M1.5 8l2 2M14.5 8l-2-2M14.5 8l-2 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="righello" aria-pressed="false" data-t-title="s_righello" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 12.5L12.5 2l1.5 1.5L3.5 14z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5l1.2 1.2M7 7.5l1.2 1.2M9 5.5l1.2 1.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="angolo" aria-pressed="false" data-t-title="s_angolo" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5h11M2.5 13.5L11 3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 13.5a4 4 0 0 0-1.3-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="area" aria-pressed="false" data-t-title="s_area" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5.5L7.5 2.5l5.5 2-1 6.5-5 3L2.5 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="ellisse" aria-pressed="false" data-t-title="s_ellisse" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6" ry="4.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="penna" aria-pressed="false" data-t-title="s_penna" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5l1-3.5L11 2.5l2.5 2.5L6 12.5z M9.5 4l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="freccia" aria-pressed="false" data-t-title="s_freccia" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13L13 3M13 3H7.5M13 3v5.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="testo" aria-pressed="false" data-t-title="s_testo" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h10M8 3.5v10M6 13.5h4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span>
+        <button type="button" class="strum" id="cercaStrumBtn" aria-expanded="false" aria-controls="cercaStrum" data-t-title="s_cerca" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 3h12l-4.6 5.4V13l-2.8 1.2V8.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span><button type="button" class="strum" data-strum="didattica" aria-pressed="false" data-t-title="s_didattica" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3L1 6.5 8 10l7-3.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8v3.2c1.2 1.2 2.6 1.8 4 1.8s2.8-.6 4-1.8V8M15 6.5v4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="quiz" aria-pressed="false" data-t-title="s_quiz" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 3.5h11v7.5H8l-3 2.5V11H2.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.6 5.6a1.5 1.5 0 1 1 2 1.4c-.5.2-.6.5-.6 1v.3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8" cy="9.6" r=".6" fill="currentColor"/></svg></button><span class="sep"></span><button type="button" class="strum" id="annullaMisura" data-t-title="s_annulla" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 3.5L2.5 6.5l3 3M2.5 6.5H10a3.5 3.5 0 0 1 0 7H7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" id="cancellaMisure" data-t-title="s_cancella" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 4.5h11M6 4.5V2.5h4v2M4 4.5l.8 9h6.4l.8-9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="gomma" aria-pressed="false" data-t-title="s_gomma" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5l4 4-6.5 6.5H4.5l-2-2z M6.5 5.5l4 4 M7 13h6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span><button type="button" class="strum" data-strum="mano" aria-pressed="false" data-t-title="s_mano" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 8.5V3.2a1 1 0 0 1 2 0V7.5M7.5 7V2.2a1 1 0 0 1 2 0V7M9.5 7V3a1 1 0 0 1 2 0v4.5M11.5 6a1 1 0 0 1 2 0v3.5c0 2.8-1.8 4.5-4.5 4.5H8.3c-1.4 0-2.4-.6-3.2-1.7L2.6 9.2a1 1 0 0 1 1.6-1.2l1.3 1.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="sposta" aria-pressed="false" data-t-title="s_sposta" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5v13M1.5 8h13M8 1.5l-2 2M8 1.5l2 2M8 14.5l-2-2M8 14.5l2-2M1.5 8l2-2M1.5 8l2 2M14.5 8l-2-2M14.5 8l-2 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="righello" aria-pressed="false" data-t-title="s_righello" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 12.5L12.5 2l1.5 1.5L3.5 14z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 9.5l1.2 1.2M7 7.5l1.2 1.2M9 5.5l1.2 1.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="angolo" aria-pressed="false" data-t-title="s_angolo" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5h11M2.5 13.5L11 3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 13.5a4 4 0 0 0-1.3-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="area" aria-pressed="false" data-t-title="s_area" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5.5L7.5 2.5l5.5 2-1 6.5-5 3L2.5 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="ellisse" aria-pressed="false" data-t-title="s_ellisse" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6" ry="4.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="penna" aria-pressed="false" data-t-title="s_penna" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 13.5l1-3.5L11 2.5l2.5 2.5L6 12.5z M9.5 4l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="freccia" aria-pressed="false" data-t-title="s_freccia" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13L13 3M13 3H7.5M13 3v5.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="testo" aria-pressed="false" data-t-title="s_testo" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h10M8 3.5v10M6 13.5h4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="sep"></span>
         <button type="button" class="strum" data-strum="struttura" aria-pressed="false" data-t-title="s_struttura" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 2.5l8 4-3.5 1.2L6 11z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11.5" cy="11.5" r="2.5" fill="currentColor"/></svg></button><button type="button" class="strum" data-strum="lesione" aria-pressed="false" data-t-title="s_lesione" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2c3.3 0 6 2.4 6 5.6 0 3.4-2.7 6.4-6 6.4S2 11 2 7.6C2 4.4 4.7 2 8 2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 6.2c1.2.2 1.8 1 1.6 2-.2 1.2-1.4 1.6-2.4 1.2-.9-.4-1.1-1.5-.5-2.4.3-.5.8-.8 1.3-.8z" fill="currentColor"/></svg></button><button type="button" class="strum" data-strum="evans" aria-pressed="false" data-t-title="s_evans" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><ellipse cx="8" cy="8" rx="6.2" ry="6.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 6.5h5M2.5 9.5h11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="calibra" aria-pressed="false" data-t-title="s_calibra" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 6h13v4h-13z M4 6v2M6.5 6v2.5M9 6v2M11.5 6v2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="volume" aria-pressed="false" data-t-title="s_volume" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2l6 3-6 3-6-3z M2 8l6 3 6-3 M2 11l6 3 6-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button type="button" class="strum" data-strum="abc" aria-pressed="false" data-t-title="s_abc" title=""><svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><text x="8" y="11.2" text-anchor="middle" font-size="7.5" font-weight="700" fill="currentColor" font-family="Segoe UI, sans-serif">ABC</text></svg></button>
       </div>
       <div id="cercaStrum" hidden>
@@ -480,6 +515,17 @@
         </div>
         <div data-ps="struttura"><p class="aiuto-ps" data-t="ps_struttura"></p>
           <button type="button" id="strutturaVolume" data-t="aggiungiVolume" disabled>Aggiungi al volume</button></div>
+        <div data-ps="quiz" id="quiz">
+          <div id="quizScelta"><p class="aiuto-ps" data-t="ps_quiz"></p>
+            <div class="ps-azioni"><button type="button" class="primario" data-quiz="dove" data-t="quizDoveBtn">Dov'è?</button><button type="button" data-quiz="cosa" data-t="quizCosaBtn">Che cos'è?</button></div></div>
+          <div id="quizCorso" hidden>
+            <p id="quizNum" class="aiuto-ps"></p><p id="quizDomanda" class="quiz-domanda"></p>
+            <div id="quizRisposta" hidden><input type="text" id="quizInput" autocomplete="off" data-t-ph="quizScrivi" placeholder="Scrivi il nome…"><ul id="quizSugg" hidden></ul></div>
+            <p id="quizEsito" class="quiz-esito"></p>
+            <div class="ps-azioni"><button type="button" id="quizAvanti" class="primario" hidden>Avanti</button><button type="button" data-quiz="esci" data-t="quizEsci">Esci</button></div>
+          </div>
+          <div id="quizFine" hidden></div>
+        </div>
         <div data-ps="didattica"><div id="didRisultato"></div></div>
         <div data-ps="lesione"><p class="aiuto-ps" data-t="ps_lesione"></p>
           <label class="riga riga-check"><span data-t="lesNeuro">Immagine in convenzione neurologica</span><input type="checkbox" class="switch" role="switch" id="lesNeuro"></label>
@@ -810,6 +856,15 @@ const TESTI = {
     tema: 'Tema', temaChiaro: 'Passa al tema chiaro', temaScuro: 'Passa al tema scuro',
     s_didattica: 'Guida alle strutture: clicca una struttura per vederne funzione e deficit', didVuoto: 'Clicca una struttura sull\'immagine o la sua etichetta.',
     funzione: 'Funzione', deficitLesione: 'In caso di lesione', controlat: 'controlaterale', omolat: 'omolaterale',
+    livelli: 'Livelli', livBase: 'Base (sempre attiva)', livAnat: 'Anatomia', livSempre: 'sempre attiva', livMappe: 'Mappe', livRilev: 'Rilevamento',
+    livMostra: 'Mostra', ispettore: 'Ispettore del punto', ispettoreD: 'al passaggio del mouse: tutti i livelli in quel punto, con le loro maschere',
+    livScarica: 'scaricamento…', livAttivo: 'attivo', livPronto: 'scaricato', livAssente: 'non ancora disponibile', livErr: 'errore',
+    livPiede: p => `Livelli attivi: ${p.n} · scaricati ${p.mb} MB`, livErrore: p => `Livello ${p.m} non caricato: ${p.e}`,
+    s_quiz: 'Quiz: riconosci le strutture', ps_quiz: 'Dieci domande sulla sezione che hai davanti. Durante il quiz etichette e maschere sono nascoste.',
+    quizDoveBtn: 'Dov\'è?', quizCosaBtn: 'Che cos\'è?', quizScrivi: 'Scrivi il nome…', quizEsci: 'Esci', quizRisultati: 'Vedi il risultato',
+    quizDove: p => `Clicca su: <b>${p.s}</b>`, quizCosa: 'Come si chiama la struttura evidenziata?', quizPunti: p => `${p.p} punti`,
+    quizGiusto: 'Giusto!', quizSbagliato: p => `Sbagliato: era ${p.g}.`, quizVuoto: 'Nessuna struttura abbastanza grande in questa sezione: cambia sezione.',
+    quizRisultato: p => `${p.p} / ${p.n}`, quizRipassa: 'Da ripassare:', quizHaiDetto: 'hai risposto', quizPerfetto: 'Tutte giuste!', quizAncora: 'Altre 10',
     nessunaStruttura: 'Nessuna struttura qui', s_mano: 'Seleziona e modifica: sposta le figure, trascina le estremità, doppio clic su un testo per cambiarlo', s_cerca: 'Cerca uno strumento (tasto /)', cercaStrumPh: 'Cerca uno strumento…', nessunoStrum: 'Nessuno strumento trovato.',
     s_gomma: 'Gomma: clicca un disegno o una misura per cancellarla', rimuoviCal: 'Rimuovi calibrazione',
     s_lesione: 'Analisi lesione (traccia il contorno della lesione)',
@@ -887,6 +942,15 @@ const TESTI = {
     tema: 'Theme', temaChiaro: 'Switch to light theme', temaScuro: 'Switch to dark theme',
     s_didattica: 'Structure guide: click a structure to see its function and deficits', didVuoto: 'Click a structure on the image or its label.',
     funzione: 'Function', deficitLesione: 'If damaged', controlat: 'contralateral', omolat: 'ipsilateral',
+    livelli: 'Layers', livBase: 'Base (always on)', livAnat: 'Anatomy', livSempre: 'always on', livMappe: 'Maps', livRilev: 'Detection',
+    livMostra: 'Show', ispettore: 'Point inspector', ispettoreD: 'on mouse over: every layer at that point, with its masks',
+    livScarica: 'downloading…', livAttivo: 'on', livPronto: 'downloaded', livAssente: 'not available yet', livErr: 'error',
+    livPiede: p => `Active layers: ${p.n} · downloaded ${p.mb} MB`, livErrore: p => `Layer ${p.m} not loaded: ${p.e}`,
+    s_quiz: 'Quiz: recognise the structures', ps_quiz: 'Ten questions on the slice in front of you. Labels and masks are hidden during the quiz.',
+    quizDoveBtn: 'Where is it?', quizCosaBtn: 'What is it?', quizScrivi: 'Type the name…', quizEsci: 'Exit', quizRisultati: 'See the result',
+    quizDove: p => `Click on: <b>${p.s}</b>`, quizCosa: 'What is the highlighted structure called?', quizPunti: p => `${p.p} points`,
+    quizGiusto: 'Correct!', quizSbagliato: p => `Wrong: it was ${p.g}.`, quizVuoto: 'No structure large enough on this slice: change slice.',
+    quizRisultato: p => `${p.p} / ${p.n}`, quizRipassa: 'To review:', quizHaiDetto: 'you answered', quizPerfetto: 'All correct!', quizAncora: '10 more',
     nessunaStruttura: 'No structure here', s_mano: 'Select and edit: move shapes, drag their ends, double-click a text to change it', s_cerca: 'Find a tool (key /)', cercaStrumPh: 'Find a tool…', nessunoStrum: 'No tool found.',
     s_gomma: 'Eraser: click a drawing or measurement to delete it', rimuoviCal: 'Remove calibration',
     s_lesione: 'Lesion analysis (draw the outline of the lesion)',
@@ -1254,7 +1318,7 @@ let cicloAttivo = false;
 async function ciclo() {
   if (cicloAttivo) return; cicloAttivo = true;
   try { while (stream) {
-    if (!inPausa && !bozza && riquadro && sessione && !inCorso && video.videoWidth) {
+    if (!inPausa && !bozza && !(quizAttivo() && quiz.corrente && !quiz.risposto) && riquadro && sessione && !inCorso && video.videoWidth) {
       const m = miniatura();
       if (!ultimaMiniatura || differenza(m, ultimaMiniatura) > SOGLIA_CAMBIO) {
         ultimaMiniatura = m;
@@ -1291,7 +1355,9 @@ async function analizza() {
   if (!prep) { risultato = null; inCorso = false; stato(() => tr('nessunaImmagine')); disegna(); return; }
 
   const t = performance.now();
-  const out = await sessione.run({ input: new ort.Tensor('float32', prep.input, [1, 1, LATO, LATO]) });
+  const tensore = new ort.Tensor('float32', prep.input, [1, 1, LATO, LATO]);
+  const out = await sessione.run({ input: tensore });
+  await analizzaLivelli(tensore);
   const ms = performance.now() - t;
   risultato = { classe: out.classe.data, conf: out.confidenza.data, geo, centro: prep.centro };
   { // le misure appartengono alla sezione: si mettono da parte e ritornano quando si torna su quella sezione
@@ -1410,7 +1476,8 @@ function disegnaBase() {
   if (selezionando) return;
   const ctx = preparaTela(); impaginato = null; if (!ctx) return;
   if (!risultato || !fotogramma.width) return;
-  const conEtichette = $('mostraEtichette').checked, W = tela.clientWidth, H = tela.clientHeight;
+  if (quizAttivo()) evidenziato = null;
+  const conEtichette = $('mostraEtichette').checked && !quizAttivo(), W = tela.clientWidth, H = tela.clientHeight;
   const dim = dimFont, riga = dim + 5;
   const A = calcolaAnalisi(), g = risultato.geo;
   ctx.font = `600 ${dim}px "Segoe UI", system-ui, sans-serif`;
@@ -1429,7 +1496,7 @@ function disegnaBase() {
   ctx.drawImage(fotogramma, a.x, a.y, a.w, a.h);
 
   // maschere (quelle del gruppo evidenziato più intense, le altre attenuate)
-  if ($('mostraMaschere').checked || evidenziato) {
+  if (!quizAttivo() && ($('mostraMaschere').checked || evidenziato)) {
     const img = new ImageData(LATO, LATO), alfa = +$('opacita').value / 100 * 255;
     const base = $('mostraMaschere').checked ? (evidenziato ? alfa * 0.45 : alfa) : 0;
     for (let i = 0; i < N; i++) {
@@ -1447,6 +1514,7 @@ function disegnaBase() {
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(sovrapposizione, g.dx, g.dy, g.dw, g.dh, a.x, a.y, a.w, a.h);
   }
+  disegnaExtra(ctx, g, a);
   ctx.restore();
 
   impaginato = { a, etichette: [] };
@@ -1501,6 +1569,7 @@ function gruppoSotto(p) {
   return A.L[i] ? { chiave: A.compGruppo[A.comp[i]], i } : null;
 }
 function aggiornaHover(p) {
+  if (quizAttivo()) { $('cursore').style.display = 'none'; return; }
   const el = $('cursore'), trovato = gruppoSotto(p), chiave = trovato ? trovato.chiave : null;
   if (chiave !== evidenziato) { evidenziato = chiave; disegna(); }
   // il riquadro in alto serve solo se la struttura non ha un'etichetta visibile
@@ -1725,7 +1794,7 @@ $('annullaMisura').onclick = () => { if (bozza) bozza = null; else misure.pop();
 $('cancellaMisure').onclick = () => { misure = []; bozza = null; archivioMisure = []; aggiornaPannelloStrum(); disegna(); };
 
 tela.addEventListener('pointerdown', ev => {
-  if (selezionando || !aImg() || ev.button !== 0) return;
+  if (selezionando || !aImg() || ev.button !== 0 || strumento === 'quiz') return;
   const p = posizione(ev);
   if (selezionata && xBtn && Math.hypot(p.x - xBtn.x, p.y - xBtn.y) <= 11) { ev.stopImmediatePropagation(); eliminaMisura(selezionata); return; }
   const kSel = selezionata ? trovaVicina(p) : -1;
@@ -1921,7 +1990,7 @@ $('volAzzera').onclick = () => { fette = []; aggiornaPannelloStrum(); };
 $('volFette').addEventListener('click', ev => { const b = ev.target.closest('button[data-k]'); if (b) { fette.splice(+b.dataset.k, 1); aggiornaPannelloStrum(); } });
 for (const id of ['volSpess', 'volGap', 'abcN', 'abcSp']) $(id).addEventListener('input', () => aggiornaPannelloStrum());
 
-const PANNELLO = { didattica: 'didattica', lesione: 'lesione', calibra: 'calibra', volume: 'volume', abc: 'abc', evans: 'evans', testo: 'testo', struttura: 'struttura' };
+const PANNELLO = { quiz: 'quiz', didattica: 'didattica', lesione: 'lesione', calibra: 'calibra', volume: 'volume', abc: 'abc', evans: 'evans', testo: 'testo', struttura: 'struttura' };
 function aggiornaPannelloStrum() {
   const ps = $('pannelloStrum'), k = PANNELLO[strumento];
   ps.hidden = !k;
@@ -1954,9 +2023,10 @@ function aggiornaPannelloStrum() {
     }
     if (k === 'lesione') $('lesRisultato').innerHTML = testoLesione(ultimaLesione);
     if (k === 'didattica') $('didRisultato').innerHTML = strutturaDidattica ? testoGuidaStruttura(strutturaDidattica) : `<p class="aiuto-ps">${tr('didVuoto')}</p>`;
-    ps.classList.toggle('largo', k === 'lesione' || k === 'didattica');
+    if (k === 'quiz') aggiornaQuiz();
+    ps.classList.toggle('largo', k === 'lesione' || k === 'didattica' || k === 'quiz');
     $('psRisultato').textContent = r;
-    $('psCal').textContent = (k === 'evans' || k === 'testo' || k === 'didattica') ? '' : calib ? tr('calibrato', { v: num(calib, 3) }) : tr('nonCalibrato');
+    $('psCal').textContent = (k === 'evans' || k === 'testo' || k === 'didattica' || k === 'quiz') ? '' : calib ? tr('calibrato', { v: num(calib, 3) }) : tr('nonCalibrato');
   }
 }
 
@@ -2290,6 +2360,254 @@ $('cercaStrumLista').addEventListener('click', ev => { const li = ev.target.clos
 $('cercaStrumLista').addEventListener('mouseleave', () => { if (selCerca !== -1) { selCerca = -1; filtraStrumenti(); } });
 $('cercaStrumLista').addEventListener('mousemove', ev => { const li = ev.target.closest('li[data-i]'); if (li && +li.dataset.i !== selCerca) { selCerca = +li.dataset.i; filtraStrumenti(); } });
 
+// ---------------- Livelli (altri modelli: mappe e rilevamento) ----------------
+// Ogni livello è una rete con lo stesso ingresso dell'anatomia; file in modelli/livelli/<id>/
+var LIVELLI = [
+  { id: 'vasi', gruppo: 'mappe', mb: 20, nome: { it: 'Territori vascolari', en: 'Vascular territories' }, d: { it: 'ACA, ACM, ACP, perforanti', en: 'ACA, MCA, PCA, perforators' } },
+  { id: 'fasci', gruppo: 'mappe', mb: 20, nome: { it: 'Fasci di sostanza bianca', en: 'White matter bundles' }, d: { it: 'corticospinale, arcuato, callosi…', en: 'corticospinal, arcuate, callosal…' } },
+  { id: 'tratti', gruppo: 'mappe', mb: 20, nome: { it: 'Tratti', en: 'Tracts' }, d: { it: 'tratti di sostanza bianca', en: 'white matter tracts' } },
+  { id: 'aree', gruppo: 'mappe', mb: 20, nome: { it: 'Aree funzionali', en: 'Functional areas' }, d: { it: 'aree citoarchitettoniche, talamo', en: 'cytoarchitectonic areas, thalamus' } },
+  { id: 'profondo', gruppo: 'mappe', mb: 20, nome: { it: 'Tronco e nuclei profondi', en: 'Brainstem and deep nuclei' }, d: { it: 'Brainstem Navigator', en: 'Brainstem Navigator' } },
+  { id: 'brainnetome', gruppo: 'mappe', mb: 20, nome: { it: 'Brainnetome', en: 'Brainnetome' }, d: { it: '246 regioni', en: '246 regions' } },
+  { id: 'lesioni', gruppo: 'rilev', mb: 20, nome: { it: 'Lesione ischemica', en: 'Ischemic lesion' }, d: { it: 'DWI / ADC · ISLES 2022', en: 'DWI / ADC · ISLES 2022' } },
+  { id: 'tumore', gruppo: 'rilev', mb: 20, nome: { it: 'Tumore ed edema', en: 'Tumour and oedema' }, d: { it: 'T1, T1c, T2, FLAIR · BraTS', en: 'T1, T1c, T2, FLAIR · BraTS' } },
+];
+const fileLiv = (id, f) => `modelli/livelli/${id}/${f}`;
+var livelliAttivi = (() => { try { return new Set(JSON.parse(localStorage.getItem('annotatore-livelli')) || []); } catch { return new Set(); } })();
+var statoLiv = {}, sessioniLiv = new Map(), risLiv = new Map();
+var ispettoreOn = (() => { try { return localStorage.getItem('annotatore-ispettore') !== '0'; } catch { return true; } })();
+const salvaLivelli = () => { try { localStorage.setItem('annotatore-livelli', JSON.stringify([...livelliAttivi])); localStorage.setItem('annotatore-ispettore', ispettoreOn ? '1' : '0'); } catch {} };
+function coloriLivello(n, k) {                // colori ben distinti, diversi per ogni livello
+  return Array.from({ length: n }, (_, c) => {
+    if (!c) return [0, 0, 0];
+    const h = (c * 137.508 + k * 47) % 360, s = .75, l = .55, kk = m => (m + h / 30) % 12, a = s * Math.min(l, 1 - l);
+    const f = m => l - a * Math.max(-1, Math.min(kk(m) - 3, 9 - kk(m), 1));
+    return [f(0) * 255, f(8) * 255, f(4) * 255].map(Math.round);
+  });
+}
+const nomeLiv = L => L.nome[lingua] || L.nome.it;
+function nomeClasseLiv(id, c) { const v = sessioniLiv.get(id); if (!v) return '';
+  return (lingua === 'en' && v.classiEn && v.classiEn[c]) || v.classi[c] || String(c); }
+async function controllaLivelli() {           // quali modelli esistono sul sito (senza scaricarli)
+  await Promise.all(LIVELLI.map(async L => {
+    if (statoLiv[L.id] && statoLiv[L.id] !== 'assente') return;
+    try { const r = await fetch(fileLiv(L.id, 'config_app.json'), { method: 'HEAD', cache: 'no-store' }); statoLiv[L.id] = r.ok ? 'disponibile' : 'assente'; }
+    catch { statoLiv[L.id] = 'assente'; }
+  }));
+  costruisciLivelli();
+}
+async function caricaLivello(L, carta) {
+  if (sessioniLiv.has(L.id)) return true;
+  statoLiv[L.id] = 'scaricando'; costruisciLivelli();
+  try {
+    await preparaOrt();
+    const cfg = await (await fetch(fileLiv(L.id, 'config_app.json'))).json();
+    const byte = await scarica(fileLiv(L.id, 'modello_int8.onnx'), p => { const i = document.querySelector(`.carta-liv[data-id="${L.id}"] .prog i`); if (i) i.style.width = p + '%'; });
+    const sess = await ort.InferenceSession.create(byte, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
+    const classi = cfg.classi || [];
+    sessioniLiv.set(L.id, { sess, classi, classiEn: cfg.classi_en, colori: cfg.colori || coloriLivello(classi.length, LIVELLI.indexOf(L) + 1) });
+    statoLiv[L.id] = 'pronto'; return true;
+  } catch (e) { statoLiv[L.id] = 'errore'; messaggio(() => tr('livErrore', { m: nomeLiv(L), e: e.message || e }), true); return false; }
+  finally { costruisciLivelli(); }
+}
+function costruisciLivelli() {
+  const box = $('livelliLista'); if (!box) return;
+  const blocco = gr => LIVELLI.filter(L => L.gruppo === gr).map(L => {
+    const st = statoLiv[L.id] || '?', on = livelliAttivi.has(L.id), no = st === 'assente';
+    const dest = st === 'scaricando' ? tr('livScarica') : sessioniLiv.has(L.id) ? (on ? tr('livAttivo') : tr('livPronto'))
+               : no ? tr('livAssente') : st === 'errore' ? tr('livErr') : `${L.mb} MB`;
+    return `<label class="carta-liv${no ? ' assente' : ''}" data-id="${L.id}"><span class="testi"><b>${nomeLiv(L)}</b><small>${L.d[lingua] || L.d.it}</small>
+      <span class="prog"${st === 'scaricando' ? '' : ' hidden'}><i></i></span></span><span class="stato-liv">${dest}</span>
+      <input type="checkbox" class="switch" ${on ? 'checked' : ''} ${no || st === 'scaricando' ? 'disabled' : ''}></label>`; }).join('');
+  box.innerHTML = `<p class="liv-tit">${tr('livBase')}</p><div class="carta-liv base"><span class="testi"><b>${tr('livAnat')}</b><small>${modelloAttivo ? modelloAttivo.nome + ' · ' + (modelloAttivo.descr[lingua] || '') : ''}</small></span><span class="stato-liv">${tr('livSempre')}</span></div>
+    <p class="liv-tit">${tr('livMappe')}</p>${blocco('mappe')}<p class="liv-tit">${tr('livRilev')}</p>${blocco('rilev')}
+    <p class="liv-tit">${tr('livMostra')}</p><label class="carta-liv"><span class="testi"><b>${tr('ispettore')}</b><small>${tr('ispettoreD')}</small></span><input type="checkbox" class="switch" id="ispOn" ${ispettoreOn ? 'checked' : ''}></label>`;
+  const tot = [...sessioniLiv.keys()].reduce((s, id) => s + LIVELLI.find(L => L.id === id).mb, 0);
+  $('livPiede').textContent = tr('livPiede', { n: livelliAttivi.size, mb: tot });
+  $('livelliBtn').classList.toggle('con-livelli', livelliAttivi.size > 0);
+}
+$('livelliLista').addEventListener('change', async ev => {
+  if (ev.target.id === 'ispOn') { ispettoreOn = ev.target.checked; salvaLivelli(); if (!ispettoreOn) chiudiIspettore(); return; }
+  const carta = ev.target.closest('.carta-liv[data-id]'); if (!carta) return;
+  const L = LIVELLI.find(x => x.id === carta.dataset.id);
+  if (ev.target.checked) { if (await caricaLivello(L, carta)) livelliAttivi.add(L.id); else ev.target.checked = false; }
+  else { livelliAttivi.delete(L.id); risLiv.delete(L.id); }
+  salvaLivelli(); costruisciLivelli(); ultimaMiniatura = null;           // rianalizza subito la sezione con i livelli scelti
+  if (riquadro && stream && !inCorso) analizza().catch(() => {}); else disegna();
+});
+const mostraLivelli = si => { $('livelli').hidden = !si; $('livelliBtn').setAttribute('aria-expanded', si); if (si) { mostraOpzioni(false); controllaLivelli(); } };
+$('livelliBtn').onclick = () => mostraLivelli($('livelli').hidden);
+vista.addEventListener('pointerdown', ev => { if (!$('livelli').hidden && !ev.target.closest('#livelli, #livelliBtn')) mostraLivelli(false); }, true);
+async function analizzaLivelli(tensore) {     // chiamata da analizza() dopo l'anatomia
+  const nuovi = new Map();
+  for (const id of livelliAttivi) { const v = sessioniLiv.get(id); if (!v) continue;
+    try { const o = await v.sess.run({ input: tensore }); nuovi.set(id, { classe: o.classe.data, conf: o.confidenza.data }); } catch {} }
+  risLiv = nuovi;
+}
+// livelli caricati all'avvio se erano attivi l'ultima volta
+setTimeout(async () => { for (const id of [...livelliAttivi]) { const L = LIVELLI.find(x => x.id === id);
+  if (!L || !(await caricaLivello(L))) livelliAttivi.delete(id); } salvaLivelli(); }, 1500);
+
+// ---------------- Maschere dei livelli, dell'ispettore e del quiz ----------------
+function disegnaExtra(ctx, g, a) {
+  const soglia = +$('soglia').value / 100, alfa = +$('opacita').value / 100 * 255, img = new ImageData(LATO, LATO); let qualcosa = false;
+  if (!quizAttivo()) for (const L of LIVELLI) {
+    if (!livelliAttivi.has(L.id)) continue; const r = risLiv.get(L.id), v = sessioniLiv.get(L.id); if (!r || !v) continue;
+    for (let i = 0; i < N; i++) { const c = r.classe[i]; if (!c || r.conf[i] < soglia) continue;
+      const col = v.colori[c] || [255, 255, 255], p = i * 4; img.data[p] = col[0]; img.data[p + 1] = col[1]; img.data[p + 2] = col[2]; img.data[p + 3] = alfa * .85; }
+    qualcosa = true;
+  }
+  for (const m of maschereEvidenziate()) {    // strutture evidenziate: piene con bordo bianco
+    const k = m.classe, cf = m.conf, dentro = j => k[j] === m.c && cf[j] >= soglia;
+    for (let i = 0; i < N; i++) { if (!dentro(i)) continue; const x = i % LATO, p = i * 4;
+      const bordo = x === 0 || x === LATO - 1 || !dentro(i - 1) || !dentro(i + 1) || !dentro(i - LATO) || !dentro(i + LATO);
+      if (bordo) { img.data[p] = img.data[p + 1] = img.data[p + 2] = 255; img.data[p + 3] = 255; }
+      else { img.data[p] = m.col[0]; img.data[p + 1] = m.col[1]; img.data[p + 2] = m.col[2]; img.data[p + 3] = 170; } }
+    qualcosa = true;
+  }
+  if (!qualcosa) return;
+  sovrapposizione.getContext('2d').putImageData(img, 0, 0);
+  ctx.imageSmoothingEnabled = false; ctx.drawImage(sovrapposizione, g.dx, g.dy, g.dw, g.dh, a.x, a.y, a.w, a.h);
+}
+function maschereEvidenziate() {
+  if (quizAttivo()) return quiz.maschere || [];
+  if (!ispezione || !risultato) return [];
+  const out = [];
+  if (ispezione.anat) out.push({ classe: risultato.classe, conf: risultato.conf, c: ispezione.anat, col: colori[ispezione.anat] || [255, 255, 255] });
+  for (const x of ispezione.liv) { const r = risLiv.get(x.id), v = sessioniLiv.get(x.id); if (r && v) out.push({ classe: r.classe, conf: r.conf, c: x.c, col: v.colori[x.c] || [255, 255, 255] }); }
+  return out;
+}
+
+// ---------------- Ispettore del punto ----------------
+var ispezione = null, rafIsp = 0;
+function puntoLato(p) {                        // indice nella griglia 256×256 sotto il punto della tela, o -1
+  const a = impaginato && impaginato.a; if (!a || !risultato) return -1;
+  const g = risultato.geo, u = Math.floor(g.dx + (p.x - a.x) / a.w * g.dw), v = Math.floor(g.dy + (p.y - a.y) / a.h * g.dh);
+  return (u < g.dx || v < g.dy || u >= g.dx + g.dw || v >= g.dy + g.dh) ? -1 : v * LATO + u;
+}
+function chiudiIspettore() { if (!ispezione) return; ispezione = null; $('ispettore').hidden = true; disegna(); }
+tela.addEventListener('pointermove', ev => {
+  if (!ispettoreOn || quizAttivo() || selezionando || bozza || spostando || panning) { if (ispezione) chiudiIspettore(); return; }
+  const p = posizione(ev), i = puntoLato(p);
+  if (i < 0) { chiudiIspettore(); return; }
+  const soglia = +$('soglia').value / 100, anat = risultato.conf[i] >= soglia ? risultato.classe[i] : 0;
+  const liv = [];
+  for (const L of LIVELLI) { if (!livelliAttivi.has(L.id)) continue; const r = risLiv.get(L.id); if (!r) continue;
+    liv.push({ id: L.id, c: r.conf[i] >= soglia ? r.classe[i] : 0 }); }
+  if (!anat && !liv.some(x => x.c)) { chiudiIspettore(); return; }
+  const chiave = anat + '|' + liv.map(x => x.c).join(',');
+  const box = $('ispettore'), vr = vista.getBoundingClientRect();
+  if (!ispezione || ispezione.chiave !== chiave) {
+    ispezione = { chiave, anat, liv: liv.filter(x => x.c) };
+    const esc = t => String(t).replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+    const pal = col => `<i style="background:rgb(${col.join(',')})"></i>`;
+    box.innerHTML = `<div class="r"><span class="k">${tr('livAnat')}</span><span class="v">${anat ? pal(colori[anat]) + esc(trNome(CLASSI[anat])) : '—'}</span></div>` +
+      liv.map(x => { const L = LIVELLI.find(l => l.id === x.id), v = sessioniLiv.get(x.id);
+        return `<div class="r"><span class="k">${esc(nomeLiv(L))}</span><span class="v">${x.c ? pal(v.colori[x.c]) + esc(nomeClasseLiv(x.id, x.c)) : '—'}</span></div>`; }).join('');
+    cancelAnimationFrame(rafIsp); rafIsp = requestAnimationFrame(disegna);
+  }
+  box.hidden = false;
+  let lx = ev.clientX - vr.left + 16, ly = ev.clientY - vr.top + 16;
+  if (lx + box.offsetWidth > vr.width - 8) lx -= box.offsetWidth + 32; if (ly + box.offsetHeight > vr.height - 50) ly -= box.offsetHeight + 32;
+  box.style.left = lx + 'px'; box.style.top = ly + 'px';
+});
+tela.addEventListener('pointerleave', chiudiIspettore);
+
+// ---------------- Quiz ----------------
+var quiz = null, QUIZ_N = 10, AREA_QUIZ = 60;
+function quizAttivo() { return !!(quiz && strumento === 'quiz'); }
+function poolQuiz() {                          // strutture presenti in questa sezione e abbastanza grandi
+  if (!risultato) return [];
+  const soglia = +$('soglia').value / 100, n = new Map();
+  for (let i = 0; i < N; i++) { const c = risultato.classe[i]; if (c && risultato.conf[i] >= soglia) n.set(c, (n.get(c) || 0) + 1); }
+  const escluse = ['sfondo', 'sostanza bianca cerebrale', 'corteccia cerebrale non classificata'];   // troppo ovvie o generiche
+  return [...n].filter(([c, k]) => k >= AREA_QUIZ && !escluse.includes(CLASSI[c])).map(([c]) => c);
+}
+function iniziaQuiz(tipo) {
+  quiz = { tipo, n: 0, punti: 0, errori: [], maschere: [], corrente: null, risposto: false, fine: false };
+  nuovaDomanda();
+}
+function nuovaDomanda() {
+  const pool = poolQuiz().filter(c => !quiz.corrente || c !== quiz.corrente.c);
+  if (!pool.length) { quiz.msg = tr('quizVuoto'); quiz.corrente = null; aggiornaQuiz(); return; }
+  const c = pool[Math.floor(Math.random() * pool.length)];
+  quiz.corrente = { c, nome: CLASSI[c] }; quiz.risposto = false; quiz.n++; quiz.msg = '';
+  quiz.maschere = quiz.tipo === 'cosa' ? [{ classe: risultato.classe, conf: risultato.conf, c, col: [242, 179, 61] }] : [];
+  aggiornaQuiz(); disegna();
+  if (quiz.tipo === 'cosa') { $('quizInput').value = ''; $('quizInput').focus(); mostraSugg(); }
+}
+function rispondi(ok, data) {
+  quiz.risposto = true; if (ok) quiz.punti++; else quiz.errori.push({ giusta: trNome(quiz.corrente.nome), data });
+  const verde = [76, 200, 120], rosso = [229, 72, 77];
+  quiz.maschere = [];                          // prima la struttura cliccata (rossa), sopra quella giusta (verde)
+  if (!ok && quiz.tipo === 'dove' && data && data.c) quiz.maschere.push({ classe: risultato.classe, conf: risultato.conf, c: data.c, col: rosso });
+  quiz.maschere.push({ classe: risultato.classe, conf: risultato.conf, c: quiz.corrente.c, col: verde });
+  quiz.msg = ok ? tr('quizGiusto') : tr('quizSbagliato', { g: trNome(quiz.corrente.nome) });
+  aggiornaQuiz(); disegna(); $('quizAvanti').focus();
+}
+function avantiQuiz() {
+  if (quiz.n >= QUIZ_N) { quiz.fine = true; quiz.maschere = []; aggiornaQuiz(); disegna(); return; }
+  ultimaMiniatura = null; nuovaDomanda();
+}
+function aggiornaQuiz() {
+  const q = quiz, esc = t => String(t).replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+  $('quizScelta').hidden = !!q && !q.fine;
+  $('quizCorso').hidden = !q || q.fine;
+  $('quizFine').hidden = !q || !q.fine;
+  if (!q) return;
+  if (q.fine) {
+    $('quizFine').innerHTML = `<p class="quiz-punti">${tr('quizRisultato', { p: q.punti, n: QUIZ_N })}</p>` +
+      (q.errori.length ? `<p class="aiuto-ps">${tr('quizRipassa')}</p><ul>${q.errori.map(e => `<li><b>${esc(e.giusta)}</b>${e.data && e.data.testo ? ` — ${tr('quizHaiDetto')} ${esc(e.data.testo)}` : ''}</li>`).join('')}</ul>` : `<p>${tr('quizPerfetto')}</p>`) +
+      `<div class="ps-azioni"><button type="button" class="primario" data-quiz="${q.tipo}">${tr('quizAncora')}</button><button type="button" data-quiz="esci">${tr('quizEsci')}</button></div>`;
+    return;
+  }
+  $('quizNum').textContent = q.corrente ? `${q.n} / ${QUIZ_N} · ${tr('quizPunti', { p: q.punti })}` : '';
+  $('quizDomanda').innerHTML = !q.corrente ? '' : q.tipo === 'dove' ? tr('quizDove', { s: esc(trNome(q.corrente.nome)) }) : tr('quizCosa');
+  $('quizRisposta').hidden = q.tipo !== 'cosa' || q.risposto || !q.corrente;
+  $('quizEsito').textContent = q.msg || ''; $('quizEsito').className = 'quiz-esito' + (q.risposto ? (q.msg === tr('quizGiusto') ? ' ok' : ' no') : '');
+  $('quizAvanti').hidden = !q.risposto; $('quizAvanti').textContent = tr(q.n >= QUIZ_N ? 'quizRisultati' : 'avanti');
+}
+$('quiz').addEventListener('click', ev => {
+  const b = ev.target.closest('button[data-quiz]'); if (!b) return;
+  if (b.dataset.quiz === 'esci') { quiz = null; aggiornaQuiz(); disegna(); return; }
+  iniziaQuiz(b.dataset.quiz);
+});
+$('quizAvanti').onclick = avantiQuiz;
+// risposta "Dov'è?": clic sull'immagine
+tela.addEventListener('pointerdown', ev => {
+  if (!quizAttivo() || !quiz.corrente || quiz.risposto || quiz.tipo !== 'dove' || ev.button !== 0) return;
+  ev.stopImmediatePropagation();
+  const i = puntoLato(posizione(ev)); if (i < 0) return;
+  const soglia = +$('soglia').value / 100, c = risultato.conf[i] >= soglia ? risultato.classe[i] : 0;
+  rispondi(c && CLASSI[c] === quiz.corrente.nome, { c, testo: c ? trNome(CLASSI[c]) : '—' });
+}, true);
+// risposta "Che cos'è?": nome con suggerimenti
+let selSugg = -1;
+function nomiQuiz() { return [...new Set(CLASSI.slice(1).filter(n => n !== 'sfondo').map(trNome))].sort((a, b) => a.localeCompare(b)); }
+function mostraSugg() {
+  const q = normalizza($('quizInput').value.trim()), lista = $('quizSugg');
+  const voci = q ? nomiQuiz().filter(n => normalizza(n).includes(q)).slice(0, 8) : [];
+  selSugg = Math.min(selSugg, voci.length - 1);
+  lista.innerHTML = voci.map((n, i) => `<li data-n="${n.replace(/"/g, '&quot;')}" aria-selected="${i === selSugg}">${n.replace(/[&<>]/g, '')}</li>`).join('');
+  lista.hidden = !voci.length;
+}
+function inviaNome(n) {
+  if (!quiz || quiz.risposto || !n.trim()) return;
+  rispondi(normalizza(n.trim()) === normalizza(trNome(quiz.corrente.nome)), { testo: n.trim() });
+  $('quizSugg').hidden = true;
+}
+$('quizInput').addEventListener('input', () => { selSugg = -1; mostraSugg(); });
+$('quizInput').addEventListener('keydown', ev => {
+  const li = [...$('quizSugg').children];
+  if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); if (li.length) { selSugg = selSugg < 0 ? (ev.key === 'ArrowDown' ? 0 : li.length - 1) : (selSugg + (ev.key === 'ArrowDown' ? 1 : -1) + li.length) % li.length; mostraSugg(); } }
+  else if (ev.key === 'Enter') { ev.preventDefault(); inviaNome(selSugg >= 0 && li[selSugg] ? li[selSugg].dataset.n : $('quizInput').value); }
+  ev.stopPropagation();
+});
+$('quizSugg').addEventListener('mousedown', ev => { const li = ev.target.closest('li'); if (li) { ev.preventDefault(); inviaNome(li.dataset.n); } });
+$('quizSugg').addEventListener('mousemove', ev => { const li = ev.target.closest('li'); if (!li) return; const k = [...$('quizSugg').children].indexOf(li); if (k !== selSugg) { selSugg = k; mostraSugg(); } });
+$('quizSugg').addEventListener('mouseleave', () => { if (selSugg !== -1) { selSugg = -1; mostraSugg(); } });
+document.addEventListener('keydown', ev => { if (quizAttivo() && quiz.risposto && ev.key === 'Enter' && !ev.target.closest('input')) { ev.preventDefault(); avantiQuiz(); } });
+
 function tastiStrumenti(ev) {
   if (ev.target.closest('input, textarea') || $('guida').open) return;
   if (ev.key === '/' && !ev.ctrlKey && !ev.metaKey) { ev.preventDefault(); apriCercaStrum(true); return; }
@@ -2313,7 +2631,7 @@ function applicaLingua() {
     doc.querySelectorAll('[data-t-ph]').forEach(el => { el.placeholder = tr(el.dataset.tPh); });
   }
   document.querySelectorAll('.lingua button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lingua === lingua));
-  aggiornaCursori(); aggiornaSuggerimenti(); aggiornaPannelloStrum();
+  aggiornaCursori(); aggiornaSuggerimenti(); aggiornaPannelloStrum(); costruisciLivelli();
   if (ultimoMessaggio) messaggio(...ultimoMessaggio);
   if (ultimoStato) stato(ultimoStato);
   costruisciOpzioni(); aggiornaScelta(); applicaTema(); testiGuida(); disegna();
