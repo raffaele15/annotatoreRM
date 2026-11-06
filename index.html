@@ -734,6 +734,7 @@
 const LATO = 256, N = LATO * LATO;
 // Versioni del modello: la PRIMA è quella caricata all'avvio (l'ultima). Le altre si caricano solo quando vengono scelte.
 const MODELLI = [
+  { id: 'v3', nome: 'v3', descr: { it: 'T1, T2, FLAIR e PD, 78 strutture', en: 'T1, T2, FLAIR and PD, 78 structures' }, file: 'modelli/v3/modello_int8.onnx', config: 'modelli/v3/config_app.json' },
   { id: 'v2', nome: 'v2', descr: { it: 'T1, T2 e FLAIR', en: 'T1, T2 and FLAIR' }, file: 'modelli/v2/modello_int8.onnx', config: 'modelli/v2/config_app.json' },
   { id: 'v1', nome: 'v1', descr: { it: 'solo T1', en: 'T1 only' }, file: 'modelli/v1/modello_int8.onnx', config: 'modelli/v1/config_app.json' },
 ];
@@ -765,10 +766,15 @@ const GRUPPI = [
   ['Insula e altra corteccia', ['insula', 'insula (o corteccia non classificata)', 'corteccia cerebrale non classificata']],
   ['Sostanza bianca', ['sostanza bianca cerebrale']],
   ['Gangli della base', ['nucleo caudato', 'putamen', 'globo pallido', 'nucleo accumbens']],
-  ['Talamo e diencefalo', ['talamo', 'diencefalo ventrale', 'chiasma ottico']],
+  ['Talamo e diencefalo', ['talamo', 'diencefalo ventrale']],
+  ['Ipotalamo e vie ottiche', ['nervo ottico', 'chiasma ottico', 'tratto ottico', 'corpi mammillari', 'commissura anteriore', 'fornice',
+    'epifisi', 'ipofisi', 'infundibolo', 'regione tuberale', 'ipotalamo mediale', 'ipotalamo laterale', 'ipotalamo anteriore', 'ipotalamo posteriore']],
   ['Ippocampo e amigdala', ['ippocampo', 'amigdala']],
   ['Ventricoli', ['ventricolo laterale', 'corno temporale del ventricolo laterale', 'terzo ventricolo', 'quarto ventricolo', 'plesso corioideo']],
-  ['Tronco e cervelletto', ['tronco encefalico', 'corteccia cerebellare', 'sostanza bianca cerebellare']],
+  ['Tronco e cervelletto', ['tronco encefalico', 'mesencefalo', 'ponte', 'bulbo', 'corteccia cerebellare', 'sostanza bianca cerebellare']],
+  ['Lobuli del cervelletto', ['cervelletto, lobuli I-IV', 'cervelletto, lobulo V', 'cervelletto, lobulo VI', 'cervelletto, Crus I',
+    'cervelletto, Crus II', 'cervelletto, lobulo VIIb', 'cervelletto, lobulo VIIIa', 'cervelletto, lobulo VIIIb', 'cervelletto, lobulo IX',
+    'cervelletto, lobulo X', 'verme, lobulo VI', 'verme, lobulo VII', 'verme, lobulo VIII', 'verme, lobulo IX', 'verme, lobulo X']],
 ];
 
 // ---------------- Lingua (italiano / inglese) ----------------
@@ -954,6 +960,17 @@ const NOMI_EN = {          // strutture (nomi di config_app.json) e gruppi del p
   'Cingolo': 'Cingulate', 'Insula e altra corteccia': 'Insula and other cortex', 'Sostanza bianca': 'White matter',
   'Gangli della base': 'Basal ganglia', 'Talamo e diencefalo': 'Thalamus and diencephalon', 'Ippocampo e amigdala': 'Hippocampus and amygdala',
   'Ventricoli': 'Ventricles', 'Tronco e cervelletto': 'Brainstem and cerebellum', 'Altro': 'Other',
+  'Ipotalamo e vie ottiche': 'Hypothalamus and optic pathway', 'Lobuli del cervelletto': 'Cerebellar lobules',
+  'mesencefalo': 'midbrain', 'ponte': 'pons', 'bulbo': 'medulla oblongata',
+  'cervelletto, lobuli I-IV': 'cerebellum, lobules I-IV', 'cervelletto, lobulo V': 'cerebellum, lobule V', 'cervelletto, lobulo VI': 'cerebellum, lobule VI',
+  'cervelletto, Crus I': 'cerebellum, Crus I', 'cervelletto, Crus II': 'cerebellum, Crus II', 'cervelletto, lobulo VIIb': 'cerebellum, lobule VIIb',
+  'cervelletto, lobulo VIIIa': 'cerebellum, lobule VIIIa', 'cervelletto, lobulo VIIIb': 'cerebellum, lobule VIIIb', 'cervelletto, lobulo IX': 'cerebellum, lobule IX',
+  'cervelletto, lobulo X': 'cerebellum, lobule X', 'verme, lobulo VI': 'vermis, lobule VI', 'verme, lobulo VII': 'vermis, lobule VII',
+  'verme, lobulo VIII': 'vermis, lobule VIII', 'verme, lobulo IX': 'vermis, lobule IX', 'verme, lobulo X': 'vermis, lobule X',
+  'nervo ottico': 'optic nerve', 'tratto ottico': 'optic tract', 'corpi mammillari': 'mammillary bodies', 'commissura anteriore': 'anterior commissure',
+  'fornice': 'fornix', 'epifisi': 'pineal gland', 'ipofisi': 'pituitary gland', 'infundibolo': 'infundibulum', 'regione tuberale': 'tuberal region',
+  'ipotalamo mediale': 'medial hypothalamus', 'ipotalamo laterale': 'lateral hypothalamus', 'ipotalamo anteriore': 'anterior hypothalamus',
+  'ipotalamo posteriore': 'posterior hypothalamus',
 };
 let lingua = (() => {
   try { const l = localStorage.getItem('annotatore-lingua'); if (l === 'it' || l === 'en') return l; } catch {}
