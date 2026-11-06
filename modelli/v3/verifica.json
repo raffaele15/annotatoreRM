@@ -1,0 +1,1 @@
+{"dice_fp32": 0.78, "dice_int8": 0.745, "ms_fp32_1thread": 186, "ms_int8_1thread": 132, "mb_int8": 19.9}

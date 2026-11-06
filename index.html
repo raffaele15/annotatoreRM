@@ -800,9 +800,8 @@
 const LATO = 256, N = LATO * LATO;
 // Versioni del modello: la PRIMA è quella caricata all'avvio (l'ultima). Le altre si caricano solo quando vengono scelte.
 const MODELLI = [
-  { id: 'v3', nome: 'v3', descr: { it: 'T1, T2, FLAIR e PD, 78 strutture', en: 'T1, T2, FLAIR and PD, 78 structures' }, file: 'modelli/v3/modello_int8.onnx', config: 'modelli/v3/config_app.json' },
-  { id: 'v2', nome: 'v2', descr: { it: 'T1, T2 e FLAIR', en: 'T1, T2 and FLAIR' }, file: 'modelli/v2/modello_int8.onnx', config: 'modelli/v2/config_app.json' },
-  { id: 'v1', nome: 'v1', descr: { it: 'solo T1', en: 'T1 only' }, file: 'modelli/v1/modello_int8.onnx', config: 'modelli/v1/config_app.json' },
+  { id: 'v3', nome: 'v3', descr: { it: 'precisa, 78 strutture (80 MB)', en: 'accurate, 78 structures (80 MB)' }, file: 'modelli/v3/modello_fp32.onnx', config: 'modelli/v3/config_app.json' },
+  { id: 'v3l', nome: 'v3 leggera', descr: { it: 'più veloce, un po\' meno precisa (20 MB)', en: 'faster, slightly less accurate (20 MB)' }, file: 'modelli/v3/modello_int8.onnx', config: 'modelli/v3/config_app.json' },
 ];
 const SOGLIA_NERO = 8;          // pixel più scuri di così, collegati al bordo, sono sfondo
 const SOGLIA_CAMBIO = 1.5;      // differenza media (0-255) sulla miniatura per rianalizzare

@@ -81,5 +81,7 @@
   "ponte",
   "bulbo"
  ],
- "normalizzazione": "zscore sui pixel >0 (buchi riempiti), sfondo=0"
+ "normalizzazione": "zscore sui pixel >0 (buchi riempiti), sfondo=0",
+ "modello": "v3 anat 800 epoche (fold 0)",
+ "dice_medio_int8": 0.745
 }
