@@ -899,7 +899,7 @@ const TESTI = {
     tema: 'Tema', temaChiaro: 'Passa al tema chiaro', temaScuro: 'Passa al tema scuro',
     s_didattica: 'Guida alle strutture: clicca una struttura per vederne funzione e deficit', didVuoto: 'Clicca una struttura sull\'immagine o la sua etichetta.',
     funzione: 'Funzione', deficitLesione: 'In caso di lesione', controlat: 'controlaterale', omolat: 'omolaterale',
-    livelli: 'Livelli', livBase: 'Base (sempre attiva)', livAnat: 'Anatomia', livSempre: 'sempre attiva', livMappe: 'Mappe', livRilev: 'Rilevamento',
+    livelli: 'Livelli', livBase: 'Base', livAnat: 'Anatomia', livSempre: 'sempre attiva', livMappe: 'Mappe', livRilev: 'Rilevamento',
     livMostra: 'Mostra', ispettore: 'Ispettore del punto', ispettoreD: 'al passaggio del mouse: tutti i livelli in quel punto, con le loro maschere',
     livScarica: 'scaricamento…', livAttivo: 'attivo', livPronto: 'scaricato', livAssente: 'non ancora disponibile', livErr: 'errore',
     livPiede: p => `Livelli attivi: ${p.n} · scaricati ${p.mb} MB`, livErrore: p => `Livello ${p.m} non caricato: ${p.e}`,
@@ -988,7 +988,7 @@ const TESTI = {
     tema: 'Theme', temaChiaro: 'Switch to light theme', temaScuro: 'Switch to dark theme',
     s_didattica: 'Structure guide: click a structure to see its function and deficits', didVuoto: 'Click a structure on the image or its label.',
     funzione: 'Function', deficitLesione: 'If damaged', controlat: 'contralateral', omolat: 'ipsilateral',
-    livelli: 'Layers', livBase: 'Base (always on)', livAnat: 'Anatomy', livSempre: 'always on', livMappe: 'Maps', livRilev: 'Detection',
+    livelli: 'Layers', livBase: 'Base', livAnat: 'Anatomy', livSempre: 'always on', livMappe: 'Maps', livRilev: 'Detection',
     livMostra: 'Show', ispettore: 'Point inspector', ispettoreD: 'on mouse over: every layer at that point, with its masks',
     livScarica: 'downloading…', livAttivo: 'on', livPronto: 'downloaded', livAssente: 'not available yet', livErr: 'error',
     livPiede: p => `Active layers: ${p.n} · downloaded ${p.mb} MB`, livErrore: p => `Layer ${p.m} not loaded: ${p.e}`,
@@ -1519,6 +1519,43 @@ function areaImmagine(margine = 0) {       // dove appare il riquadro dentro la 
            w: fotogramma.width * s, h: fotogramma.height * s };
 }
 const rgba = (c, a) => `rgba(${colori[c][0]},${colori[c][1]},${colori[c][2]},${a})`;
+const rgbaCol = (col, a) => `rgba(${col[0]},${col[1]},${col[2]},${a})`;
+// gruppi "struttura + lato" di una mappa qualsiasi (classe, confidenza): punto più interno di ogni blocco, area
+function gruppiMappa(classe, conf, soglia, centro) {
+  const L = new Uint16Array(N);
+  for (let i = 0; i < N; i++) L[i] = conf[i] >= soglia ? classe[i] : 0;
+  const d = new Float32Array(N), INF = 1e9;
+  for (let i = 0; i < N; i++) { if (!L[i]) continue; const x = i % LATO, y = (i / LATO) | 0;
+    d[i] = (x === 0 || y === 0 || x === LATO - 1 || y === LATO - 1 || L[i - 1] !== L[i] || L[i + 1] !== L[i] || L[i - LATO] !== L[i] || L[i + LATO] !== L[i]) ? 1 : INF; }
+  for (let y = 1; y < LATO; y++) for (let x = 1; x < LATO - 1; x++) { const i = y * LATO + x; if (!L[i] || d[i] === 1) continue;
+    if (L[i - 1] === L[i]) d[i] = Math.min(d[i], d[i - 1] + 1); if (L[i - LATO] === L[i]) d[i] = Math.min(d[i], d[i - LATO] + 1); }
+  for (let y = LATO - 2; y >= 0; y--) for (let x = LATO - 2; x > 0; x--) { const i = y * LATO + x; if (!L[i] || d[i] === 1) continue;
+    if (L[i + 1] === L[i]) d[i] = Math.min(d[i], d[i + 1] + 1); if (L[i + LATO] === L[i]) d[i] = Math.min(d[i], d[i + LATO] + 1); }
+  const comp = new Int32Array(N).fill(-1), coda = new Int32Array(N), gruppi = new Map();
+  for (let i0 = 0; i0 < N; i0++) {
+    if (!L[i0] || comp[i0] >= 0) continue;
+    const c = L[i0]; let h = 0, t = 0, area = 0, migliore = i0; comp[i0] = 1; coda[t++] = i0;
+    while (h < t) { const i = coda[h++]; area++; if (d[i] > d[migliore]) migliore = i; const x = i % LATO;
+      for (const j of [x > 0 ? i - 1 : -1, x < LATO - 1 ? i + 1 : -1, i - LATO, i + LATO]) if (j >= 0 && j < N && comp[j] < 0 && L[j] === c) { comp[j] = 1; coda[t++] = j; } }
+    const ax = migliore % LATO, ay = (migliore / LATO) | 0, lato = ax < centro ? 'sx' : 'dx', k = c + '-' + lato;
+    const g = gruppi.get(k);
+    if (!g) gruppi.set(k, { c, lato, area, maxArea: area, ax, ay });
+    else { g.area += area; if (area > g.maxArea) { g.maxArea = area; g.ax = ax; g.ay = ay; } }
+  }
+  return [...gruppi.values()].filter(g => g.maxArea >= AREA_MIN_ETICHETTA);
+}
+// etichette da mostrare: anatomia (se attiva) + ogni livello attivo, con nome e colore propri
+function gruppiEtichette(A) {
+  const out = anatOn ? A.gruppi.map(gr => ({ ...gr, nome: trNome(CLASSI[gr.c]), col: colori[gr.c] })) : [];
+  if (quizAttivo()) return out;
+  const soglia = +$('soglia').value / 100;
+  for (const L of LIVELLI) {
+    if (!livelliAttivi.has(L.id)) continue; const r = risLiv.get(L.id), v = sessioniLiv.get(L.id); if (!r || !v) continue;
+    if (!r.gruppi || r.soglia !== soglia) { r.gruppi = gruppiMappa(r.classe, r.conf, soglia, risultato.centro); r.soglia = soglia; }
+    for (const g of r.gruppi) out.push({ ...g, chiave: L.id + ':' + g.c + '-' + g.lato, nome: nomeClasseLiv(L.id, g.c), col: v.colori[g.c] || [255, 255, 255] });
+  }
+  return out;
+}
 
 function disegna() { disegnaBase(); disegnaMisure(); }
 function disegnaBase() {
@@ -1531,7 +1568,8 @@ function disegnaBase() {
   const A = calcolaAnalisi(), g = risultato.geo;
   ctx.font = `600 ${dim}px "Segoe UI", system-ui, sans-serif`;
   // margini laterali larghi quanto serve all'etichetta più lunga (max 30 % della larghezza)
-  const piuLunga = Math.max(0, ...A.gruppi.map(gr => ctx.measureText(trNome(CLASSI[gr.c])).width));
+  const tutti = gruppiEtichette(A);
+  const piuLunga = Math.max(0, ...tutti.map(gr => ctx.measureText(gr.nome).width));
   const margine = conEtichette ? Math.round(Math.min(W * 0.3, Math.max(90, piuLunga + 26))) : 0;
   const spazioTesto = margine - 26;
   const tronca = t => { if (ctx.measureText(t).width <= spazioTesto) return t;
@@ -1545,7 +1583,7 @@ function disegnaBase() {
   ctx.drawImage(fotogramma, a.x, a.y, a.w, a.h);
 
   // maschere (quelle del gruppo evidenziato più intense, le altre attenuate)
-  if (!quizAttivo() && ($('mostraMaschere').checked || evidenziato)) {
+  if (!quizAttivo() && anatOn && ($('mostraMaschere').checked || evidenziato)) {
     const img = new ImageData(LATO, LATO), alfa = +$('opacita').value / 100 * 255;
     const base = $('mostraMaschere').checked ? (evidenziato ? alfa * 0.45 : alfa) : 0;
     for (let i = 0; i < N; i++) {
@@ -1573,7 +1611,7 @@ function disegnaBase() {
   ctx.font = `600 ${dim}px "Segoe UI", system-ui, sans-serif`; ctx.textBaseline = 'middle';
   const capienza = Math.max(1, Math.floor((H - 8) / riga));
   for (const lato of ['sx', 'dx']) {
-    let col = A.gruppi.filter(gr => gr.lato === lato);
+    let col = tutti.filter(gr => gr.lato === lato);
     if (col.length > capienza) col = col.sort((p, q) => q.area - p.area).slice(0, capienza);
     col = col.map(gr => ({ gr, p: inSchermo(gr.ax, gr.ay) })).filter(e => e.p.x >= margine && e.p.x <= W - margine && e.p.y >= 0 && e.p.y <= H)
              .sort((p, q) => p.p.y - q.p.y);
@@ -1583,10 +1621,10 @@ function disegnaBase() {
     let limite = H - 4 - riga / 2;
     for (let k = col.length - 1; k >= 0; k--) { col[k].y = Math.min(col[k].y, limite); limite = col[k].y - riga; }
     for (const e of col) {
-      const testo = tronca(trNome(CLASSI[e.gr.c])), w = ctx.measureText(testo).width;
+      const testo = tronca(e.gr.nome), w = ctx.measureText(testo).width;
       const xTesto = lato === 'sx' ? margine - 10 - w : W - margine + 10, xLinea = lato === 'sx' ? margine - 6 : W - margine + 6;
       impaginato.etichette.push({ chiave: e.gr.chiave, x: xTesto - 4, y: e.y - riga / 2, w: w + 8, h: riga,
-                                  testo, c: e.gr.c, xTesto, xLinea, p: e.p, ye: e.y, lato, larg: w });
+                                  testo, nome: e.gr.nome, col: e.gr.col, xTesto, xLinea, p: e.p, ye: e.y, lato, larg: w });
     }
   }
   // prima le linee e le etichette normali, poi quella evidenziata sopra a tutte
@@ -1594,14 +1632,14 @@ function disegnaBase() {
   for (const e of ordine) {
     const sel = e.chiave === evidenziato, attenuata = evidenziato && !sel;
     ctx.globalAlpha = attenuata ? 0.45 : 1;
-    ctx.strokeStyle = sel ? '#fff' : rgba(e.c, 0.9); ctx.lineWidth = sel ? 2 : 1;
+    ctx.strokeStyle = sel ? '#fff' : rgbaCol(e.col, 0.9); ctx.lineWidth = sel ? 2 : 1;
     ctx.beginPath(); ctx.moveTo(e.p.x, e.p.y); ctx.lineTo(e.xLinea, e.ye); ctx.stroke();
-    ctx.fillStyle = sel ? '#fff' : rgba(e.c, 1);
+    ctx.fillStyle = sel ? '#fff' : rgbaCol(e.col, 1);
     ctx.beginPath(); ctx.arc(e.p.x, e.p.y, sel ? 3.5 : 2.5, 0, 2 * Math.PI); ctx.fill();
-    if (sel) { ctx.fillStyle = rgba(e.c, 1); ctx.fillRect(e.x, e.y, e.w, e.h); }
+    if (sel) { ctx.fillStyle = rgbaCol(e.col, 1); ctx.fillRect(e.x, e.y, e.w, e.h); }
     ctx.fillStyle = sel ? '#000' : '#E8EEF1';
     ctx.fillText(e.testo, e.xTesto, e.ye + 0.5);
-    if (!sel) { ctx.fillStyle = rgba(e.c, 1); ctx.fillRect(e.lato === 'sx' ? e.xTesto + e.larg + 3 : e.xTesto - 6, e.ye - 3, 3, 6); }
+    if (!sel) { ctx.fillStyle = rgbaCol(e.col, 1); ctx.fillRect(e.lato === 'sx' ? e.xTesto + e.larg + 3 : e.xTesto - 6, e.ye - 3, 3, 6); }
   }
   ctx.globalAlpha = 1;
 }
@@ -1615,7 +1653,7 @@ function gruppoSotto(p) {
   const u = Math.floor(g.dx + (p.x - a.x) / a.w * g.dw), v = Math.floor(g.dy + (p.y - a.y) / a.h * g.dh);
   if (u < g.dx || v < g.dy || u >= g.dx + g.dw || v >= g.dy + g.dh) return null;
   const A = calcolaAnalisi(), i = v * LATO + u;
-  return A.L[i] ? { chiave: A.compGruppo[A.comp[i]], i } : null;
+  return anatOn && A.L[i] ? { chiave: A.compGruppo[A.comp[i]], i } : null;
 }
 function aggiornaHover(p) {
   if (quizAttivo()) { $('cursore').style.display = 'none'; return; }
@@ -1627,7 +1665,7 @@ function aggiornaHover(p) {
     el.textContent = `${trNome(CLASSI[analisi.L[trovato.i]])} · ${Math.round(risultato.conf[trovato.i] * 100)} %`; el.style.display = 'block';
   } else if (trovato && trovato.i < 0) {            // etichetta accorciata: mostra il nome completo
     const e = impaginato.etichette.find(e => e.chiave === chiave);
-    if (e && e.testo.endsWith('…')) { el.textContent = trNome(CLASSI[e.c]); el.style.display = 'block'; } else el.style.display = 'none';
+    if (e && e.testo.endsWith('…')) { el.textContent = e.nome; el.style.display = 'block'; } else el.style.display = 'none';
   } else el.style.display = 'none';
 }
 
@@ -2461,8 +2499,9 @@ const icoLiv = id => `<span class="ico-liv ico-${id}"><svg viewBox="0 0 16 16" a
 const fileLiv = (id, f) => `modelli/livelli/${id}/${f}`;
 var livelliAttivi = (() => { try { return new Set(JSON.parse(localStorage.getItem('annotatore-livelli')) || []); } catch { return new Set(); } })();
 var statoLiv = {}, sessioniLiv = new Map(), risLiv = new Map();
+var anatOn = (() => { try { return localStorage.getItem('annotatore-anat') !== '0'; } catch { return true; } })();
 var ispettoreOn = (() => { try { return localStorage.getItem('annotatore-ispettore') !== '0'; } catch { return true; } })();
-const salvaLivelli = () => { try { localStorage.setItem('annotatore-livelli', JSON.stringify([...livelliAttivi])); localStorage.setItem('annotatore-ispettore', ispettoreOn ? '1' : '0'); } catch {} };
+const salvaLivelli = () => { try { localStorage.setItem('annotatore-anat', anatOn ? '1' : '0'); localStorage.setItem('annotatore-livelli', JSON.stringify([...livelliAttivi])); localStorage.setItem('annotatore-ispettore', ispettoreOn ? '1' : '0'); } catch {} };
 function coloriLivello(n, k) {                // colori ben distinti, diversi per ogni livello
   return Array.from({ length: n }, (_, c) => {
     if (!c) return [0, 0, 0];
@@ -2505,7 +2544,7 @@ function costruisciLivelli() {
     return `<label class="carta-liv${no ? ' assente' : ''}" data-id="${L.id}">${icoLiv(L.id)}<span class="testi"><b>${nomeLiv(L)}</b><small>${L.d[lingua] || L.d.it}</small>
       <span class="prog"${st === 'scaricando' ? '' : ' hidden'}><i></i></span></span><span class="stato-liv">${dest}</span>
       <input type="checkbox" class="switch" ${on ? 'checked' : ''} ${no || st === 'scaricando' ? 'disabled' : ''}></label>`; }).join('');
-  box.innerHTML = `<p class="liv-tit">${tr('livBase')}</p><div class="carta-liv base"><span class="ico-liv ico-anat"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3c-1-1.2-3.5-1-4.3.8C2 4 1.6 6.5 2.6 7.6c-.8 1.4 0 3.4 1.6 3.6.4 1.6 2.5 2.2 3.8 1.1M8 3c1-1.2 3.5-1 4.3.8 1.7.2 2.1 2.7 1.1 3.8.8 1.4 0 3.4-1.6 3.6-.4 1.6-2.5 2.2-3.8 1.1M8 3v9.5"/></svg></span><span class="testi"><b>${tr('livAnat')}</b><small>${modelloAttivo ? modelloAttivo.nome + ' · ' + (modelloAttivo.descr[lingua] || '') : ''}</small></span><span class="stato-liv">${tr('livSempre')}</span></div>
+  box.innerHTML = `<p class="liv-tit">${tr('livBase')}</p><div class="carta-liv base"><span class="ico-liv ico-anat"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3c-1-1.2-3.5-1-4.3.8C2 4 1.6 6.5 2.6 7.6c-.8 1.4 0 3.4 1.6 3.6.4 1.6 2.5 2.2 3.8 1.1M8 3c1-1.2 3.5-1 4.3.8 1.7.2 2.1 2.7 1.1 3.8.8 1.4 0 3.4-1.6 3.6-.4 1.6-2.5 2.2-3.8 1.1M8 3v9.5"/></svg></span><span class="testi"><b>${tr('livAnat')}</b><small>${modelloAttivo ? modelloAttivo.nome + ' · ' + (modelloAttivo.descr[lingua] || '') : ''}</small></span><input type="checkbox" class="switch" id="anatOn" ${anatOn ? 'checked' : ''}></div>
     <p class="liv-tit">${tr('livMappe')}</p>${blocco('mappe')}<p class="liv-tit">${tr('livRilev')}</p>${blocco('rilev')}
     <p class="liv-tit">${tr('livMostra')}</p><label class="carta-liv"><span class="testi"><b>${tr('ispettore')}</b><small>${tr('ispettoreD')}</small></span><input type="checkbox" class="switch" id="ispOn" ${ispettoreOn ? 'checked' : ''}></label>`;
   const tot = [...sessioniLiv.keys()].reduce((s, id) => s + LIVELLI.find(L => L.id === id).mb, 0);
@@ -2514,6 +2553,7 @@ function costruisciLivelli() {
 }
 $('livelliLista').addEventListener('change', async ev => {
   if (ev.target.id === 'ispOn') { ispettoreOn = ev.target.checked; salvaLivelli(); if (!ispettoreOn) chiudiIspettore(); return; }
+  if (ev.target.id === 'anatOn') { anatOn = ev.target.checked; salvaLivelli(); evidenziato = null; disegna(); return; }
   const carta = ev.target.closest('.carta-liv[data-id]'); if (!carta) return;
   const L = LIVELLI.find(x => x.id === carta.dataset.id);
   if (ev.target.checked) { if (await caricaLivello(L, carta)) livelliAttivi.add(L.id); else ev.target.checked = false; }
@@ -2579,7 +2619,7 @@ tela.addEventListener('pointermove', ev => {
   if (!ispettoreOn || quizAttivo() || selezionando || bozza || spostando || panning) { if (ispezione) chiudiIspettore(); return; }
   const p = posizione(ev), i = puntoLato(p);
   if (i < 0) { chiudiIspettore(); return; }
-  const soglia = +$('soglia').value / 100, anat = risultato.conf[i] >= soglia ? risultato.classe[i] : 0;
+  const soglia = +$('soglia').value / 100, anat = anatOn && risultato.conf[i] >= soglia ? risultato.classe[i] : 0;
   const liv = [];
   for (const L of LIVELLI) { if (!livelliAttivi.has(L.id)) continue; const r = risLiv.get(L.id); if (!r) continue;
     liv.push({ id: L.id, c: r.conf[i] >= soglia ? r.classe[i] : 0 }); }
@@ -2590,7 +2630,7 @@ tela.addEventListener('pointermove', ev => {
     ispezione = { chiave, anat, liv: liv.filter(x => x.c) };
     const esc = t => String(t).replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
     const pal = col => `<i style="background:rgb(${col.join(',')})"></i>`;
-    box.innerHTML = `<div class="r"><span class="k">${tr('livAnat')}</span><span class="v">${anat ? pal(colori[anat]) + esc(trNome(CLASSI[anat])) : '—'}</span></div>` +
+    box.innerHTML = (anatOn ? `<div class="r"><span class="k">${tr('livAnat')}</span><span class="v">${anat ? pal(colori[anat]) + esc(trNome(CLASSI[anat])) : '—'}</span></div>` : '') +
       liv.map(x => { const L = LIVELLI.find(l => l.id === x.id), v = sessioniLiv.get(x.id);
         return `<div class="r"><span class="k">${esc(nomeLiv(L))}</span><span class="v">${x.c ? pal(v.colori[x.c]) + esc(nomeClasseLiv(x.id, x.c)) : '—'}</span></div>`; }).join('');
     cancelAnimationFrame(rafIsp); rafIsp = requestAnimationFrame(disegna);
