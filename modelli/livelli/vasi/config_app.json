@@ -1,0 +1,27 @@
+{
+ "lato": 256,
+ "classi": [
+  "sfondo",
+  "arteria cerebrale anteriore",
+  "arterie lenticolostriate mediali",
+  "arterie lenticolostriate laterali",
+  "arteria cerebrale media, parte frontale",
+  "arteria cerebrale media, parte parietale",
+  "arteria cerebrale media, parte temporale",
+  "arteria cerebrale media, parte occipitale",
+  "arteria cerebrale media, parte insulare",
+  "arteria cerebrale posteriore, parte temporale",
+  "arteria cerebrale posteriore, parte occipitale",
+  "arterie coroidee posteriori e talamoperforanti",
+  "arteria coroidea anteriore e talamoperforanti",
+  "arteria basilare (rami pontini)",
+  "arteria cerebellare superiore",
+  "arterie cerebellari inferiori"
+ ],
+ "file": "modello_int8.onnx",
+ "normalizzazione": "zscore sui pixel >0 (buchi riempiti), sfondo=0",
+ "dice_fp32": 0.891,
+ "dice_int8": 0.884,
+ "scelto": "int8",
+ "mb": 19.9
+}

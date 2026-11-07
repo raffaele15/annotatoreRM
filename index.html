@@ -214,11 +214,18 @@
   #listaGruppi [hidden] { display: none !important; }
   #demoPiani { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 5; display: flex; align-items: center; gap: 4px;
     padding: 4px; border-radius: 999px; background: rgba(13,16,18,.82); border: 1px solid #3A444C; }
-  #demoPiani[hidden] { display: none; }
+  #demoPiani[hidden], #demoNav[hidden] { display: none; }
+  #demoNav { position: absolute; bottom: 58px; left: 50%; transform: translateX(-50%); z-index: 5; display: flex; align-items: center; gap: 6px;
+    padding: 4px; border-radius: 999px; background: rgba(13,16,18,.82); border: 1px solid #3A444C; }
+  #demoNav button { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; border: 0; background: transparent; color: #E6ECF0; cursor: pointer; }
+  #demoNav button:hover { background: #1b2024; }
+  #demoNav button:disabled { opacity: .35; cursor: default; }
+  #demoNav button:focus-visible { outline: 2px solid var(--accento); outline-offset: 1px; }
+  #demoNav svg { width: 16px; height: 16px; }
+  #demoNum { min-width: 4.2em; text-align: center; font: 600 .8rem/1 inherit; color: #C9D2D8; font-variant-numeric: tabular-nums; }
   #demoPiani button { font: 600 .8rem/1 inherit; padding: 6px 11px; border-radius: 999px; border: 0; background: transparent; color: #C9D2D8; cursor: pointer; }
   #demoPiani button[aria-pressed="true"] { background: var(--accento); color: var(--accento-testo); }
   #demoPiani button:focus-visible { outline: 2px solid var(--accento, #F2B33D); outline-offset: 1px; }
-  #demoPiani span { font-size: .7rem; color: #8A969E; padding: 0 8px 0 4px; white-space: nowrap; }
   .vuoto-azioni { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
   /* Finestra fluttuante: comandi nascosti quando il mouse è fuori */
   body.in-pip .barra { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
@@ -485,11 +492,15 @@
       <video id="video" muted playsinline></video>
       <canvas id="tela" aria-label="Immagine RM con strutture etichettate" data-t-aria="tela"></canvas>
       <div id="cursore"></div>
+      <div id="demoNav" role="group" aria-label="Sezione" hidden>
+        <button type="button" data-passo="-1" aria-label="Sezione precedente" data-t-aria="demoPrec" data-t-title="demoPrec" title="Sezione precedente"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span id="demoNum">6 / 11</span>
+        <button type="button" data-passo="1" aria-label="Sezione successiva" data-t-aria="demoSucc" data-t-title="demoSucc" title="Sezione successiva"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
       <div id="demoPiani" role="group" aria-label="Piano" hidden>
         <button type="button" data-piano="ax" aria-pressed="true" data-t="pAx">Assiale</button>
         <button type="button" data-piano="cor" aria-pressed="false" data-t="pCor">Coronale</button>
         <button type="button" data-piano="sag" aria-pressed="false" data-t="pSag">Sagittale</button>
-        <span data-t="demoFonte">FLAIR · NIMH ds005752 (CC0)</span>
       </div>
       <div class="vuoto">
         <svg viewBox="0 0 168 104" aria-hidden="true"><rect x="1" y="1" width="166" height="102" rx="8" fill="none" stroke="#3A444C" stroke-width="1.5" stroke-dasharray="5 4"/>
@@ -929,7 +940,7 @@ const TESTI = {
     salva: 'Salva immagine', salvaTitolo: 'Salva l\'immagine come la vedi (PNG)', salvata: p => `Immagine salvata: ${p.f}`,
     cerca: 'Cerca struttura…', nessunRisultato: 'Nessuna struttura trovata.',
     tipSeleziona: 'Prima avvia la cattura', tipPip: 'Prima seleziona il riquadro sull\'immagine',
-    pAx: 'Assiale', pCor: 'Coronale', pSag: 'Sagittale', demoFonte: 'FLAIR · NIMH ds005752 (CC0)',
+    pAx: 'Assiale', pCor: 'Coronale', pSag: 'Sagittale', demoPrec: 'Sezione precedente', demoSucc: 'Sezione successiva',
     demoBtn: 'Prova con un esempio', demoAttiva: 'Usa la rotella sull\'immagine per cambiare sezione.',
     privacy: 'Le immagini restano nel tuo browser: l\'analisi avviene sul tuo computer e nessun dato viene inviato o salvato altrove.',
     guida1: 'Clicca <b>Avvia cattura</b>.',
@@ -1018,7 +1029,7 @@ const TESTI = {
     salva: 'Save image', salvaTitolo: 'Save the image as you see it (PNG)', salvata: p => `Image saved: ${p.f}`,
     cerca: 'Search structure…', nessunRisultato: 'No structure found.',
     tipSeleziona: 'Start the capture first', tipPip: 'Select the area on the image first',
-    pAx: 'Axial', pCor: 'Coronal', pSag: 'Sagittal', demoFonte: 'FLAIR · NIMH ds005752 (CC0)',
+    pAx: 'Axial', pCor: 'Coronal', pSag: 'Sagittal', demoPrec: 'Previous slice', demoSucc: 'Next slice',
     demoBtn: 'Try an example', demoAttiva: 'Use the mouse wheel on the image to change slice.',
     privacy: 'Images stay in your browser: the analysis runs on your computer and no data is sent or stored elsewhere.',
     guida1: 'Click <b>Start capture</b>.',
@@ -1776,7 +1787,7 @@ async function avviaDemo() {
   riquadro = { x: 0, y: 0, w: DEMO_LATO, h: DEMO_LATO }; selezionando = false; ultimaMiniatura = null;
   $('seleziona').disabled = false; $('pip').disabled = false; $('salvaImg').disabled = false;
   nuovaVista(true); impostaPianoDemo('ax');
-  $('demoPiani').hidden = false;
+  $('demoPiani').hidden = false; $('demoNav').hidden = false; aggiornaNavDemo();
   evidenzia('pip'); messaggio(() => tr('demoAttiva'));
   ciclo();
 }
@@ -1786,18 +1797,28 @@ function impostaPianoDemo(p) {
   calib = Math.max(P.W, P.H) / (DEMO_LATO - 40);                          // 1 pixel dello sprite = 1 mm
   $('volSpess').value = P.passo; $('volGap').value = 0; $('abcSp').value = P.passo;
   for (const b of document.querySelectorAll('#demoPiani [data-piano]')) b.setAttribute('aria-pressed', b.dataset.piano === p ? 'true' : 'false');
-  ultimaMiniatura = null; demo.disegna && demo.disegna();
+  ultimaMiniatura = null; demo.disegna && demo.disegna(); aggiornaNavDemo();
 }
+function aggiornaNavDemo() {
+  if (!demo) return;
+  $('demoNum').textContent = `${demo.i + 1} / ${DEMO_N}`;
+  for (const b of document.querySelectorAll('#demoNav [data-passo]')) b.disabled = +b.dataset.passo < 0 ? demo.i === 0 : demo.i === DEMO_N - 1;
+}
+function passoDemo(d) {
+  if (!demo) return;
+  demo.i = Math.max(0, Math.min(DEMO_N - 1, demo.i + d)); demo.disegna(); aggiornaNavDemo();
+}
+$('demoNav').addEventListener('click', ev => { const b = ev.target.closest('[data-passo]'); if (b) passoDemo(+b.dataset.passo); });
 $('demoPiani').addEventListener('click', ev => { const b = ev.target.closest('[data-piano]'); if (b) impostaPianoDemo(b.dataset.piano); });
 function fermaDemo() {
-  if (!demo) return; clearInterval(demo.timer); $('demoPiani').hidden = true;
+  if (!demo) return; clearInterval(demo.timer); $('demoPiani').hidden = true; $('demoNav').hidden = true;
   try { demo.c.captureStream && video.srcObject && video.srcObject.getTracks().forEach(t => t.stop()); } catch {}
   demo = null;
 }
 tela.addEventListener('wheel', ev => {
   if (!demo || selezionando || ev.ctrlKey) return;
   ev.preventDefault();
-  demo.i = Math.max(0, Math.min(DEMO_N - 1, demo.i + (ev.deltaY > 0 ? -1 : 1))); demo.disegna();
+  passoDemo(ev.deltaY > 0 ? -1 : 1);
 }, { passive: false });
 $('demoBtn').onclick = () => avviaDemo().catch(e => messaggio(() => tr('erroreAnalisi') + (e.message || e), true));
 
@@ -2418,11 +2439,11 @@ $('cercaStrumLista').addEventListener('mousemove', ev => { const li = ev.target.
 // Ogni livello è una rete con lo stesso ingresso dell'anatomia; file in modelli/livelli/<id>/
 var LIVELLI = [
   { id: 'vasi', gruppo: 'mappe', mb: 20, nome: { it: 'Territori vascolari', en: 'Vascular territories' }, d: { it: 'ACA, ACM, ACP, perforanti', en: 'ACA, MCA, PCA, perforators' } },
-  { id: 'fasci', gruppo: 'mappe', mb: 20, nome: { it: 'Fasci di sostanza bianca', en: 'White matter bundles' }, d: { it: 'corticospinale, arcuato, callosi…', en: 'corticospinal, arcuate, callosal…' } },
-  { id: 'tratti', gruppo: 'mappe', mb: 20, nome: { it: 'Tratti', en: 'Tracts' }, d: { it: 'tratti di sostanza bianca', en: 'white matter tracts' } },
-  { id: 'aree', gruppo: 'mappe', mb: 20, nome: { it: 'Aree funzionali', en: 'Functional areas' }, d: { it: 'aree citoarchitettoniche, talamo', en: 'cytoarchitectonic areas, thalamus' } },
-  { id: 'profondo', gruppo: 'mappe', mb: 20, nome: { it: 'Tronco e nuclei profondi', en: 'Brainstem and deep nuclei' }, d: { it: 'Brainstem Navigator', en: 'Brainstem Navigator' } },
-  { id: 'brainnetome', gruppo: 'mappe', mb: 20, nome: { it: 'Parcellizzazione fine', en: 'Fine parcellation' }, d: { it: '246 regioni · atlante Brainnetome', en: '246 regions · Brainnetome atlas' } },
+  { id: 'fasci', gruppo: 'mappe', mb: 80, nome: { it: 'Fasci di sostanza bianca', en: 'White matter bundles' }, d: { it: 'corticospinale, arcuato, callosi…', en: 'corticospinal, arcuate, callosal…' } },
+  { id: 'tratti', gruppo: 'mappe', mb: 80, nome: { it: 'Tratti', en: 'Tracts' }, d: { it: 'tratti di sostanza bianca', en: 'white matter tracts' } },
+  { id: 'aree', gruppo: 'mappe', mb: 80, nome: { it: 'Aree funzionali', en: 'Functional areas' }, d: { it: 'aree citoarchitettoniche, talamo', en: 'cytoarchitectonic areas, thalamus' } },
+  { id: 'profondo', gruppo: 'mappe', mb: 80, nome: { it: 'Tronco e nuclei profondi', en: 'Brainstem and deep nuclei' }, d: { it: 'Brainstem Navigator', en: 'Brainstem Navigator' } },
+  { id: 'brainnetome', gruppo: 'mappe', mb: 80, nome: { it: 'Parcellizzazione fine', en: 'Fine parcellation' }, d: { it: '246 regioni · atlante Brainnetome', en: '246 regions · Brainnetome atlas' } },
   { id: 'lesioni', gruppo: 'rilev', mb: 20, nome: { it: 'Lesione ischemica', en: 'Ischemic lesion' }, d: { it: 'DWI / ADC · ISLES 2022', en: 'DWI / ADC · ISLES 2022' } },
   { id: 'tumore', gruppo: 'rilev', mb: 20, nome: { it: 'Tumore ed edema', en: 'Tumour and oedema' }, d: { it: 'T1, T1c, T2, FLAIR · BraTS', en: 'T1, T1c, T2, FLAIR · BraTS' } },
 ];
@@ -2467,7 +2488,7 @@ async function caricaLivello(L, carta) {
   try {
     await preparaOrt();
     const cfg = await (await fetch(fileLiv(L.id, 'config_app.json'))).json();
-    const byte = await scarica(fileLiv(L.id, 'modello_int8.onnx'), p => { const i = document.querySelector(`.carta-liv[data-id="${L.id}"] .prog i`); if (i) i.style.width = p + '%'; });
+    const byte = await scarica(fileLiv(L.id, cfg.file || 'modello_int8.onnx'), p => { const i = document.querySelector(`.carta-liv[data-id="${L.id}"] .prog i`); if (i) i.style.width = p + '%'; });
     const sess = await ort.InferenceSession.create(byte, { executionProviders: ['wasm'], graphOptimizationLevel: 'all' });
     const classi = cfg.classi || [];
     sessioniLiv.set(L.id, { sess, classi, classiEn: cfg.classi_en, colori: cfg.colori || coloriLivello(classi.length, LIVELLI.indexOf(L) + 1) });
